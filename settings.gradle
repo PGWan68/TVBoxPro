@@ -1,0 +1,3 @@
+rootProject.name = "TvBoxPro"
+include ':app'
+include ':quickjs'
