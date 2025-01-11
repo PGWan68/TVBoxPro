@@ -11,13 +11,16 @@ def static buildTime() {
 
 
 Properties properties = new Properties()
-InputStream inputStream = project.rootProject.file('gradle.properties').newDataInputStream()
+InputStream inputStream = project.rootProject.file('config.properties').newDataInputStream()
 properties.load(inputStream)
 
 def keyKeyStoreFile = file(properties.getProperty('keyStoreFile'))
 def keyKeyStorePassword = properties.getProperty('keyStorePassword')
 def keyKeyAlias = properties.getProperty('keyAlias')
 def keyKeyAliasPassword = properties.getProperty('keyAliasPassword')
+
+def versionCodeConf = properties.getProperty('versionCode').toInteger()
+def versionNameConf = properties.getProperty('versionName').concat("_" + buildTime())
 
 android {
     namespace 'com.github.tvbox.osc'
@@ -27,8 +30,8 @@ android {
         applicationId 'com.github.tvbox.osc.pro'
         minSdkVersion 21
         targetSdkVersion 35
-        versionCode 1
-        versionName "1.0.".concat(buildTime())
+        versionCode versionCodeConf
+        versionName versionNameConf
         multiDexEnabled true
         //设置room的Schema的位置
         javaCompileOptions {
@@ -64,6 +67,7 @@ android {
         release {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             minifyEnabled = true
+            shrinkResources true
             signingConfig signingConfigs.release
 
             ndk {
@@ -85,8 +89,7 @@ android {
         variant.outputs.configureEach { output ->
             def flavorNames = variant.productFlavors.collect { it.name }.join('-')
             // 构建自定义文件名
-            def fileName = "TVBoxPro_${variant.buildType.name}.apk"
-            outputFileName = fileName
+            outputFileName = "TVBoxPro_${variant.buildType.name}_${versionNameConf}.apk"
         }
     }
 
