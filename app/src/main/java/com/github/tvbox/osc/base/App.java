@@ -60,9 +60,11 @@ public class App extends MultiDexApplication {
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
     }
 
+
     @Override
     public void onCreate() {
         super.onCreate();
+
         SubtitleHelper.initSubtitleColor(this);
         initParams();
         // takagen99 : Initialize Locale
@@ -71,10 +73,9 @@ public class App extends MultiDexApplication {
         OkGoHelper.init();
         // 闭关检查模式
         XXPermissions.setCheckMode(false);
-        // Get EPG Info
-        EpgUtil.init();
-        // 初始化Web服务器
+
         ControlManager.init(this);
+
         //初始化数据库
         AppDataManager.init();
         LoadSir.beginBuilder()
@@ -85,33 +86,45 @@ public class App extends MultiDexApplication {
                 .setSupportDP(false)
                 .setSupportSP(false)
                 .setSupportSubunits(Subunits.MM);
-        PlayerHelper.init();
 
-        // Delete Cache
+        post(() -> {
+
+            initMyTV();
+            // Get EPG Info
+            EpgUtil.init();
+            // 初始化Web服务器
+
+            PlayerHelper.init();
+
+            ControlManager.get().startServer();
+            startWebserver();
+
+            // Delete Cache
         /*File dir = getCacheDir();
         FileUtils.recursiveDelete(dir);
         dir = getExternalCacheDir();
         FileUtils.recursiveDelete(dir);*/
 
-        FileUtils.cleanPlayerCache();
+            FileUtils.cleanPlayerCache();
 
-        // Add JS support
-        QuickJSLoader.init();
+            // Add JS support
+            QuickJSLoader.init();
 
-        // add font support, my tv embed font not include emoji
-        String extStorageDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File fontFile = new File(extStorageDir + "/tvbox.ttf");
-        if (fontFile.exists()) {
-            viewPump = ViewPump.builder()
-                    .addInterceptor(new CalligraphyInterceptor(
-                            new CalligraphyConfig.Builder()
-                                    .setDefaultFontPath(fontFile.getAbsolutePath())
-                                    .setFontAttrId(R.attr.fontPath)
-                                    .build()))
-                    .build();
-        }
+            // add font support, my tv embed font not include emoji
+            String extStorageDir = Environment.getExternalStorageDirectory().getAbsolutePath();
+            File fontFile = new File(extStorageDir + "/tvbox.ttf");
+            if (fontFile.exists()) {
+                viewPump = ViewPump.builder()
+                        .addInterceptor(new CalligraphyInterceptor(
+                                new CalligraphyConfig.Builder()
+                                        .setDefaultFontPath(fontFile.getAbsolutePath())
+                                        .setFontAttrId(R.attr.fontPath)
+                                        .build()))
+                        .build();
+            }
 
-        initMyTV();
+
+        });
     }
 
     private void initMyTV() {
