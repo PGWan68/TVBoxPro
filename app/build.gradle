@@ -9,12 +9,22 @@ def static buildTime() {
     return new Date().format("yyyyMMdd_HHmm", TimeZone.getTimeZone("GMT+08:00"))
 }
 
+
+Properties properties = new Properties()
+InputStream inputStream = project.rootProject.file('gradle.properties').newDataInputStream()
+properties.load(inputStream)
+
+def keyKeyStoreFile = file(properties.getProperty('keyStoreFile'))
+def keyKeyStorePassword = properties.getProperty('keyStorePassword')
+def keyKeyAlias = properties.getProperty('keyAlias')
+def keyKeyAliasPassword = properties.getProperty('keyAliasPassword')
+
 android {
     namespace 'com.github.tvbox.osc'
     compileSdk 35
 
     defaultConfig {
-        applicationId 'com.github.tvbox.osc.tk'
+        applicationId 'com.github.tvbox.osc.pro'
         minSdkVersion 21
         targetSdkVersion 35
         versionCode 1
@@ -30,15 +40,31 @@ android {
             useSupportLibrary = true
         }
     }
-
     packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
+        jniLibs {
+            useLegacyPackaging true
+        }
+        resources {
+            excludes += ['META-INF/DEPENDENCIES']
+        }
     }
+
+
+    signingConfigs {
+        release {
+            storeFile keyKeyStoreFile
+            storePassword keyKeyStorePassword
+            keyAlias keyKeyAlias
+            keyPassword keyKeyAliasPassword
+        }
+    }
+
 
     buildTypes {
         release {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             minifyEnabled = true
+            signingConfig signingConfigs.release
 
             ndk {
                 abiFilters "armeabi-v7a", "arm64-v8a"
@@ -47,6 +73,8 @@ android {
 
         debug {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable true
+            signingConfig signingConfigs.release
             ndk {
                 abiFilters "x86"
             }
@@ -57,7 +85,7 @@ android {
         variant.outputs.configureEach { output ->
             def flavorNames = variant.productFlavors.collect { it.name }.join('-')
             // 构建自定义文件名
-            def fileName = "TVBoxPro_${variant.buildType.name}-${flavorNames}.apk"
+            def fileName = "TVBoxPro_${variant.buildType.name}.apk"
             outputFileName = fileName
         }
     }
@@ -71,10 +99,6 @@ android {
         jvmTarget = "17"
     }
 
-    lintOptions {
-        checkReleaseBuilds false
-        abortOnError false
-    }
 
     buildFeatures {
         dataBinding = true
@@ -84,6 +108,8 @@ android {
 
     lint {
         disable 'UnsafeOptInUsageError'
+        abortOnError false
+        checkReleaseBuilds false
     }
 
 }

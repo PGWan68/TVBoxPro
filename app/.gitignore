@@ -4,6 +4,8 @@
 *.ap_
 *.aab
 
+/release
+
 proguardMapping.txt
 
 # Files for the ART/Dalvik VM
@@ -89,10 +91,3 @@ lint/tmp/
 /LTDecodeSpace
 /adb.exe
 /LTDecodeNew3.exe
-
-
-.gradle
-
-.kotlin
-
-/gradle
