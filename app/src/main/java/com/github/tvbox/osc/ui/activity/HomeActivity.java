@@ -367,9 +367,6 @@ public class HomeActivity extends BaseActivity {
         });
     }
 
-    private boolean dataInitOk = false;
-    private boolean jarInitOk = false;
-
     // takagen99 : Switch to show / hide source title
     boolean HomeShow = Hawk.get(HawkConfig.HOME_SHOW_SOURCE, false);
 
@@ -380,6 +377,10 @@ public class HomeActivity extends BaseActivity {
         NetworkInfo activeNetworkInfo = cm.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
+
+
+    private boolean dataInitOk = false;
+    private boolean jarInitOk = false;
 
     private void initData() {
 
@@ -415,9 +416,9 @@ public class HomeActivity extends BaseActivity {
             showLoading();
             sourceViewModel.getSort(ApiConfig.get().getHomeSourceBean().getKey());
             if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                LOG.e("有");
+                LOG.e("有写入权限");
             } else {
-                LOG.e("无");
+                LOG.e("无写入权限");
             }
             if (Hawk.get(HawkConfig.HOME_DEFAULT_SHOW, false)) {
                 jumpActivity(LivePlayActivity.class);

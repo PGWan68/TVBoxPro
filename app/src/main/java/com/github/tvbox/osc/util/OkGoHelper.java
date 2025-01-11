@@ -59,7 +59,7 @@ public class OkGoHelper {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkExoPlayer");
 
         if (Hawk.get(HawkConfig.DEBUG_OPEN, false)) {
-            loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.BODY);
+            loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.BASIC);
             loggingInterceptor.setColorLevel(Level.INFO);
         } else {
             loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.NONE);
@@ -127,7 +127,7 @@ public class OkGoHelper {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkExoPlayer");
         if (Hawk.get(HawkConfig.DEBUG_OPEN, false)) {
-            loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.BODY);
+            loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.BASIC);
             loggingInterceptor.setColorLevel(Level.INFO);
         } else {
             loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.NONE);
