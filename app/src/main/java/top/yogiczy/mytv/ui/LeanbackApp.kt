@@ -22,26 +22,26 @@ import kotlinx.coroutines.flow.debounce
 import top.yogiczy.mytv.ui.screens.leanback.components.LeanbackPadding
 import top.yogiczy.mytv.ui.screens.leanback.main.LeanbackMainScreen
 import top.yogiczy.mytv.ui.screens.leanback.toast.LeanbackToastScreen
-import top.yogiczy.mytv.ui.screens.leanback.toast.LeanbackToastState
 
 @Composable
 fun LeanbackApp(
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit = {},
 ) {
-    val context = LocalContext.current
-    val doubleBackPressedExitState = rememberLeanbackDoubleBackPressedExitState()
+//    val context = LocalContext.current
+//    val doubleBackPressedExitState = rememberLeanbackDoubleBackPressedExitState()
 
     LeanbackToastScreen()
     LeanbackMainScreen(
         modifier = modifier,
         onBackPressed = {
-            if (doubleBackPressedExitState.allowExit) {
-                onBackPressed()
-            } else {
-                doubleBackPressedExitState.backPress()
-                LeanbackToastState.I.showToast("再按一次退出")
-            }
+//            if (doubleBackPressedExitState.allowExit) {
+//                onBackPressed()
+//            } else {
+//                doubleBackPressedExitState.backPress()
+//                LeanbackToastState.I.showToast("再按一次退出")
+//            }
+            onBackPressed();
         },
     )
 }
