@@ -363,6 +363,11 @@ public class HomeActivity extends BaseActivity {
                     sortAdapter.setNewData(DefaultConfig.adjustSort(ApiConfig.get().getHomeSourceBean().getKey(), new ArrayList<>(), true));
                 }
                 initViewPager(absXml);
+
+                if (!isNetworkAvailable()) {
+                    Toast.makeText(HomeActivity.this, getString(R.string.act_no_network), Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
     }
