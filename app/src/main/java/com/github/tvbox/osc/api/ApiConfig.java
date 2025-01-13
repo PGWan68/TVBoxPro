@@ -1,6 +1,7 @@
 package com.github.tvbox.osc.api;
 
 import android.app.Activity;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -8,19 +9,19 @@ import android.util.Base64;
 import com.github.catvod.crawler.JarLoader;
 import com.github.catvod.crawler.JsLoader;
 import com.github.catvod.crawler.Spider;
-import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.bean.IJKCode;
+import com.github.tvbox.osc.bean.LineBean;
 import com.github.tvbox.osc.bean.LiveChannelGroup;
 import com.github.tvbox.osc.bean.LiveChannelItem;
 import com.github.tvbox.osc.bean.ParseBean;
 import com.github.tvbox.osc.bean.SourceBean;
 import com.github.tvbox.osc.server.ControlManager;
-import com.github.tvbox.osc.ui.activity.HomeActivity;
 import com.github.tvbox.osc.util.AES;
 import com.github.tvbox.osc.util.AdBlocker;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.M3U8;
 import com.github.tvbox.osc.util.MD5;
 import com.github.tvbox.osc.util.VideoParseRuler;
@@ -40,7 +41,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -75,10 +79,15 @@ public class ApiConfig {
 
     private final String requestAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
 
+    private final List<LineBean> defaultVodLines;
+    private final List<LineBean> defaultLiveLines;
+
     private ApiConfig() {
         sourceBeanList = new LinkedHashMap<>();
         liveChannelGroupList = new ArrayList<>();
         parseBeanList = new ArrayList<>();
+        defaultVodLines = new ArrayList<>();
+        defaultLiveLines = new ArrayList<>();
     }
 
     public static ApiConfig get() {
@@ -90,6 +99,41 @@ public class ApiConfig {
             }
         }
         return instance;
+    }
+
+    public void init() {
+        try {
+            AssetManager assetManager = App.getInstance().getAssets();
+            InputStreamReader inputStreamReader = new InputStreamReader(assetManager.open("default_lines.json"), StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(inputStreamReader);
+            String line;
+            StringBuilder builder = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                builder.append(line);
+            }
+            br.close();
+            inputStreamReader.close();
+            if (!builder.toString().isEmpty()) {
+                JsonObject objJson = new Gson().fromJson(builder.toString(), (Type) JsonObject.class);
+                for (JsonElement opt : objJson.get("vod").getAsJsonArray()) {
+                    JsonObject obj = (JsonObject) opt;
+                    String name = obj.get("name").getAsString().trim();
+                    String url = obj.get("url").getAsString().trim();
+                    defaultVodLines.add(new LineBean(name, url));
+                }
+
+                for (JsonElement opt : objJson.get("live").getAsJsonArray()) {
+                    JsonObject obj = (JsonObject) opt;
+                    String name = obj.get("name").getAsString().trim();
+                    String url = obj.get("url").getAsString().trim();
+                    defaultLiveLines.add(new LineBean(name, url));
+                }
+            }
+
+        } catch (IOException e) {
+            LOG.e(e);
+        }
+
     }
 
     public static String FindResult(String json, String configKey) {
@@ -129,13 +173,14 @@ public class ApiConfig {
         return "".getBytes();
     }
 
+
     public void loadConfig(boolean useCache, LoadConfigCallback callback, Activity activity) {
-        // Embedded Source : Update in Strings.xml if required
-        String apiUrl = Hawk.get(HawkConfig.API_URL, HomeActivity.getRes().getString(R.string.app_source));
+        String apiUrl = getCurrentApiUrl();
         if (apiUrl.isEmpty()) {
             callback.error("源地址为空");
             return;
         }
+
         File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/" + MD5.encode(apiUrl));
         if (useCache && cache.exists()) {
             try {
@@ -143,7 +188,7 @@ public class ApiConfig {
                 callback.success();
                 return;
             } catch (Throwable th) {
-                th.printStackTrace();
+                LOG.e(th);
             }
         }
         String TempKey = null, configUrl = "", pk = ";pk;";
@@ -164,8 +209,9 @@ public class ApiConfig {
         } else {
             configUrl = apiUrl;
         }
-        System.out.println("API URL :" + configUrl);
+        LOG.i("API URL :" + configUrl);
         String configKey = TempKey;
+        String finalApiUrl = apiUrl;
         OkGo.<String>get(configUrl)
                 .headers("User-Agent", userAgent)
                 .headers("Accept", requestAccept)
@@ -174,7 +220,7 @@ public class ApiConfig {
                     public void onSuccess(Response<String> response) {
                         try {
                             String json = response.body();
-                            parseJson(apiUrl, json);
+                            parseJson(finalApiUrl, json);
                             try {
                                 File cacheDir = cache.getParentFile();
                                 if (!cacheDir.exists())
@@ -200,7 +246,7 @@ public class ApiConfig {
                         super.onError(response);
                         if (cache.exists()) {
                             try {
-                                parseJson(apiUrl, cache);
+                                parseJson(finalApiUrl, cache);
                                 callback.success();
                                 return;
                             } catch (Throwable th) {
@@ -217,10 +263,10 @@ public class ApiConfig {
                         } else {
                             result = FindResult(response.body().string(), configKey);
                         }
-                        if (apiUrl.startsWith("clan")) {
-                            result = clanContentFix(clanToAddress(apiUrl), result);
+                        if (finalApiUrl.startsWith("clan")) {
+                            result = clanContentFix(clanToAddress(finalApiUrl), result);
                         }
-                        result = fixContentPath(apiUrl, result);
+                        result = fixContentPath(finalApiUrl, result);
                         return result;
                     }
                 });
@@ -292,7 +338,7 @@ public class ApiConfig {
     }
 
     private void parseJson(String apiUrl, File f) throws Throwable {
-        System.out.println("从本地缓存加载" + f.getAbsolutePath());
+        LOG.i("从本地缓存加载" + f.getAbsolutePath());
         BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
         StringBuilder sb = new StringBuilder();
         String s = "";
@@ -341,7 +387,7 @@ public class ApiConfig {
                 firstSite = sb;
             sourceBeanList.put(siteKey, sb);
         }
-        if (sourceBeanList != null && sourceBeanList.size() > 0) {
+        if (!sourceBeanList.isEmpty()) {
             String home = Hawk.get(HawkConfig.HOME_API, "");
             SourceBean sh = getSource(home);
             if (sh == null || sh.getHide() == 1)
@@ -381,7 +427,7 @@ public class ApiConfig {
         // takagen99: Check if Live URL is setup in Settings, if no, get from File Config
         liveChannelGroupList.clear();           //修复从后台切换重复加载频道列表
         String liveURL = Hawk.get(HawkConfig.LIVE_URL, "");
-        String epgURL  = Hawk.get(HawkConfig.EPG_URL, "");
+        String epgURL = Hawk.get(HawkConfig.EPG_URL, "");
 
         String liveURL_final = null;
         try {
@@ -408,7 +454,7 @@ public class ApiConfig {
                         }
 
                         // takagen99: Capture Live URL into Config
-                        System.out.println("Live URL :" + extUrlFix);
+                        LOG.i("Live URL :" + extUrlFix);
                         putLiveHistory(extUrlFix);
                         // Overwrite with Live URL from Settings
                         if (StringUtils.isBlank(liveURL)) {
@@ -428,7 +474,7 @@ public class ApiConfig {
                     // takagen99 : Getting EPG URL from File Config & put into Settings
                     if (livesOBJ.has("epg")) {
                         String epg = livesOBJ.get("epg").getAsString();
-                        System.out.println("EPG URL :" + epg);
+                        LOG.i("EPG URL :" + epg);
                         putEPGHistory(epg);
                         // Overwrite with EPG URL from Settings
                         if (StringUtils.isBlank(epgURL)) {
@@ -458,7 +504,7 @@ public class ApiConfig {
                             // takagen99 : Getting EPG URL from File Config & put into Settings
                             if (fengMiLives.has("epg")) {
                                 String epg = fengMiLives.get("epg").getAsString();
-                                System.out.println("EPG URL :" + epg);
+                                LOG.i("EPG URL :" + epg);
                                 putEPGHistory(epg);
                                 // Overwrite with EPG URL from Settings
                                 if (StringUtils.isBlank(epgURL)) {
@@ -470,7 +516,7 @@ public class ApiConfig {
 
                             if (url.startsWith("http")) {
                                 // takagen99: Capture Live URL into Settings
-                                System.out.println("Live URL :" + url);
+                                LOG.i("Live URL :" + url);
                                 putLiveHistory(url);
                                 // Overwrite with Live URL from Settings
                                 if (StringUtils.isBlank(liveURL)) {
@@ -501,13 +547,13 @@ public class ApiConfig {
 
 
         } catch (Throwable th) {
-            th.printStackTrace();
+            LOG.e(th);
         }
 
         // Video parse rule for host
         if (infoJson.has("rules")) {
             VideoParseRuler.clearRule();
-            for(JsonElement oneHostRule : infoJson.getAsJsonArray("rules")) {
+            for (JsonElement oneHostRule : infoJson.getAsJsonArray("rules")) {
                 JsonObject obj = (JsonObject) oneHostRule;
                 if (obj.has("host")) {
                     String host = obj.get("host").getAsString();
@@ -761,6 +807,14 @@ public class ApiConfig {
         return ijkCodes;
     }
 
+    public List<LineBean> getDefaultVodLines() {
+        return defaultVodLines;
+    }
+
+    public List<LineBean> getDefaultLiveLines() {
+        return defaultLiveLines;
+    }
+
     public IJKCode getCurrentIJKCode() {
         String codeName = Hawk.get(HawkConfig.IJK_CODEC, "");
         return getIJKCodec(codeName);
@@ -809,6 +863,22 @@ public class ApiConfig {
 
         }
         return url;
+    }
+
+    public String getCurrentApiUrl() {
+        String apiUrl = Hawk.get(HawkConfig.API_URL, "");
+        if (apiUrl.isEmpty() && !defaultVodLines.isEmpty()) {
+            apiUrl = defaultVodLines.get(0).getUrl();
+            Hawk.put(HawkConfig.API_URL, apiUrl);
+            return apiUrl;
+        }
+        return apiUrl;
+    }
+
+
+    public void clear() {
+        mHomeSource = null;
+        sourceBeanList.clear();
     }
 
 }

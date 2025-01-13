@@ -1,7 +1,6 @@
 package top.yogiczy.mytv.activities
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
@@ -13,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import top.yogiczy.mytv.ui.theme.PadTheme
 
-class PadActivity : ComponentActivity() {
+class PadActivity : BaseLiveActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

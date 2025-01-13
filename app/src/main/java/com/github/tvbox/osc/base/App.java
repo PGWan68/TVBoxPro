@@ -1,5 +1,6 @@
 package com.github.tvbox.osc.base;
 
+import android.content.res.AssetManager;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,6 +10,7 @@ import androidx.multidex.MultiDexApplication;
 
 import com.github.catvod.crawler.JsLoader;
 import com.github.tvbox.osc.R;
+import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.callback.EmptyCallback;
 import com.github.tvbox.osc.callback.LoadingCallback;
 import com.github.tvbox.osc.data.AppDataManager;
@@ -21,6 +23,9 @@ import com.github.tvbox.osc.util.LocaleHelper;
 import com.github.tvbox.osc.util.OkGoHelper;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.github.tvbox.osc.util.SubtitleHelper;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.hjq.permissions.XXPermissions;
 import com.kingja.loadsir.core.LoadSir;
 import com.orhanobut.hawk.Hawk;
@@ -29,7 +34,13 @@ import com.whl.quickjs.android.QuickJSLoader;
 import com.yanzhenjie.andserver.AndServer;
 import com.yanzhenjie.andserver.Server;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
@@ -54,6 +65,7 @@ public class App extends MultiDexApplication {
     public static ViewPump viewPump = null;
     private static Server server = null;
     private final Handler handler;
+
 
     public App() {
         instance = this;
@@ -90,9 +102,11 @@ public class App extends MultiDexApplication {
 
         // Get EPG Info
         EpgUtil.init();
-        // 初始化Web服务器
 
         PlayerHelper.init();
+
+        // 默认配置初始化
+        ApiConfig.get().init();
 
         // Delete Cache
         /*File dir = getCacheDir();
@@ -121,6 +135,7 @@ public class App extends MultiDexApplication {
         initMyTV();
     }
 
+
     private void initMyTV() {
         UnsafeTrustManager.Companion.enableUnsafeTrustManager();
         AppGlobal.cacheDir = getApplicationContext().getCacheDir();
@@ -145,14 +160,11 @@ public class App extends MultiDexApplication {
         Hawk.init(this).build();
         Hawk.put(HawkConfig.DEBUG_OPEN, true);
 
-        // 默认线路
-        Hawk.put(HawkConfig.API_URL, "https://mpanso.me/DEMO.json");
-
         // 首页选项
         putDefault(HawkConfig.HOME_SHOW_SOURCE, true);       //数据源显示: true=开启, false=关闭
         putDefault(HawkConfig.HOME_SEARCH_POSITION, false);  //按钮位置-搜索: true=上方, false=下方
         putDefault(HawkConfig.HOME_MENU_POSITION, false);     //按钮位置-设置: true=上方, false=下方
-        putDefault(HawkConfig.HOME_REC, 1);                  //推荐: 0=豆瓣热播, 1=站点推荐, 2=观看历史
+        putDefault(HawkConfig.HOME_REC, 0);                  //推荐: 0=豆瓣热播, 1=站点推荐, 2=观看历史
         putDefault(HawkConfig.HOME_NUM, 4);                  //历史条数: 0=20条, 1=40条, 2=60条, 3=80条, 4=100条
         putDefault(HawkConfig.HOME_REC_STYLE, true);          //网格展示数据源，true=列表，false=一行
 

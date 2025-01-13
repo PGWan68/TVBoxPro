@@ -212,7 +212,14 @@
     <methods>;
 }
 
--keep class com.github.catvod.*{*;}
+-keep class com.github.catvod.** {*;}
+
+# Gson
+-keepattributes Signature
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+-keepattributes AnnotationDefault,RuntimeVisibleAnnotations
+
 
 # magnet：解决模拟器推送 磁力链接 闪退
 -keep class com.xunlei.downloadlib.** {*;}

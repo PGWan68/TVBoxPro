@@ -116,29 +116,22 @@ public class SourceViewModel extends ViewModel {
         if (type == 3) {
             Runnable waitResponse = () -> {
                 ExecutorService executor = Executors.newSingleThreadExecutor();
-                Future<String> future = executor.submit(new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        Spider sp = ApiConfig.get().getCSP(sourceBean);
-                        String sortJson = sp.homeContent(true);
-                        System.out.println(sortJson);
-                        return sortJson;
-                    }
+                Future<String> future = executor.submit(() -> {
+                    Spider sp = ApiConfig.get().getCSP(sourceBean);
+                    return sp.homeContent(true);
                 });
                 String sortJson = null;
                 try {
                     sortJson = future.get(15, TimeUnit.SECONDS);
-                } catch (TimeoutException e) {
-                    e.printStackTrace();
+                } catch (TimeoutException | InterruptedException | ExecutionException e) {
                     future.cancel(true);
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+                    LOG.e(e);
                 } finally {
                     if (sortJson != null) {
-                        AbsSortXml sortXml = sortJson(sortResult, sortJson);
+                        AbsSortXml sortXml = sortJsonFunc(sortJson);
                         if (sortXml != null && Hawk.get(HawkConfig.HOME_REC, 0) == 1) {
                             AbsXml absXml = json(null, sortJson, sourceBean.getKey());
-                            if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && absXml.movie.videoList.size() > 0) {
+                            if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && !absXml.movie.videoList.isEmpty()) {
                                 sortXml.videoList = absXml.movie.videoList;
                                 sortResult.postValue(sortXml);
                             } else {
@@ -159,7 +152,7 @@ public class SourceViewModel extends ViewModel {
                     try {
                         executor.shutdown();
                     } catch (Throwable th) {
-                        th.printStackTrace();
+                        LOG.e(th);
                     }
                 }
             };
@@ -182,10 +175,10 @@ public class SourceViewModel extends ViewModel {
                             AbsSortXml sortXml = null;
                             if (type == 0) {
                                 String xml = response.body();
-                                sortXml = sortXml(sortResult, xml);
-                            } else if (type == 1) {
+                                sortXml = sortXmlFunc(xml);
+                            } else {
                                 String json = response.body();
-                                sortXml = sortJson(sortResult, json);
+                                sortXml = sortJsonFunc(json);
                             }
                             if (sortXml != null && Hawk.get(HawkConfig.HOME_REC, 0) == 1 && sortXml.list != null && sortXml.list.videoList != null && sortXml.list.videoList.size() > 0) {
                                 ArrayList<String> ids = new ArrayList<>();
@@ -193,12 +186,9 @@ public class SourceViewModel extends ViewModel {
                                     ids.add(vod.id);
                                 }
                                 AbsSortXml finalSortXml = sortXml;
-                                getHomeRecList(sourceBean, ids, new HomeRecCallback() {
-                                    @Override
-                                    public void done(List<Movie.Video> videos) {
-                                        finalSortXml.videoList = videos;
-                                        sortResult.postValue(finalSortXml);
-                                    }
+                                getHomeRecList(sourceBean, ids, videos -> {
+                                    finalSortXml.videoList = videos;
+                                    sortResult.postValue(finalSortXml);
                                 });
                             } else {
                                 sortResult.postValue(sortXml);
@@ -230,7 +220,7 @@ public class SourceViewModel extends ViewModel {
                             String sortJson = response.body();
                             LOG.i(sortJson);
                             if (sortJson != null) {
-                                AbsSortXml sortXml = sortJson(sortResult, sortJson);
+                                AbsSortXml sortXml = sortJsonFunc(sortJson);
                                 if (sortXml != null && Hawk.get(HawkConfig.HOME_REC, 0) == 1) {
                                     AbsXml absXml = json(null, sortJson, sourceBean.getKey());
                                     if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && absXml.movie.videoList.size() > 0) {
@@ -276,8 +266,8 @@ public class SourceViewModel extends ViewModel {
                         Spider sp = ApiConfig.get().getCSP(homeSourceBean);
                         json(listResult, sp.categoryContent(sortData.id, page + "", true, sortData.filterSelect), homeSourceBean.getKey());
                     } catch (Throwable th) {
-                        th.printStackTrace();
                         listResult.postValue(null);
+                        LOG.e(th);
                     }
                 }
             });
@@ -319,13 +309,13 @@ public class SourceViewModel extends ViewModel {
                     });
         } else if (type == 4) {
             String ext = "";
-            if (sortData.filterSelect != null && sortData.filterSelect.size() > 0) {
+            if (sortData.filterSelect != null && !sortData.filterSelect.isEmpty()) {
                 try {
                     LOG.i(new JSONObject(sortData.filterSelect).toString());
                     ext = Base64.encodeToString(new JSONObject(sortData.filterSelect).toString().getBytes("UTF-8"), Base64.DEFAULT | Base64.NO_WRAP);
                     LOG.i(ext);
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    LOG.e(e);
                 }
             }
             OkGo.<String>get(homeSourceBean.getApi())
@@ -761,44 +751,41 @@ public class SourceViewModel extends ViewModel {
         return filter;
     }
 
-    private AbsSortXml sortJson(MutableLiveData<AbsSortXml> result, String json) {
+    private AbsSortXml sortJsonFunc(String json) {
         try {
             JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
             AbsSortJson sortJson = new Gson().fromJson(obj, new TypeToken<AbsSortJson>() {
             }.getType());
             AbsSortXml data = sortJson.toAbsSortXml();
-            try {
-                if (obj.has("filters")) {
-                    LinkedHashMap<String, ArrayList<MovieSort.SortFilter>> sortFilters = new LinkedHashMap<>();
-                    JsonObject filters = obj.getAsJsonObject("filters");
-                    for (String key : filters.keySet()) {
-                        ArrayList<MovieSort.SortFilter> sortFilter = new ArrayList<>();
-                        JsonElement one = filters.get(key);
-                        if (one.isJsonObject()) {
-                            sortFilter.add(getSortFilter(one.getAsJsonObject()));
-                        } else {
-                            for (JsonElement ele : one.getAsJsonArray()) {
-                                sortFilter.add(getSortFilter(ele.getAsJsonObject()));
-                            }
+            if (obj.has("filters")) {
+                LinkedHashMap<String, ArrayList<MovieSort.SortFilter>> sortFilters = new LinkedHashMap<>();
+                JsonObject filters = obj.getAsJsonObject("filters");
+                for (String key : filters.keySet()) {
+                    ArrayList<MovieSort.SortFilter> sortFilter = new ArrayList<>();
+                    JsonElement one = filters.get(key);
+                    if (one.isJsonObject()) {
+                        sortFilter.add(getSortFilter(one.getAsJsonObject()));
+                    } else {
+                        for (JsonElement ele : one.getAsJsonArray()) {
+                            sortFilter.add(getSortFilter(ele.getAsJsonObject()));
                         }
-                        sortFilters.put(key, sortFilter);
                     }
-                    for (MovieSort.SortData sort : data.classes.sortList) {
-                        if (sortFilters.containsKey(sort.id) && sortFilters.get(sort.id) != null) {
-                            sort.filters = sortFilters.get(sort.id);
-                        }
+                    sortFilters.put(key, sortFilter);
+                }
+                for (MovieSort.SortData sort : data.classes.sortList) {
+                    if (sortFilters.containsKey(sort.id) && sortFilters.get(sort.id) != null) {
+                        sort.filters = sortFilters.get(sort.id);
                     }
                 }
-            } catch (Throwable th) {
-
             }
             return data;
         } catch (Exception e) {
+            LOG.e(e);
             return null;
         }
     }
 
-    private AbsSortXml sortXml(MutableLiveData<AbsSortXml> result, String xml) {
+    private AbsSortXml sortXmlFunc(String xml) {
         try {
             XStream xstream = new XStream(new DomDriver());//创建Xstram对象
             xstream.autodetectAnnotations(true);

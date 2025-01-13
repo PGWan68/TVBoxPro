@@ -4,8 +4,6 @@ import android.app.PictureInPictureParams
 import android.os.Build
 import android.os.Bundle
 import android.util.Rational
-import android.view.WindowManager
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -23,7 +21,7 @@ import top.yogiczy.mytv.ui.utils.HttpServer
 import top.yogiczy.mytv.ui.utils.SP
 import kotlin.system.exitProcess
 
-class LeanbackActivity : ComponentActivity() {
+class LeanbackActivity : BaseLiveActivity() {
     override fun onUserLeaveHint() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         if (!SP.uiPipMode) return
@@ -58,7 +56,7 @@ class LeanbackActivity : ComponentActivity() {
                     LeanbackApp(
                         onBackPressed = {
                             finish()
-                            exitProcess(0)
+//                            exitProcess(0)
                         },
                     )
                 }

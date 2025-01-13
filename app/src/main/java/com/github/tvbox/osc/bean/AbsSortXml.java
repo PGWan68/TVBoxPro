@@ -19,4 +19,13 @@ public class AbsSortXml implements Serializable {
     public Movie list;
 
     public List<Movie.Video> videoList;
+
+    @Override
+    public String toString() {
+        return "AbsSortXml{" +
+                "classes=" + classes +
+                ", list=" + list +
+                ", videoList=" + videoList +
+                '}';
+    }
 }

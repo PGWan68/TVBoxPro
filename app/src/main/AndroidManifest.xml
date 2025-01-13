@@ -39,11 +39,13 @@
         android:banner="@drawable/app_banner"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:resizeableActivity="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:requestLegacyExternalStorage="true"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:ignore="UnusedAttribute">
 
         <activity
             android:name=".ui.activity.HomeActivity"
@@ -140,19 +142,19 @@
             android:value="disable" />
 
         <activity
+            android:name="top.yogiczy.mytv.activities.LiveMainActivity"
+            android:screenOrientation="sensorLandscape"
+            android:exported="false"
+            android:theme="@style/Theme.MyTV">
+        </activity>
+
+        <activity
             android:name="top.yogiczy.mytv.activities.LeanbackActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|screenLayout|keyboardHidden"
             android:exported="true"
             android:screenOrientation="sensorLandscape"
-            android:supportsPictureInPicture="true"
             android:theme="@style/Theme.MyTV.Leanback"
             tools:ignore="DiscouragedApi">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -164,14 +166,7 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="top.yogiczy.mytv.activities.LiveMainActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyTV">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
+
 
         <activity
             android:name="top.yogiczy.mytv.activities.PadActivity"

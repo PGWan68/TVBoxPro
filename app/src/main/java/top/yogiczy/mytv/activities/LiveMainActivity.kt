@@ -2,10 +2,9 @@ package top.yogiczy.mytv.activities
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import top.yogiczy.mytv.ui.utils.SP
 
-class LiveMainActivity : ComponentActivity() {
+class LiveMainActivity : BaseLiveActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -16,9 +15,7 @@ class LiveMainActivity : ComponentActivity() {
         }
 
         // TODO 切换时变化生硬
-        startActivity(Intent(this, activityClass).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        })
+        startActivity(Intent(this, activityClass))
 
         finish()
     }

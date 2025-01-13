@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import top.yogiczy.mytv.ui.theme.MobileTheme
 
-class LiveMobileActivity : ComponentActivity() {
+class LiveMobileActivity : BaseLiveActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

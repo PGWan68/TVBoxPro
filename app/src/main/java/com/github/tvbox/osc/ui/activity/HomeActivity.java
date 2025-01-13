@@ -1,6 +1,5 @@
 package com.github.tvbox.osc.ui.activity;
 
-import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.IntEvaluator;
@@ -40,6 +39,7 @@ import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.base.BaseActivity;
 import com.github.tvbox.osc.base.BaseLazyFragment;
 import com.github.tvbox.osc.bean.AbsSortXml;
+import com.github.tvbox.osc.bean.LineBean;
 import com.github.tvbox.osc.bean.MovieSort;
 import com.github.tvbox.osc.bean.SourceBean;
 import com.github.tvbox.osc.event.RefreshEvent;
@@ -57,9 +57,7 @@ import com.github.tvbox.osc.ui.tv.widget.NoScrollViewPager;
 import com.github.tvbox.osc.ui.tv.widget.ViewObj;
 import com.github.tvbox.osc.util.AppManager;
 import com.github.tvbox.osc.util.DefaultConfig;
-import com.github.tvbox.osc.util.FileUtils;
 import com.github.tvbox.osc.util.HawkConfig;
-import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
@@ -71,12 +69,12 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import me.jessyan.autosize.utils.AutoSizeUtils;
 
@@ -172,6 +170,7 @@ public class HomeActivity extends BaseActivity {
         this.mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, 0, false));
         this.mGridView.setSpacingWithMargins(0, AutoSizeUtils.dp2px(this.mContext, 10.0f));
         this.mGridView.setAdapter(this.sortAdapter);
+
         this.mGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             public void onItemPreSelected(TvRecyclerView tvRecyclerView, View view, int position) {
                 if (view != null && !HomeActivity.this.isDownOrUp) {
@@ -245,20 +244,20 @@ public class HomeActivity extends BaseActivity {
         tvName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                dataInitOk = false;
-//                jarInitOk = true;
-//                showSiteSwitch();
-                File dir = getCacheDir();
-                FileUtils.recursiveDelete(dir);
-                dir = getExternalCacheDir();
-                FileUtils.recursiveDelete(dir);
-                Toast.makeText(HomeActivity.this, getString(R.string.hm_cache_del), Toast.LENGTH_SHORT).show();
+//                File dir = getCacheDir();
+//                FileUtils.recursiveDelete(dir);
+//                dir = getExternalCacheDir();
+//                FileUtils.recursiveDelete(dir);
+//                Toast.makeText(HomeActivity.this, getString(R.string.hm_cache_del), Toast.LENGTH_SHORT).show();
+
+                // 功能修改，改为选择点播线路
+                showVodLinesSelectDialog();
             }
         });
         tvName.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                reloadHome();
+                reloadHome(true);
                 return true;
             }
         });
@@ -333,23 +332,54 @@ public class HomeActivity extends BaseActivity {
         //mHandler.postDelayed(mFindFocus, 250);
     }
 
-    public static boolean reHome(Context appContext) {
-        Intent intent = new Intent(appContext, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("useCache", true);
-        intent.putExtras(bundle);
-        appContext.startActivity(intent);
-        return true;
+    // 点播线路选择
+    private void showVodLinesSelectDialog() {
+        List<LineBean> vodLines = ApiConfig.get().getDefaultVodLines();
+
+        if (!vodLines.isEmpty()) {
+            SelectDialog<LineBean> dialog = new SelectDialog<>(HomeActivity.this);
+
+            TvRecyclerView tvRecyclerView = dialog.findViewById(R.id.list);
+            tvRecyclerView.setLayoutManager(new V7GridLayoutManager(dialog.getContext(), 1));
+
+            String url = ApiConfig.get().getCurrentApiUrl();
+            int position = 0;
+            for (LineBean vodLine : vodLines) {
+                if (Objects.equals(vodLine.getUrl(), url)) {
+                    position = vodLines.indexOf(vodLine);
+                }
+            }
+
+            dialog.setTip(getString(R.string.dia_lines));
+            dialog.setAdapter(tvRecyclerView, new SelectDialogAdapter.SelectDialogInterface<LineBean>() {
+                @Override
+                public void click(LineBean value, int pos) {
+                    Hawk.put(HawkConfig.API_URL, value.getUrl());
+                    ApiConfig.get().clear();
+                    reloadHome(false);
+                }
+
+                @Override
+                public String getDisplay(LineBean val) {
+                    return val.getUrl();
+                }
+            }, new DiffUtil.ItemCallback<LineBean>() {
+                @Override
+                public boolean areItemsTheSame(@NonNull @NotNull LineBean oldItem, @NonNull @NotNull LineBean newItem) {
+                    return oldItem == newItem;
+                }
+
+                @Override
+                public boolean areContentsTheSame(@NonNull @NotNull LineBean oldItem, @NonNull @NotNull LineBean newItem) {
+                    return oldItem.getUrl().equals(newItem.getUrl());
+                }
+            }, vodLines, position);
+            dialog.setOnDismissListener(dialog1 -> {
+            });
+            dialog.show();
+        }
     }
 
-    public static void homeRecf() { //站点切换
-        int homeRec = Hawk.get(HawkConfig.HOME_REC, -1);
-        int limit = 2;
-        if (homeRec == limit) homeRec = -1;
-        homeRec++;
-        Hawk.put(HawkConfig.HOME_REC, homeRec);
-    }
 
     private void initViewModel() {
         sourceViewModel = new ViewModelProvider(this).get(SourceViewModel.class);
@@ -420,14 +450,15 @@ public class HomeActivity extends BaseActivity {
         if (dataInitOk && jarInitOk) {
             showLoading();
             sourceViewModel.getSort(ApiConfig.get().getHomeSourceBean().getKey());
-            if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                LOG.e("有写入权限");
-            } else {
-                LOG.e("无写入权限");
-            }
+//            if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//                LOG.e("有写入权限");
+//            } else {
+//                LOG.e("无写入权限");
+//            }
             if (Hawk.get(HawkConfig.HOME_DEFAULT_SHOW, false)) {
                 jumpActivity(LivePlayActivity.class);
             }
+
             return;
         }
         showLoading();
@@ -562,10 +593,10 @@ public class HomeActivity extends BaseActivity {
     }
 
     private void initViewPager(AbsSortXml absXml) {
-        if (sortAdapter.getData().size() > 0) {
+        if (!sortAdapter.getData().isEmpty()) {
             for (MovieSort.SortData data : sortAdapter.getData()) {
                 if (data.id.equals("my0")) {
-                    if (Hawk.get(HawkConfig.HOME_REC, 0) == 1 && absXml != null && absXml.videoList != null && absXml.videoList.size() > 0) {
+                    if (Hawk.get(HawkConfig.HOME_REC, 0) == 1 && absXml != null && absXml.videoList != null && !absXml.videoList.isEmpty()) {
                         fragments.add(UserFragment.newInstance(absXml.videoList));
                     } else {
                         fragments.add(UserFragment.newInstance(null));
@@ -586,6 +617,7 @@ public class HomeActivity extends BaseActivity {
             mViewPager.setPageTransformer(true, new DefaultTransformer());
             mViewPager.setAdapter(pageAdapter);
             mViewPager.setCurrentItem(currentSelected, false);
+            mGridView.setSelection(currentSelected);
         }
     }
 
@@ -811,7 +843,7 @@ public class HomeActivity extends BaseActivity {
         for (SourceBean sb : ApiConfig.get().getSourceBeanList()) {
             if (sb.getHide() == 0) sites.add(sb);
         }
-        if (sites.size() > 0) {
+        if (!sites.isEmpty()) {
             SelectDialog<SourceBean> dialog = new SelectDialog<>(HomeActivity.this);
 
             // Multi Column Selection
@@ -832,7 +864,7 @@ public class HomeActivity extends BaseActivity {
                 @Override
                 public void click(SourceBean value, int pos) {
                     ApiConfig.get().setSourceBean(value);
-                    reloadHome();
+                    reloadHome(true);
                 }
 
                 @Override
@@ -867,22 +899,32 @@ public class HomeActivity extends BaseActivity {
         }
     }
 
-    void reloadHome() {
+    void reloadHome(boolean useCache) {
         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         Bundle bundle = new Bundle();
-        bundle.putBoolean("useCache", true);
+        bundle.putBoolean("useCache", useCache);
         intent.putExtras(bundle);
         HomeActivity.this.startActivity(intent);
     }
 
-//    public void onClick(View v) {
-//        FastClickCheckUtil.check(v);
-//        if (v.getId() == R.id.tvFind) {
-//            jumpActivity(SearchActivity.class);
-//        } else if (v.getId() == R.id.tvMenu) {
-//            jumpActivity(SettingActivity.class);
-//        }
-//    }
+    public static boolean reHome(Context appContext) {
+        Intent intent = new Intent(appContext, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("useCache", true);
+        intent.putExtras(bundle);
+        appContext.startActivity(intent);
+        return true;
+    }
+
+    public static void homeRecf() { //站点切换
+        int homeRec = Hawk.get(HawkConfig.HOME_REC, -1);
+        int limit = 2;
+        if (homeRec == limit) homeRec = -1;
+        homeRec++;
+        Hawk.put(HawkConfig.HOME_REC, homeRec);
+    }
+
 
 }

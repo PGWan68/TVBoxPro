@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import top.yogiczy.mytv.activities.LeanbackActivity;
 import top.yogiczy.mytv.activities.LiveMainActivity;
 
 /**
@@ -340,8 +341,7 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         FastClickCheckUtil.check(v);
         if (v.getId() == R.id.tvLive) {
 //            jumpActivity(LivePlayActivity.class);
-            Intent intent = new Intent(mContext, LiveMainActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(mContext, LeanbackActivity.class));
 
         } else if (v.getId() == R.id.tvSearch) {
             jumpActivity(SearchActivity.class);

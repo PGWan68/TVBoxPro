@@ -29,6 +29,7 @@ public class LocaleHelper {
 
     public static Context onAttach(Context context, String defaultLanguage) {
         String lang = getPersistedData(context, defaultLanguage);
+        LOG.i("language = " + lang);
         return setLocale(context, lang);
     }
 
