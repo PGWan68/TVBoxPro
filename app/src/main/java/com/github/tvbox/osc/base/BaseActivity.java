@@ -62,7 +62,7 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
         if (Hawk.get(HawkConfig.HOME_LOCALE, 0) == 0) {
             super.attachBaseContext(LocaleHelper.onAttach(newBase, ""));
         } else {
-            super.attachBaseContext(LocaleHelper.onAttach(newBase, "en"));
+            super.attachBaseContext(LocaleHelper.onAttach(newBase, "zh"));
         }
     }
 
