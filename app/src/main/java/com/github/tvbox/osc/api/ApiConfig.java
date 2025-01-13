@@ -495,42 +495,48 @@ public class ApiConfig {
                     if (!lives.contains("type")) {
                         loadLives(infoJson.get("lives").getAsJsonArray());
                     } else {
-                        JsonObject fengMiLives = infoJson.get("lives").getAsJsonArray().get(0).getAsJsonObject();
-                        Hawk.put(HawkConfig.LIVE_PLAYER_TYPE, DefaultConfig.safeJsonInt(fengMiLives, "playerType", -1));
-                        String type = fengMiLives.get("type").getAsString();
-                        if (type.equals("0")) {
-                            String url = fengMiLives.get("url").getAsString();
 
-                            // takagen99 : Getting EPG URL from File Config & put into Settings
-                            if (fengMiLives.has("epg")) {
-                                String epg = fengMiLives.get("epg").getAsString();
-                                LOG.i("EPG URL :" + epg);
-                                putEPGHistory(epg);
-                                // Overwrite with EPG URL from Settings
-                                if (StringUtils.isBlank(epgURL)) {
-                                    Hawk.put(HawkConfig.EPG_URL, epg);
-                                } else {
-                                    Hawk.put(HawkConfig.EPG_URL, epgURL);
-                                }
-                            }
+                        for (JsonElement element : infoJson.get("lives").getAsJsonArray()) {
+                            JsonObject liveObj = element.getAsJsonObject();
+                            Hawk.put(HawkConfig.LIVE_PLAYER_TYPE, DefaultConfig.safeJsonInt(liveObj, "playerType", -1));
+                            String type = liveObj.get("type").getAsString();
+                            if (type.equals("0")) {
+                                String url = liveObj.get("url").getAsString();
 
-                            if (url.startsWith("http")) {
-                                // takagen99: Capture Live URL into Settings
-                                LOG.i("Live URL :" + url);
-                                putLiveHistory(url);
-                                // Overwrite with Live URL from Settings
-                                if (StringUtils.isBlank(liveURL)) {
-                                    Hawk.put(HawkConfig.LIVE_URL, url);
-                                } else {
-                                    url = liveURL;
+                                // takagen99 : Getting EPG URL from File Config & put into Settings
+                                if (liveObj.has("epg")) {
+                                    String epg = liveObj.get("epg").getAsString();
+                                    LOG.i("EPG URL :" + epg);
+                                    putEPGHistory(epg);
+                                    // Overwrite with EPG URL from Settings
+                                    if (StringUtils.isBlank(epgURL)) {
+                                        Hawk.put(HawkConfig.EPG_URL, epg);
+                                    } else {
+                                        Hawk.put(HawkConfig.EPG_URL, epgURL);
+                                    }
                                 }
 
-                                // Final Live URL
-                                liveURL_final = url;
+                                if (url.startsWith("http")) {
+                                    // takagen99: Capture Live URL into Settings
+                                    LOG.i("Live URL :" + url);
+                                    putLiveHistory(url);
+                                    // Overwrite with Live URL from Settings
+                                    if (StringUtils.isBlank(liveURL)) {
+                                        Hawk.put(HawkConfig.LIVE_URL, url);
+                                    } else {
+                                        url = liveURL;
+                                    }
+
+                                    // Final Live URL
+                                    liveURL_final = url;
+
+                                    // TODO
 
 //                            url = Base64.encodeToString(url.getBytes("UTF-8"), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP);
+                                }
                             }
                         }
+
                     }
                 }
 

@@ -69,7 +69,7 @@ object HttpServer : Loggable() {
                 }
 
                 HttpServer.showToast = showToast
-                log.i("服务已启动: 0.0.0.0:${SERVER_PORT}")
+                log.i("服务已启动: $serverUrl")
             } catch (ex: Exception) {
                 log.e("服务启动失败: ${ex.message}", ex)
                 launch(Dispatchers.Main) {
