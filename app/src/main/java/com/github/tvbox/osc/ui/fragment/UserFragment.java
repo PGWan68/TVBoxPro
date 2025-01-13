@@ -39,8 +39,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import top.yogiczy.mytv.activities.LeanbackActivity;
-import top.yogiczy.mytv.activities.LiveMainActivity;
+import com.github.tvbox.kotlin.activities.LeanbackActivity;
 
 /**
  * @author pj567

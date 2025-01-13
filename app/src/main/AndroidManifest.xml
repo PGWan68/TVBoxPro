@@ -142,14 +142,14 @@
             android:value="disable" />
 
         <activity
-            android:name="top.yogiczy.mytv.activities.LiveMainActivity"
+            android:name="com.github.tvbox.kotlin.activities.LiveMainActivity"
             android:screenOrientation="sensorLandscape"
             android:exported="false"
             android:theme="@style/Theme.MyTV">
         </activity>
 
         <activity
-            android:name="top.yogiczy.mytv.activities.LeanbackActivity"
+            android:name="com.github.tvbox.kotlin.activities.LeanbackActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|screenLayout|keyboardHidden"
             android:exported="true"
             android:screenOrientation="sensorLandscape"
@@ -158,7 +158,7 @@
         </activity>
 
         <activity
-            android:name="top.yogiczy.mytv.activities.LiveMobileActivity"
+            android:name="com.github.tvbox.kotlin.activities.LiveMobileActivity"
             android:exported="false"
             android:theme="@style/Theme.MyTV">
             <intent-filter>
@@ -169,7 +169,7 @@
 
 
         <activity
-            android:name="top.yogiczy.mytv.activities.PadActivity"
+            android:name="com.github.tvbox.kotlin.activities.PadActivity"
             android:exported="false"
             android:theme="@style/Theme.MyTV">
             <intent-filter>
@@ -178,7 +178,7 @@
         </activity>
 
         <receiver
-            android:name="top.yogiczy.mytv.BootReceiver"
+            android:name="com.github.tvbox.kotlin.BootReceiver"
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">

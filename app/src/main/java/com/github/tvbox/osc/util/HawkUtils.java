@@ -172,15 +172,11 @@ public class HawkUtils {
      */
     public static int getExoRendererModeActualValue() {
         int i = getExoRendererMode();
-        switch (i) {
-            case 0:
-                return DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON;
-            case 2:
-                return DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
-            case 1:
-            default:
-                return DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER;
-        }
+        return switch (i) {
+            case 0 -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON;
+            case 2 -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
+            default -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER;
+        };
     }
 
     /**

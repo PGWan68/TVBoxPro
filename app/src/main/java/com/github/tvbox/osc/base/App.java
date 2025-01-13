@@ -1,6 +1,5 @@
 package com.github.tvbox.osc.base;
 
-import android.content.res.AssetManager;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,9 +22,6 @@ import com.github.tvbox.osc.util.LocaleHelper;
 import com.github.tvbox.osc.util.OkGoHelper;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.github.tvbox.osc.util.SubtitleHelper;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.hjq.permissions.XXPermissions;
 import com.kingja.loadsir.core.LoadSir;
 import com.orhanobut.hawk.Hawk;
@@ -34,13 +30,7 @@ import com.whl.quickjs.android.QuickJSLoader;
 import com.yanzhenjie.andserver.AndServer;
 import com.yanzhenjie.andserver.Server;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
@@ -48,9 +38,9 @@ import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
 import me.jessyan.autosize.AutoSizeConfig;
 import me.jessyan.autosize.unit.Subunits;
-import top.yogiczy.mytv.AppGlobal;
-import top.yogiczy.mytv.UnsafeTrustManager;
-import top.yogiczy.mytv.ui.utils.SP;
+import com.github.tvbox.kotlin.AppGlobal;
+import com.github.tvbox.kotlin.UnsafeTrustManager;
+import com.github.tvbox.kotlin.ui.utils.SP;
 
 /**
  * @author pj567
