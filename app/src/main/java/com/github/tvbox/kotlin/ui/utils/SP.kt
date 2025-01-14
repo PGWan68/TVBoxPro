@@ -3,6 +3,7 @@ package com.github.tvbox.kotlin.ui.utils
 import android.content.Context
 import android.content.SharedPreferences
 import com.github.tvbox.kotlin.data.utils.Constants
+import com.github.tvbox.kotlin.ui.utils.SP.SharedPreferenceDelegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -21,105 +22,6 @@ object SP {
         sp = getInstance(context)
     }
 
-    enum class KEY {
-        /** ==================== 应用 ==================== */
-        /** 开机自启 */
-        APP_BOOT_LAUNCH,
-
-        /** 上一次最新版本 */
-        APP_LAST_LATEST_VERSION,
-
-        /** 设备显示类型 */
-        APP_DEVICE_DISPLAY_TYPE,
-
-        /** ==================== 调式 ==================== */
-        /** 显示fps */
-        DEBUG_SHOW_FPS,
-
-        /** 播放器详细信息 */
-        DEBUG_SHOW_VIDEO_PLAYER_METADATA,
-
-        /** ==================== 直播源 ==================== */
-        /** 上一次直播源序号 */
-        IPTV_LAST_IPTV_IDX,
-
-        /** 换台反转 */
-        IPTV_CHANNEL_CHANGE_FLIP,
-
-        /** 直播源精简 */
-        IPTV_SOURCE_SIMPLIFY,
-
-        /** 直播源url */
-        IPTV_SOURCE_URL,
-
-        /** 直播源缓存时间（毫秒） */
-        IPTV_SOURCE_CACHE_TIME,
-
-        /** 直播源可播放host列表 */
-        IPTV_PLAYABLE_HOST_LIST,
-
-        /** 直播源历史列表 */
-        IPTV_SOURCE_URL_HISTORY_LIST,
-
-        /** 是否启用数字选台 */
-        IPTV_CHANNEL_NO_SELECT_ENABLE,
-
-        /** 是否启用直播源频道收藏 */
-        IPTV_CHANNEL_FAVORITE_ENABLE,
-
-        /** 显示直播源频道收藏列表 */
-        IPTV_CHANNEL_FAVORITE_LIST_VISIBLE,
-
-        /** 直播源频道收藏列表 */
-        IPTV_CHANNEL_FAVORITE_LIST,
-
-        /** ==================== 节目单 ==================== */
-        /** 启用节目单 */
-        EPG_ENABLE,
-
-        /** 节目单 xml url */
-        EPG_XML_URL,
-
-        /** 节目单刷新时间阈值（小时） */
-        EPG_REFRESH_TIME_THRESHOLD,
-
-        /** 节目单历史列表 */
-        EPG_XML_URL_HISTORY_LIST,
-
-        /** ==================== 界面 ==================== */
-        /** 显示节目进度 */
-        UI_SHOW_EPG_PROGRAMME_PROGRESS,
-
-        /** 使用经典选台界面 */
-        UI_USE_CLASSIC_PANEL_SCREEN,
-
-        /** 界面密度缩放比例 */
-        UI_DENSITY_SCALE_RATIO,
-
-        /** 界面字体缩放比例 */
-        UI_FONT_SCALE_RATIO,
-
-        /** 时间显示模式 */
-        UI_TIME_SHOW_MODE,
-
-        /** 画中画模式 */
-        UI_PIP_MODE,
-
-        /** ==================== 更新 ==================== */
-        /** 更新强提醒（弹窗形式） */
-        UPDATE_FORCE_REMIND,
-
-        /** ==================== 播放器 ==================== */
-        /** 播放器 自定义ua */
-        VIDEO_PLAYER_USER_AGENT,
-
-        /** 播放器 加载超时 */
-        VIDEO_PLAYER_LOAD_TIMEOUT,
-
-        /** 播放器 画面比例 */
-        VIDEO_PLAYER_ASPECT_RATIO,
-    }
-
     /** ==================== 应用 ==================== */
     /** 开机自启 */
     var appBootLaunch by SharedPreferenceDelegates.boolean()
@@ -128,9 +30,12 @@ object SP {
     var appLastLatestVersion by SharedPreferenceDelegates.string()
 
     /** 设备显示类型 */
+    private var priAppDeviceDisplayType by SharedPreferenceDelegates.int()
     var appDeviceDisplayType: AppDeviceDisplayType
-        get() = AppDeviceDisplayType.fromValue(sp.getInt(KEY.APP_DEVICE_DISPLAY_TYPE.name, 0))
-        set(value) = sp.edit().putInt(KEY.APP_DEVICE_DISPLAY_TYPE.name, value.value).apply()
+        get() = AppDeviceDisplayType.fromValue(priAppDeviceDisplayType)
+        set(value) {
+            priAppDeviceDisplayType = value.value
+        }
 
     /** ==================== 调式 ==================== */
     /** 显示fps */
@@ -200,9 +105,12 @@ object SP {
     var uiFontScaleRatio by SharedPreferenceDelegates.float(defaultValue = 1f)
 
     /** 时间显示模式 */
+    private var priUiTimeShowMode by SharedPreferenceDelegates.int(defaultValue = UiTimeShowMode.HIDDEN.value)
     var uiTimeShowMode: UiTimeShowMode
-        get() = UiTimeShowMode.fromValue(sp.getInt(KEY.UI_TIME_SHOW_MODE.name, 0))
-        set(value) = sp.edit().putInt(KEY.UI_TIME_SHOW_MODE.name, value.value).apply()
+        get() = UiTimeShowMode.fromValue(priUiTimeShowMode)
+        set(value) {
+            priUiTimeShowMode = value.value;
+        }
 
     /** 画中画模式 */
     var uiPipMode by SharedPreferenceDelegates.boolean()
@@ -219,11 +127,14 @@ object SP {
     var videoPlayerLoadTimeout by SharedPreferenceDelegates.long(defaultValue = Constants.VIDEO_PLAYER_LOAD_TIMEOUT)
 
     /** 播放器 画面比例 */
+    private var priVideoPlayerAspectRatio by SharedPreferenceDelegates.int(defaultValue = VideoPlayerAspectRatio.ORIGINAL.value)
     var videoPlayerAspectRatio: VideoPlayerAspectRatio
         get() = VideoPlayerAspectRatio.fromValue(
-            sp.getInt(KEY.VIDEO_PLAYER_ASPECT_RATIO.name, VideoPlayerAspectRatio.ORIGINAL.value)
+            priVideoPlayerAspectRatio
         )
-        set(value) = sp.edit().putInt(KEY.VIDEO_PLAYER_ASPECT_RATIO.name, value.value).apply()
+        set(value) {
+            priVideoPlayerAspectRatio = value.value;
+        }
 
     enum class UiTimeShowMode(val value: Int) {
         /** 隐藏 */
