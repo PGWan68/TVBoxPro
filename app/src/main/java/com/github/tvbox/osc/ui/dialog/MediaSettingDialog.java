@@ -12,9 +12,12 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.github.tvbox.osc.BuildConfig;
 import com.github.tvbox.osc.R;
-import com.github.tvbox.osc.util.HawkUtils;
+import com.github.tvbox.osc.api.ApiConfig;
+import com.github.tvbox.osc.base.App;
+import com.github.tvbox.osc.bean.IJKCode;
+import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.widget.OnItemClickListener;
-import com.github.tvbox.osc.widget.OnItemSelectedListener;
+import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.SimpleOnItemListener;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 
@@ -62,23 +65,74 @@ public class MediaSettingDialog extends BaseDialog {
             MediaSettingEnum mediaSettingEnum = MediaSettingEnum.valueOf(item.tag);
             switch (mediaSettingEnum) {
                 case IjkMediaCodecMode:
-                    HawkUtils.nextIJKCodec();
+                    nextIJKCodec();
                     break;
                 case IjkCache:
-                    HawkUtils.nextIJKCache();
+                    nextIJKCache();
                     break;
                 case ExoRenderer:
-                    HawkUtils.nextExoRenderer();
+                    nextExoRenderer();
                     break;
                 case ExoRendererMode:
-                    HawkUtils.nextExoRendererMode();
+                    nextExoRendererMode();
                     break;
                 case VodPlayerPreferred:
-                    HawkUtils.nextVodPlayerPreferred();
+                    nextVodPlayerPreferred();
                     break;
             }
             contentAdapter.refreshNotifyItemChanged(i);
         });
+    }
+
+
+    public static void nextVodPlayerPreferred() {
+        int index = Hawk.get(HawkConfig.VOD_PLAYER_PREFERRED, 0);
+        App app = App.getInstance();
+        String[] array = app.getResources().getStringArray(R.array.media_content_General_VodPlayerPreferred);
+        index++;
+        index %= array.length;
+        Hawk.put(HawkConfig.VOD_PLAYER_PREFERRED, index);
+    }
+
+    /**
+     * 获取exo渲染器 自己存储的数据
+     *
+     * @return int
+     */
+    private static int getExoRenderer() {
+        return Hawk.get(HawkConfig.EXO_RENDERER, 0);
+    }
+
+
+    private static void nextExoRenderer() {
+        App app = App.getInstance();
+        String[] array = app.getResources().getStringArray(R.array.media_content_ExoPlayer_renderer);
+        int renderer = getExoRenderer();
+        renderer++;
+        renderer %= array.length;
+        Hawk.put(HawkConfig.EXO_RENDERER, renderer);
+    }
+
+    private static void nextIJKCache() {
+        boolean ijkCache = getIJKCache();
+        Hawk.put(HawkConfig.IJK_CACHE_PLAY, !ijkCache);
+    }
+
+    private void nextIJKCodec() {
+        List<IJKCode> ijkCodes = ApiConfig.get().getIjkCodes();
+        String ijkCodec = Hawk.get(HawkConfig.IJK_CODEC, "");
+        int index = 0;
+        for (int i = 0; i < ijkCodes.size(); i++) {
+            IJKCode ijkCode = ijkCodes.get(i);
+            if (ijkCode.getName().equals(ijkCodec)) {
+                index = i;
+                break;
+            }
+        }
+        ijkCodes.get(index).selected(false);
+        index++;
+        index %= ijkCodes.size();
+        ijkCodes.get(index).selected(true);
     }
 
     public List<MediaSettingEntity> getListTitle() {
@@ -144,22 +198,77 @@ public class MediaSettingDialog extends BaseDialog {
             MediaSettingEnum mediaSettingEnum = MediaSettingEnum.valueOf(item.tag);
             switch (mediaSettingEnum) {
                 case IjkMediaCodecMode:
-                    tvContent.setText(HawkUtils.getIJKCodec());
+                    tvContent.setText(Hawk.get(HawkConfig.IJK_CODEC, ""));
                     break;
                 case IjkCache:
-                    tvContent.setText(HawkUtils.getIJKCacheDesc());
+                    tvContent.setText(getIJKCacheDesc());
                     break;
                 case ExoRenderer:
-                    tvContent.setText(HawkUtils.getExoRendererDesc());
+                    tvContent.setText(getExoRendererDesc());
                     break;
                 case ExoRendererMode:
-                    tvContent.setText(HawkUtils.getExoRendererModeDesc());
+                    tvContent.setText(getExoRendererModeDesc());
                     break;
                 case VodPlayerPreferred:
-                    tvContent.setText(HawkUtils.getVodPlayerPreferredDesc());
+                    tvContent.setText(getVodPlayerPreferredDesc());
                     break;
             }
         }
+    }
+
+    public static String getVodPlayerPreferredDesc() {
+        App app = App.getInstance();
+        String[] array = app.getResources().getStringArray(R.array.media_content_General_VodPlayerPreferred);
+        return array[Hawk.get(HawkConfig.VOD_PLAYER_PREFERRED, 0)];
+    }
+
+    /**
+     * 获取exo渲染器模式描述
+     *
+     * @return {@link String }
+     */
+    public static String getExoRendererModeDesc() {
+        App app = App.getInstance();
+        String[] array = app.getResources().getStringArray(R.array.media_content_ExoPlayer_renderer_mode);
+        return array[getExoRendererMode()];
+    }
+
+    /**
+     * 获取exo渲染器描述
+     *
+     * @return {@link String }
+     */
+    public static String getExoRendererDesc() {
+        App app = App.getInstance();
+        String[] array = app.getResources().getStringArray(R.array.media_content_ExoPlayer_renderer);
+        return array[getExoRenderer()];
+    }
+
+    /**
+     * 获取exo渲染器模式 自己存储的 值
+     *
+     * @return int
+     */
+    public static int getExoRendererMode() {
+        return Hawk.get(HawkConfig.EXO_RENDERER_MODE, 1);
+    }
+
+    public static void nextExoRendererMode() {
+        int rendererMode = getExoRendererMode();
+        App app = App.getInstance();
+        String[] array = app.getResources().getStringArray(R.array.media_content_ExoPlayer_renderer_mode);
+        rendererMode++;
+        rendererMode %= array.length;
+        Hawk.put(HawkConfig.EXO_RENDERER_MODE, rendererMode);
+    }
+
+
+    private static boolean getIJKCache() {
+        return Hawk.get(HawkConfig.IJK_CACHE_PLAY, false);
+    }
+
+    private static String getIJKCacheDesc() {
+        return getIJKCache() ? "开启" : "关闭";
     }
 
     //数据Bean
@@ -189,6 +298,6 @@ public class MediaSettingDialog extends BaseDialog {
 
     //数据枚举
     public enum MediaSettingEnum {
-        IjkMediaCodecMode, IjkCache, ExoRenderer, ExoRendererMode,VodPlayerPreferred
+        IjkMediaCodecMode, IjkCache, ExoRenderer, ExoRendererMode, VodPlayerPreferred
     }
 }

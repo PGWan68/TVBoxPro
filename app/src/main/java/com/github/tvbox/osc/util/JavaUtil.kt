@@ -1,6 +1,7 @@
 package com.github.tvbox.osc.util
 
 import com.github.tvbox.osc.bean.LiveChannelGroup
+import com.orhanobut.hawk.Hawk
 
 /**
  *Automatic generated
@@ -10,8 +11,8 @@ import com.github.tvbox.osc.bean.LiveChannelGroup
 object JavaUtil {
     @JvmStatic
     fun findLiveLastChannel(liveChannelGroupList: List<LiveChannelGroup>): Pair<Int, Int> {
-        val lastChannelName = HawkUtils.getLastLiveChannel()
-        val lastChannelGroupName = HawkUtils.getLastLiveChannelGroup()
+        val lastChannelName = Hawk.get(HawkConfig.LIVE_CHANNEL, "")
+        val lastChannelGroupName = Hawk.get(HawkConfig.LIVE_CHANNEL_GROUP, "");
         return liveChannelGroupList.find { it.groupName == lastChannelGroupName }?.let {
             val channelItem =
                 it.liveChannels.find { channelItem -> channelItem.channelName == lastChannelName }

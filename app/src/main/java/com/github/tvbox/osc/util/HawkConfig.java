@@ -79,4 +79,12 @@ public class HawkConfig {
     public static boolean hotVodDelete;
 
     public static final String SEARCH_RESULT_WIDTH = "search_result_width"; // 搜索结果view宽度
+
+    public static final String DANMU_OPEN = "danmu_open";
+    public static final String DANMU_MAXLINE = "danmu_maxline";
+    public static final String DANMU_SPEED = "danmu_speed";
+    public static final String DANMU_ALPHA = "danmu_alpha";
+    public static final String DANMU_SIZESCALE = "danmu_sizescale";
+    public static final String DANMU_COLOR = "danmu_color";
+
 }

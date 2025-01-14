@@ -3,6 +3,8 @@ package com.github.tvbox.kotlin.ui.utils
 import android.content.Context
 import android.content.SharedPreferences
 import com.github.tvbox.kotlin.data.utils.Constants
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 /**
  * 应用配置存储
@@ -120,9 +122,7 @@ object SP {
 
     /** ==================== 应用 ==================== */
     /** 开机自启 */
-    var appBootLaunch: Boolean
-        get() = sp.getBoolean(KEY.APP_BOOT_LAUNCH.name, false)
-        set(value) = sp.edit().putBoolean(KEY.APP_BOOT_LAUNCH.name, value).apply()
+    var appBootLaunch by SharedPreferenceDelegates.boolean()
 
     /** 上一次最新版本 */
     var appLastLatestVersion: String
@@ -337,4 +337,73 @@ object SP {
             }
         }
     }
+
+
+    private object SharedPreferenceDelegates {
+
+        fun int(defaultValue: Int = 0) = object : ReadWriteProperty<SP, Int> {
+
+            override fun getValue(thisRef: SP, property: KProperty<*>): Int {
+                return sp.getInt(property.name, defaultValue)
+            }
+
+            override fun setValue(thisRef: SP, property: KProperty<*>, value: Int) {
+                sp.edit().putInt(property.name, value).apply()
+            }
+        }
+
+        fun long(defaultValue: Long = 0L) = object : ReadWriteProperty<SP, Long> {
+
+            override fun getValue(thisRef: SP, property: KProperty<*>): Long {
+                return sp.getLong(property.name, defaultValue)
+            }
+
+            override fun setValue(thisRef: SP, property: KProperty<*>, value: Long) {
+                sp.edit().putLong(property.name, value).apply()
+            }
+        }
+
+        fun boolean(defaultValue: Boolean = false) = object : ReadWriteProperty<SP, Boolean> {
+            override fun getValue(thisRef: SP, property: KProperty<*>): Boolean {
+                return sp.getBoolean(property.name, defaultValue)
+            }
+
+            override fun setValue(thisRef: SP, property: KProperty<*>, value: Boolean) {
+                sp.edit().putBoolean(property.name, value).apply()
+            }
+        }
+
+        fun float(defaultValue: Float = 0.0f) = object : ReadWriteProperty<SP, Float> {
+            override fun getValue(thisRef: SP, property: KProperty<*>): Float {
+                return sp.getFloat(property.name, defaultValue)
+            }
+
+            override fun setValue(thisRef: SP, property: KProperty<*>, value: Float) {
+                sp.edit().putFloat(property.name, value).apply()
+            }
+        }
+
+        fun string(defaultValue: String? = null) = object : ReadWriteProperty<SP, String?> {
+            override fun getValue(thisRef: SP, property: KProperty<*>): String? {
+                return sp.getString(property.name, defaultValue)
+            }
+
+            override fun setValue(thisRef: SP, property: KProperty<*>, value: String?) {
+                sp.edit().putString(property.name, value).apply()
+            }
+        }
+
+        fun stringSet(defaultValue: Set<String>? = null) =
+            object : ReadWriteProperty<SP, Set<String>?> {
+                override fun getValue(thisRef: SP, property: KProperty<*>): Set<String>? {
+                    return sp.getStringSet(property.name, defaultValue)
+                }
+
+                override fun setValue(thisRef: SP, property: KProperty<*>, value: Set<String>?) {
+                    sp.edit().putStringSet(property.name, value).apply()
+                }
+            }
+    }
+
+
 }

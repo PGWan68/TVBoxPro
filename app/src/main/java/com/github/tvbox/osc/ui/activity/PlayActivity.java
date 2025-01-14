@@ -82,7 +82,6 @@ import com.github.tvbox.osc.util.AdBlocker;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.FileUtils;
 import com.github.tvbox.osc.util.HawkConfig;
-import com.github.tvbox.osc.util.HawkUtils;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.M3U8;
 import com.github.tvbox.osc.util.MD5;
@@ -197,10 +196,10 @@ public class PlayActivity extends BaseActivity {
     }
 
     private void setDanmuViewSettings(boolean reload) {
-        float speed = HawkUtils.getDanmuSpeed();
-        float alpha = HawkUtils.getDanmuAlpha();
-        float sizeScale = HawkUtils.getDanmuSizeScale();
-        int maxLine = HawkUtils.getDanmuMaxLine();
+        float speed = Hawk.get(HawkConfig.DANMU_SPEED, 1.5f);
+        float alpha = Hawk.get(HawkConfig.DANMU_ALPHA, 90 / 100.0f);
+        float sizeScale = Hawk.get(HawkConfig.DANMU_SIZESCALE, 0.8f);
+        int maxLine = Hawk.get(HawkConfig.DANMU_MAXLINE, 3);
         HashMap<Integer, Integer> maxLines = new HashMap<>();
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
@@ -1052,9 +1051,9 @@ public class PlayActivity extends BaseActivity {
     private void checkDanmu(String danmu) {
         danmuText = danmu;
         mDanmuView.release();
-        mDanmuView.setVisibility(TextUtils.isEmpty(danmuText) || !HawkUtils.getDanmuOpen() ? View.GONE : View.VISIBLE);
+        mDanmuView.setVisibility(TextUtils.isEmpty(danmuText) || !Hawk.get(HawkConfig.DANMU_OPEN, true)? View.GONE : View.VISIBLE);
         if (TextUtils.isEmpty(danmuText)
-                || !HawkUtils.getDanmuOpen()
+                || !Hawk.get(HawkConfig.DANMU_OPEN, true)
                 || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode())) return;
         if (!danmuText.isEmpty()) {
             mController.setHasDanmu(true);
@@ -1083,7 +1082,7 @@ public class PlayActivity extends BaseActivity {
         try {
             if (!mVodPlayerCfg.has("pl")) {
                 int playType = Hawk.get(HawkConfig.PLAY_TYPE, 1);
-                boolean configurationFile = HawkUtils.getVodPlayerPreferredConfigurationFile();
+                boolean configurationFile = Hawk.get(HawkConfig.VOD_PLAYER_PREFERRED, 0) == 0;
                 int playerType = sourceBean.getPlayerType();
                 if (configurationFile && playerType != -1) {
                     playType = playerType;

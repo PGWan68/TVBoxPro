@@ -25,13 +25,13 @@ import androidx.media3.ui.PlayerView;
 
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.util.HawkConfig;
-import com.github.tvbox.osc.util.HawkUtils;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.orhanobut.hawk.Hawk;
 
 import java.util.Locale;
 import java.util.Map;
 
+import io.github.anilbeesetti.nextlib.media3ext.ffdecoder.NextRenderersFactory;
 import xyz.doikki.videoplayer.player.AbstractPlayer;
 import xyz.doikki.videoplayer.util.PlayerUtils;
 
@@ -63,14 +63,31 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
         mMediaSourceHelper = ExoMediaSourceHelper.getInstance(context);
     }
 
+    /**
+     * 创建exo渲染器
+     *
+     * @param context 上下文
+     * @return {@link DefaultRenderersFactory }
+     */
+    public DefaultRenderersFactory createExoRendererActualValue(Context context) {
+        int renderer = Hawk.get(HawkConfig.EXO_RENDERER, 0);
+        switch (renderer) {
+            case 1:
+                return new NextRenderersFactory(context);
+            case 0:
+            default:
+                return new DefaultRenderersFactory(context);
+        }
+    }
+
     @SuppressLint("UnsafeOptInUsageError")
     @Override
     public void initPlayer() {
         if (mRenderersFactory == null) {
-            mRenderersFactory = HawkUtils.createExoRendererActualValue(mAppContext);
+            mRenderersFactory = createExoRendererActualValue(mAppContext);
         }
         //https://github.com/androidx/media/blob/release/libraries/decoder_ffmpeg/README.md
-        mRenderersFactory.setExtensionRendererMode(HawkUtils.getExoRendererModeActualValue());
+        mRenderersFactory.setExtensionRendererMode(getExoRendererModeActualValue());
 
         if (mTrackSelector == null) {
             mTrackSelector = new DefaultTrackSelector(mAppContext);
@@ -99,6 +116,17 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
         mMediaSourceHelper.clearSocksProxy();
     }
 
+    /**
+     * 返回程序 需要的值 exo渲染器模式
+     */
+    public static int getExoRendererModeActualValue() {
+        int i = Hawk.get(HawkConfig.EXO_RENDERER_MODE, 1);
+        return switch (i) {
+            case 0 -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON;
+            case 2 -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
+            default -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER;
+        };
+    }
     public DefaultTrackSelector getTrackSelector() {
         return mTrackSelector;
     }

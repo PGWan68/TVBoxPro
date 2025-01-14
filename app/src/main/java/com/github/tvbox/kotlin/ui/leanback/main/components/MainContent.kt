@@ -20,9 +20,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import com.github.tvbox.kotlin.AppGlobal
 import com.github.tvbox.kotlin.data.entities.EpgList
 import com.github.tvbox.kotlin.data.entities.EpgList.Companion.currentProgrammes
@@ -38,7 +35,7 @@ import com.github.tvbox.kotlin.ui.leanback.panel.LeanbackPanelScreen
 import com.github.tvbox.kotlin.ui.leanback.panel.LeanbackPanelTempScreen
 import com.github.tvbox.kotlin.ui.leanback.panel.rememberLeanbackPanelChannelNoSelectState
 import com.github.tvbox.kotlin.ui.leanback.quickpanel.LeanbackQuickPanelScreen
-import com.github.tvbox.kotlin.ui.leanback.settings.LeanbackSettingsScreen
+import com.github.tvbox.kotlin.ui.leanback.settings.LeanbackSettingsScreenPreview
 import com.github.tvbox.kotlin.ui.leanback.settings.LeanbackSettingsViewModel
 import com.github.tvbox.kotlin.ui.leanback.toast.LeanbackToastState
 import com.github.tvbox.kotlin.ui.leanback.video.LeanbackVideoScreen
@@ -46,6 +43,9 @@ import com.github.tvbox.kotlin.ui.leanback.video.rememberLeanbackVideoPlayerStat
 import com.github.tvbox.kotlin.ui.utils.SP
 import com.github.tvbox.kotlin.ui.utils.handleLeanbackDragGestures
 import com.github.tvbox.kotlin.ui.utils.handleLeanbackKeyEvents
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun LeanbackMainContent(
@@ -305,7 +305,7 @@ fun LeanbackMainContent(
         }
 
         LeanbackVisible({ mainContentState.isSettingsVisible }) {
-            LeanbackSettingsScreen()
+            LeanbackSettingsScreenPreview()
         }
 
         LeanbackVisible({ settingsViewModel.debugShowFps }) {

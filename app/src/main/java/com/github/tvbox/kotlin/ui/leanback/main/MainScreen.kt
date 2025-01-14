@@ -23,13 +23,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.tvbox.kotlin.ui.leanback.components.LeanbackVisible
 import com.github.tvbox.kotlin.ui.leanback.main.components.LeanbackBackPressHandledArea
 import com.github.tvbox.kotlin.ui.leanback.main.components.LeanbackMainContent
-import com.github.tvbox.kotlin.ui.leanback.settings.LeanbackSettingsScreen
+import com.github.tvbox.kotlin.ui.leanback.settings.LeanbackSettingsScreenPreview
 import com.github.tvbox.kotlin.ui.rememberLeanbackChildPadding
 import com.github.tvbox.kotlin.ui.theme.LeanbackTheme
 import com.github.tvbox.kotlin.ui.utils.HttpServer
@@ -97,7 +98,7 @@ private fun LeanbackMainScreenLoading(messageProvider: () -> String?) {
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackMainScreenLoadingPreview() {
     LeanbackTheme {
@@ -164,7 +165,7 @@ private fun LeanbackMainScreenError(
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackMainScreenErrorPreview() {
     LeanbackTheme {
@@ -175,7 +176,7 @@ private fun LeanbackMainScreenErrorPreview() {
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackMainScreenErrorLongPreview() {
     LeanbackTheme {
@@ -213,7 +214,7 @@ private fun LeanbackMainSettingsHandle(
             content()
 
             LeanbackVisible({ showSettings }) {
-                LeanbackSettingsScreen()
+                LeanbackSettingsScreenPreview()
             }
         }
     }

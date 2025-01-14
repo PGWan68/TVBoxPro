@@ -52,7 +52,6 @@ import com.github.tvbox.osc.ui.dialog.LivePasswordDialog;
 import com.github.tvbox.osc.util.EpgUtil;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
-import com.github.tvbox.osc.util.HawkUtils;
 import com.github.tvbox.osc.util.JavaUtil;
 import com.github.tvbox.osc.util.live.TxtSubscribe;
 import com.google.gson.JsonArray;
@@ -883,7 +882,8 @@ public class LivePlayActivity extends BaseActivity {
         mVideoView.release();
         currentLiveChannelItem = getLiveChannels(currentChannelGroupIndex).get(currentLiveChannelIndex);
         Hawk.put(HawkConfig.LIVE_CHANNEL, currentLiveChannelItem.getChannelName());
-        HawkUtils.setLastLiveChannelGroup(liveChannelGroupList.get(currentChannelGroupIndex).getGroupName());
+        Hawk.put(HawkConfig.LIVE_CHANNEL_GROUP, liveChannelGroupList.get(currentChannelGroupIndex).getGroupName());
+
         livePlayerManager.getLiveChannelPlayer(mVideoView, currentLiveChannelItem.getChannelName());
         channel_Name = currentLiveChannelItem;
         currentLiveChannelItem.setinclude_back(currentLiveChannelItem.getUrl().indexOf("PLTV/8888") != -1);
@@ -917,7 +917,7 @@ public class LivePlayActivity extends BaseActivity {
             currentLiveChannelIndex = liveChannelIndex;
             currentLiveChannelItem = getLiveChannels(currentChannelGroupIndex).get(currentLiveChannelIndex);
             Hawk.put(HawkConfig.LIVE_CHANNEL, currentLiveChannelItem.getChannelName());
-            HawkUtils.setLastLiveChannelGroup(liveChannelGroupList.get(currentChannelGroupIndex).getGroupName());
+            Hawk.put(HawkConfig.LIVE_CHANNEL_GROUP, liveChannelGroupList.get(currentChannelGroupIndex).getGroupName());
             livePlayerManager.getLiveChannelPlayer(mVideoView, currentLiveChannelItem.getChannelName());
         }
         channel_Name = currentLiveChannelItem;

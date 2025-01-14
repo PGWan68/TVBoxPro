@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.tvbox.kotlin.ui.leanback.settings.components.LeanbackSettingsCategoryContent
@@ -27,7 +28,7 @@ import com.github.tvbox.kotlin.ui.rememberLeanbackChildPadding
 import com.github.tvbox.kotlin.ui.theme.LeanbackTheme
 
 @Composable
-fun LeanbackSettingsScreen(
+private fun LeanbackSettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     val childPadding = rememberLeanbackChildPadding()
@@ -67,9 +68,9 @@ fun LeanbackSettingsScreen(
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
-private fun LeanbackSettingsScreenPreview() {
+fun LeanbackSettingsScreenPreview() {
     LeanbackTheme {
         LeanbackSettingsScreen()
     }

@@ -6,8 +6,9 @@ import android.text.TextUtils;
 import com.github.tvbox.osc.bean.Danmu;
 import com.github.tvbox.osc.util.ColorHelper;
 import com.github.tvbox.osc.util.FileUtils;
-import com.github.tvbox.osc.util.HawkUtils;
+import com.github.tvbox.osc.util.HawkConfig;
 import com.lzy.okgo.OkGo;
+import com.orhanobut.hawk.Hawk;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,7 +74,7 @@ public class Parser extends BaseDanmakuParser {
         int type = Integer.parseInt(values[1]);
         long time = (long) (Float.parseFloat(values[0]) * 1000);
         float size = Float.parseFloat(values[2]) * (mDispDensity - 0.6f);
-        int color = HawkUtils.getDanmuColor()? ColorHelper.getCN():(int) ((0x00000000ff000000L | Long.parseLong(values[3])) & 0x00000000ffffffffL);
+        int color = Hawk.get(HawkConfig.DANMU_COLOR, false)? ColorHelper.getCN():(int) ((0x00000000ff000000L | Long.parseLong(values[3])) & 0x00000000ffffffffL);
         item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
         item.setTime(time);
         item.setTimer(mTimer);
