@@ -125,9 +125,7 @@ object SP {
     var appBootLaunch by SharedPreferenceDelegates.boolean()
 
     /** 上一次最新版本 */
-    var appLastLatestVersion: String
-        get() = sp.getString(KEY.APP_LAST_LATEST_VERSION.name, "")!!
-        set(value) = sp.edit().putString(KEY.APP_LAST_LATEST_VERSION.name, value).apply()
+    var appLastLatestVersion by SharedPreferenceDelegates.string()
 
     /** 设备显示类型 */
     var appDeviceDisplayType: AppDeviceDisplayType
@@ -136,114 +134,70 @@ object SP {
 
     /** ==================== 调式 ==================== */
     /** 显示fps */
-    var debugShowFps: Boolean
-        get() = sp.getBoolean(KEY.DEBUG_SHOW_FPS.name, false)
-        set(value) = sp.edit().putBoolean(KEY.DEBUG_SHOW_FPS.name, value).apply()
+    var debugShowFps by SharedPreferenceDelegates.boolean()
 
     /** 播放器详细信息 */
-    var debugShowVideoPlayerMetadata: Boolean
-        get() = sp.getBoolean(KEY.DEBUG_SHOW_VIDEO_PLAYER_METADATA.name, false)
-        set(value) = sp.edit().putBoolean(KEY.DEBUG_SHOW_VIDEO_PLAYER_METADATA.name, value).apply()
+    var debugShowVideoPlayerMetadata by SharedPreferenceDelegates.boolean()
 
     /** ==================== 直播源 ==================== */
     /** 上一次直播源序号 */
-    var iptvLastIptvIdx: Int
-        get() = sp.getInt(KEY.IPTV_LAST_IPTV_IDX.name, 0)
-        set(value) = sp.edit().putInt(KEY.IPTV_LAST_IPTV_IDX.name, value).apply()
+    var iptvLastIptvIdx by SharedPreferenceDelegates.int()
 
     /** 换台反转 */
-    var iptvChannelChangeFlip: Boolean
-        get() = sp.getBoolean(KEY.IPTV_CHANNEL_CHANGE_FLIP.name, false)
-        set(value) = sp.edit().putBoolean(KEY.IPTV_CHANNEL_CHANGE_FLIP.name, value).apply()
+    var iptvChannelChangeFlip by SharedPreferenceDelegates.boolean()
 
     /** 直播源精简 */
-    var iptvSourceSimplify: Boolean
-        get() = sp.getBoolean(KEY.IPTV_SOURCE_SIMPLIFY.name, false)
-        set(value) = sp.edit().putBoolean(KEY.IPTV_SOURCE_SIMPLIFY.name, value).apply()
+    var iptvSourceSimplify by SharedPreferenceDelegates.boolean()
 
     /** 直播源 url */
-    var iptvSourceUrl: String
-        get() = (sp.getString(KEY.IPTV_SOURCE_URL.name, "")
-            ?: "").ifBlank { Constants.IPTV_SOURCE_URL }
-        set(value) = sp.edit().putString(KEY.IPTV_SOURCE_URL.name, value).apply()
+    var iptvSourceUrl by SharedPreferenceDelegates.string(defaultValue = Constants.IPTV_SOURCE_URL)
 
     /** 直播源缓存时间（毫秒） */
-    var iptvSourceCacheTime: Long
-        get() = sp.getLong(KEY.IPTV_SOURCE_CACHE_TIME.name, Constants.IPTV_SOURCE_CACHE_TIME)
-        set(value) = sp.edit().putLong(KEY.IPTV_SOURCE_CACHE_TIME.name, value).apply()
+    var iptvSourceCacheTime by SharedPreferenceDelegates.long(defaultValue = Constants.IPTV_SOURCE_CACHE_TIME)
 
     /** 直播源可播放host列表 */
-    var iptvPlayableHostList: Set<String>
-        get() = sp.getStringSet(KEY.IPTV_PLAYABLE_HOST_LIST.name, emptySet()) ?: emptySet()
-        set(value) = sp.edit().putStringSet(KEY.IPTV_PLAYABLE_HOST_LIST.name, value).apply()
+    var iptvPlayableHostList by SharedPreferenceDelegates.stringSet()
 
     /** 直播源历史列表 */
-    var iptvSourceUrlHistoryList: Set<String>
-        get() = sp.getStringSet(KEY.IPTV_SOURCE_URL_HISTORY_LIST.name, emptySet()) ?: emptySet()
-        set(value) = sp.edit().putStringSet(KEY.IPTV_SOURCE_URL_HISTORY_LIST.name, value).apply()
+    var iptvSourceUrlHistoryList by SharedPreferenceDelegates.stringSet()
 
     /** 是否启用数字选台 */
-    var iptvChannelNoSelectEnable: Boolean
-        get() = sp.getBoolean(KEY.IPTV_CHANNEL_NO_SELECT_ENABLE.name, true)
-        set(value) = sp.edit().putBoolean(KEY.IPTV_CHANNEL_NO_SELECT_ENABLE.name, value).apply()
+    var iptvChannelNoSelectEnable by SharedPreferenceDelegates.boolean(defaultValue = true)
 
     /** 是否启用直播源频道收藏 */
-    var iptvChannelFavoriteEnable: Boolean
-        get() = sp.getBoolean(KEY.IPTV_CHANNEL_FAVORITE_ENABLE.name, true)
-        set(value) = sp.edit().putBoolean(KEY.IPTV_CHANNEL_FAVORITE_ENABLE.name, value).apply()
+    var iptvChannelFavoriteEnable by SharedPreferenceDelegates.boolean(defaultValue = true)
 
     /** 显示直播源频道收藏列表 */
-    var iptvChannelFavoriteListVisible: Boolean
-        get() = sp.getBoolean(KEY.IPTV_CHANNEL_FAVORITE_LIST_VISIBLE.name, false)
-        set(value) = sp.edit().putBoolean(KEY.IPTV_CHANNEL_FAVORITE_LIST_VISIBLE.name, value)
-            .apply()
+    var iptvChannelFavoriteListVisible by SharedPreferenceDelegates.boolean()
 
     /** 直播源频道收藏列表 */
-    var iptvChannelFavoriteList: Set<String>
-        get() = sp.getStringSet(KEY.IPTV_CHANNEL_FAVORITE_LIST.name, emptySet()) ?: emptySet()
-        set(value) = sp.edit().putStringSet(KEY.IPTV_CHANNEL_FAVORITE_LIST.name, value).apply()
+    var iptvChannelFavoriteList by SharedPreferenceDelegates.stringSet()
 
     /** ==================== 节目单 ==================== */
     /** 启用节目单 */
-    var epgEnable: Boolean
-        get() = sp.getBoolean(KEY.EPG_ENABLE.name, true)
-        set(value) = sp.edit().putBoolean(KEY.EPG_ENABLE.name, value).apply()
+    var epgEnable by SharedPreferenceDelegates.boolean(defaultValue = true)
 
     /** 节目单 xml url */
-    var epgXmlUrl: String
-        get() = (sp.getString(KEY.EPG_XML_URL.name, "") ?: "").ifBlank { Constants.EPG_XML_URL }
-        set(value) = sp.edit().putString(KEY.EPG_XML_URL.name, value).apply()
+    var epgXmlUrl by SharedPreferenceDelegates.string(defaultValue = Constants.EPG_XML_URL)
 
     /** 节目单刷新时间阈值（小时） */
-    var epgRefreshTimeThreshold: Int
-        get() = sp.getInt(KEY.EPG_REFRESH_TIME_THRESHOLD.name, Constants.EPG_REFRESH_TIME_THRESHOLD)
-        set(value) = sp.edit().putInt(KEY.EPG_REFRESH_TIME_THRESHOLD.name, value).apply()
+    var epgRefreshTimeThreshold by SharedPreferenceDelegates.int(defaultValue = Constants.EPG_REFRESH_TIME_THRESHOLD)
 
     /** 节目单历史列表 */
-    var epgXmlUrlHistoryList: Set<String>
-        get() = sp.getStringSet(KEY.EPG_XML_URL_HISTORY_LIST.name, emptySet()) ?: emptySet()
-        set(value) = sp.edit().putStringSet(KEY.EPG_XML_URL_HISTORY_LIST.name, value).apply()
+    var epgXmlUrlHistoryList by SharedPreferenceDelegates.stringSet()
 
     /** ==================== 界面 ==================== */
     /** 显示节目进度 */
-    var uiShowEpgProgrammeProgress: Boolean
-        get() = sp.getBoolean(KEY.UI_SHOW_EPG_PROGRAMME_PROGRESS.name, true)
-        set(value) = sp.edit().putBoolean(KEY.UI_SHOW_EPG_PROGRAMME_PROGRESS.name, value).apply()
+    var uiShowEpgProgrammeProgress by SharedPreferenceDelegates.boolean(defaultValue = true)
 
     /** 使用经典选台界面 */
-    var uiUseClassicPanelScreen: Boolean
-        get() = sp.getBoolean(KEY.UI_USE_CLASSIC_PANEL_SCREEN.name, true)
-        set(value) = sp.edit().putBoolean(KEY.UI_USE_CLASSIC_PANEL_SCREEN.name, value).apply()
+    var uiUseClassicPanelScreen by SharedPreferenceDelegates.boolean(defaultValue = true)
 
     /** 界面密度缩放比例 */
-    var uiDensityScaleRatio: Float
-        get() = sp.getFloat(KEY.UI_DENSITY_SCALE_RATIO.name, 1f)
-        set(value) = sp.edit().putFloat(KEY.UI_DENSITY_SCALE_RATIO.name, value).apply()
+    var uiDensityScaleRatio by SharedPreferenceDelegates.float(defaultValue = 1f)
 
     /** 界面字体缩放比例 */
-    var uiFontScaleRatio: Float
-        get() = sp.getFloat(KEY.UI_FONT_SCALE_RATIO.name, 1f)
-        set(value) = sp.edit().putFloat(KEY.UI_FONT_SCALE_RATIO.name, value).apply()
+    var uiFontScaleRatio by SharedPreferenceDelegates.float(defaultValue = 1f)
 
     /** 时间显示模式 */
     var uiTimeShowMode: UiTimeShowMode
@@ -251,28 +205,18 @@ object SP {
         set(value) = sp.edit().putInt(KEY.UI_TIME_SHOW_MODE.name, value.value).apply()
 
     /** 画中画模式 */
-    var uiPipMode: Boolean
-        get() = sp.getBoolean(KEY.UI_PIP_MODE.name, false)
-        set(value) = sp.edit().putBoolean(KEY.UI_PIP_MODE.name, value).apply()
+    var uiPipMode by SharedPreferenceDelegates.boolean()
 
     /** ==================== 更新 ==================== */
     /** 更新强提醒（弹窗形式） */
-    var updateForceRemind: Boolean
-        get() = sp.getBoolean(KEY.UPDATE_FORCE_REMIND.name, false)
-        set(value) = sp.edit().putBoolean(KEY.UPDATE_FORCE_REMIND.name, value).apply()
+    var updateForceRemind by SharedPreferenceDelegates.boolean()
 
     /** ==================== 播放器 ==================== */
     /** 播放器 自定义ua */
-    var videoPlayerUserAgent: String
-        get() = (sp.getString(KEY.VIDEO_PLAYER_USER_AGENT.name, "") ?: "").ifBlank {
-            Constants.VIDEO_PLAYER_USER_AGENT
-        }
-        set(value) = sp.edit().putString(KEY.VIDEO_PLAYER_USER_AGENT.name, value).apply()
+    var videoPlayerUserAgent by SharedPreferenceDelegates.string(defaultValue = Constants.VIDEO_PLAYER_USER_AGENT)
 
     /** 播放器 加载超时 */
-    var videoPlayerLoadTimeout: Long
-        get() = sp.getLong(KEY.VIDEO_PLAYER_LOAD_TIMEOUT.name, Constants.VIDEO_PLAYER_LOAD_TIMEOUT)
-        set(value) = sp.edit().putLong(KEY.VIDEO_PLAYER_LOAD_TIMEOUT.name, value).apply()
+    var videoPlayerLoadTimeout by SharedPreferenceDelegates.long(defaultValue = Constants.VIDEO_PLAYER_LOAD_TIMEOUT)
 
     /** 播放器 画面比例 */
     var videoPlayerAspectRatio: VideoPlayerAspectRatio
@@ -383,23 +327,23 @@ object SP {
             }
         }
 
-        fun string(defaultValue: String? = null) = object : ReadWriteProperty<SP, String?> {
-            override fun getValue(thisRef: SP, property: KProperty<*>): String? {
-                return sp.getString(property.name, defaultValue)
+        fun string(defaultValue: String? = "") = object : ReadWriteProperty<SP, String> {
+            override fun getValue(thisRef: SP, property: KProperty<*>): String {
+                return sp.getString(property.name, defaultValue) ?: ""
             }
 
-            override fun setValue(thisRef: SP, property: KProperty<*>, value: String?) {
+            override fun setValue(thisRef: SP, property: KProperty<*>, value: String) {
                 sp.edit().putString(property.name, value).apply()
             }
         }
 
-        fun stringSet(defaultValue: Set<String>? = null) =
-            object : ReadWriteProperty<SP, Set<String>?> {
-                override fun getValue(thisRef: SP, property: KProperty<*>): Set<String>? {
-                    return sp.getStringSet(property.name, defaultValue)
+        fun stringSet(defaultValue: Set<String> = emptySet()) =
+            object : ReadWriteProperty<SP, Set<String>> {
+                override fun getValue(thisRef: SP, property: KProperty<*>): Set<String> {
+                    return sp.getStringSet(property.name, defaultValue) ?: emptySet();
                 }
 
-                override fun setValue(thisRef: SP, property: KProperty<*>, value: Set<String>?) {
+                override fun setValue(thisRef: SP, property: KProperty<*>, value: Set<String>) {
                     sp.edit().putStringSet(property.name, value).apply()
                 }
             }
