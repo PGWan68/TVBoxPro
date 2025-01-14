@@ -1,6 +1,7 @@
 package com.github.tvbox.kotlin.activities
 
 import android.app.PictureInPictureParams
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Rational
@@ -57,6 +58,10 @@ class LeanbackActivity : BaseLiveActivity() {
                             finish()
 //                            exitProcess(0)
                         },
+
+                        startActivity = {
+                            this@LeanbackActivity.startActivity(Intent(this@LeanbackActivity,it))
+                        }
                     )
                 }
             }

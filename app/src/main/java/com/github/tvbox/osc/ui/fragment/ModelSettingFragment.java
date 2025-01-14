@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DiffUtil;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.BaseActivity;
@@ -50,6 +51,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import me.jessyan.autosize.utils.AutoSizeUtils;
@@ -107,7 +109,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvDebugOpen = findViewById(R.id.tvDebugOpen);
         tvDebugOpen.setText(Hawk.get(HawkConfig.DEBUG_OPEN, false) ? "开启" : "关闭");
         tvApi = findViewById(R.id.tvApi);
-        tvApi.setText(Hawk.get(HawkConfig.API_URL, ""));
+        tvApi.setText(SP.INSTANCE.getApiUrl());
         // Home Section
         tvHomeApi = findViewById(R.id.tvHomeApi);
         tvHomeApi.setText(ApiConfig.get().getHomeSourceBean().getName());
@@ -163,7 +165,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setOnListener(new ApiDialog.OnListener() {
                     @Override
                     public void onchange(String api) {
-                        Hawk.put(HawkConfig.API_URL, api);
+                        SP.INSTANCE.setApiUrl(api);
                         tvApi.setText(api);
                     }
                 });
@@ -180,10 +182,10 @@ public class ModelSettingFragment extends BaseLazyFragment {
         findViewById(R.id.llApiHistory).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
+                List<String> history = new ArrayList<>(SP.INSTANCE.getApiHistory());
                 if (history.isEmpty())
                     return;
-                String current = Hawk.get(HawkConfig.API_URL, "");
+                String current = SP.INSTANCE.getApiUrl();
                 int idx = 0;
                 if (history.contains(current))
                     idx = history.indexOf(current);
@@ -192,14 +194,14 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setAdapter(new ApiHistoryDialogAdapter.SelectDialogInterface() {
                     @Override
                     public void click(String api) {
-                        Hawk.put(HawkConfig.API_URL, api);
+                        SP.INSTANCE.setApiUrl(api);
                         tvApi.setText(api);
                         dialog.dismiss();
                     }
 
                     @Override
                     public void del(String value, ArrayList<String> data) {
-                        Hawk.put(HawkConfig.API_HISTORY, data);
+                        SP.INSTANCE.setApiHistory(new HashSet<>(data));
                     }
                 }, history, idx);
                 dialog.show();
@@ -421,6 +423,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                     tvBgPlayType.setText(value);
                     Hawk.put(HawkConfig.BACKGROUND_PLAY_TYPE, pos);
                 }
+
                 @Override
                 public String getDisplay(String val) {
                     return val;
@@ -430,11 +433,12 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 public boolean areItemsTheSame(@NonNull @NotNull String oldItem, @NonNull @NotNull String newItem) {
                     return oldItem.equals(newItem);
                 }
+
                 @Override
                 public boolean areContentsTheSame(@NonNull @NotNull String oldItem, @NonNull @NotNull String newItem) {
                     return oldItem.equals(newItem);
                 }
-            }, bgPlayTypes,bgPlayTypePos);
+            }, bgPlayTypes, bgPlayTypePos);
             dialog.show();
         });
         // Select PLAYER Type --------------------------------------------
@@ -448,13 +452,13 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 players.add(1);
                 players.add(2);
                 players.add(3);
-                if (MXPlayer.getPackageInfo()!=null){
+                if (MXPlayer.getPackageInfo() != null) {
                     players.add(10);
                 }
-                if (ReexPlayer.getPackageInfo() != null){
+                if (ReexPlayer.getPackageInfo() != null) {
                     players.add(11);
                 }
-                if (Kodi.getPackageInfo() != null){
+                if (Kodi.getPackageInfo() != null) {
                     players.add(12);
                 }
                 SelectDialog<Integer> dialog = new SelectDialog<>(mActivity);

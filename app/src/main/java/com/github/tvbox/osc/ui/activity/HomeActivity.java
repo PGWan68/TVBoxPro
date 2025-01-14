@@ -33,6 +33,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.viewpager.widget.ViewPager;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.App;
@@ -354,7 +355,7 @@ public class HomeActivity extends BaseActivity {
             dialog.setAdapter(tvRecyclerView, new SelectDialogAdapter.SelectDialogInterface<LineBean>() {
                 @Override
                 public void click(LineBean value, int pos) {
-                    Hawk.put(HawkConfig.API_URL, value.getUrl());
+                    SP.INSTANCE.setApiUrl(value.getUrl());
                     ApiConfig.get().clear();
                     reloadHome(false);
                 }

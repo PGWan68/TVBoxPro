@@ -27,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.App;
@@ -77,12 +78,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.TimeZone;
 
 import kotlin.Pair;
@@ -220,7 +222,7 @@ public class LivePlayActivity extends BaseActivity {
         hideSystemUI(false);
 
         // Getting EPG Address
-        epgStringAddress = Hawk.get(HawkConfig.EPG_URL, "");
+        epgStringAddress = SP.INSTANCE.getEpgUrl();
         if (StringUtils.isBlank(epgStringAddress)) {
             epgStringAddress = "https://epg.112114.xyz/";
 //            Hawk.put(HawkConfig.EPG_URL, epgStringAddress);
@@ -1674,10 +1676,10 @@ public class LivePlayActivity extends BaseActivity {
                 switch (position) {
                     case 0:
                         // takagen99 : Added Live History list selection - 直播列表
-                        ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_HISTORY, new ArrayList<String>());
+                        ArrayList<String> liveHistory = new ArrayList<>(SP.INSTANCE.getLiveHistory());
                         if (liveHistory.isEmpty())
                             return;
-                        String current = Hawk.get(HawkConfig.LIVE_URL, "");
+                        String current = SP.INSTANCE.getLiveUrl();
                         int idx = 0;
                         if (liveHistory.contains(current))
                             idx = liveHistory.indexOf(current);
@@ -1686,7 +1688,7 @@ public class LivePlayActivity extends BaseActivity {
                         dialog.setAdapter(new ApiHistoryDialogAdapter.SelectDialogInterface() {
                             @Override
                             public void click(String liveURL) {
-                                Hawk.put(HawkConfig.LIVE_URL, liveURL);
+                                SP.INSTANCE.setLiveUrl(liveURL);
                                 liveChannelGroupList.clear();
                                 try {
                                     liveURL = Base64.encodeToString(liveURL.getBytes("UTF-8"), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP);
@@ -1700,7 +1702,7 @@ public class LivePlayActivity extends BaseActivity {
 
                             @Override
                             public void del(String value, ArrayList<String> data) {
-                                Hawk.put(HawkConfig.LIVE_HISTORY, data);
+                                SP.INSTANCE.setLiveHistory(new HashSet<>(data));
                             }
                         }, liveHistory, idx);
                         dialog.show();

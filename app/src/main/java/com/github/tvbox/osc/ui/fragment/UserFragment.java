@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.github.tvbox.kotlin.activities.MainSettingActivity;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.BaseLazyFragment;
@@ -341,6 +342,7 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         if (v.getId() == R.id.tvLive) {
 //            jumpActivity(LivePlayActivity.class);
             startActivity(new Intent(mContext, LeanbackActivity.class));
+//            startActivity(new Intent(mContext, MainSettingActivity.class));
 
         } else if (v.getId() == R.id.tvSearch) {
             jumpActivity(SearchActivity.class);

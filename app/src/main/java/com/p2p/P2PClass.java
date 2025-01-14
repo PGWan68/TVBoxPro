@@ -1,7 +1,8 @@
 package com.p2p;
 
+import com.github.tvbox.osc.util.LOG;
+
 import java.io.File;
-import java.util.concurrent.Executors;
 
 
 public class P2PClass {
@@ -31,7 +32,11 @@ public class P2PClass {
     }
 
     static {
-        System.loadLibrary("p2p");
+        try {
+            System.loadLibrary("p2p");
+        } catch (Throwable e) {
+            LOG.e(e);
+        }
     }
 
     public P2PClass(String str) {

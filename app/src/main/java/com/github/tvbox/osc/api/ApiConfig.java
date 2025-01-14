@@ -9,6 +9,7 @@ import android.util.Base64;
 import com.github.catvod.crawler.JarLoader;
 import com.github.catvod.crawler.JsLoader;
 import com.github.catvod.crawler.Spider;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.bean.IJKCode;
 import com.github.tvbox.osc.bean.LineBean;
@@ -47,6 +48,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -426,8 +428,8 @@ public class ApiConfig {
 
         // takagen99: Check if Live URL is setup in Settings, if no, get from File Config
         liveChannelGroupList.clear();           //修复从后台切换重复加载频道列表
-        String liveURL = Hawk.get(HawkConfig.LIVE_URL, "");
-        String epgURL = Hawk.get(HawkConfig.EPG_URL, "");
+        String liveURL = SP.INSTANCE.getLiveUrl();
+        String epgURL = SP.INSTANCE.getEpgUrl();
 
         String liveURL_final = null;
         try {
@@ -458,7 +460,7 @@ public class ApiConfig {
                         putLiveHistory(extUrlFix);
                         // Overwrite with Live URL from Settings
                         if (StringUtils.isBlank(liveURL)) {
-                            Hawk.put(HawkConfig.LIVE_URL, extUrlFix);
+                            SP.INSTANCE.setLiveUrl(extUrlFix);
                         } else {
                             extUrlFix = liveURL;
                         }
@@ -478,9 +480,9 @@ public class ApiConfig {
                         putEPGHistory(epg);
                         // Overwrite with EPG URL from Settings
                         if (StringUtils.isBlank(epgURL)) {
-                            Hawk.put(HawkConfig.EPG_URL, epg);
+                            SP.INSTANCE.setEpgUrl(epg);
                         } else {
-                            Hawk.put(HawkConfig.EPG_URL, epgURL);
+                            SP.INSTANCE.setEpgUrl(epgURL);
                         }
                     }
 
@@ -510,9 +512,9 @@ public class ApiConfig {
                                     putEPGHistory(epg);
                                     // Overwrite with EPG URL from Settings
                                     if (StringUtils.isBlank(epgURL)) {
-                                        Hawk.put(HawkConfig.EPG_URL, epg);
+                                        SP.INSTANCE.setEpgUrl(epg);
                                     } else {
-                                        Hawk.put(HawkConfig.EPG_URL, epgURL);
+                                        SP.INSTANCE.setEpgUrl(epgURL);
                                     }
                                 }
 
@@ -522,7 +524,7 @@ public class ApiConfig {
                                     putLiveHistory(url);
                                     // Overwrite with Live URL from Settings
                                     if (StringUtils.isBlank(liveURL)) {
-                                        Hawk.put(HawkConfig.LIVE_URL, url);
+                                        SP.INSTANCE.setLiveUrl(url);
                                     } else {
                                         url = liveURL;
                                     }
@@ -659,23 +661,23 @@ public class ApiConfig {
 
     private void putLiveHistory(String url) {
         if (!url.isEmpty()) {
-            ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_HISTORY, new ArrayList<String>());
+            ArrayList<String> liveHistory = new ArrayList<>(SP.INSTANCE.getLiveHistory());
             if (!liveHistory.contains(url))
                 liveHistory.add(0, url);
             if (liveHistory.size() > 20)
                 liveHistory.remove(20);
-            Hawk.put(HawkConfig.LIVE_HISTORY, liveHistory);
+            SP.INSTANCE.setLiveHistory(new HashSet<>(liveHistory));
         }
     }
 
     public static void putEPGHistory(String url) {
         if (!url.isEmpty()) {
-            ArrayList<String> epgHistory = Hawk.get(HawkConfig.EPG_HISTORY, new ArrayList<String>());
+            ArrayList<String> epgHistory = new ArrayList<>(SP.INSTANCE.getEpgHistory());
             if (!epgHistory.contains(url))
                 epgHistory.add(0, url);
             if (epgHistory.size() > 20)
                 epgHistory.remove(20);
-            Hawk.put(HawkConfig.EPG_HISTORY, epgHistory);
+            SP.INSTANCE.setEpgHistory(new HashSet<>(epgHistory));
         }
     }
 
@@ -872,10 +874,10 @@ public class ApiConfig {
     }
 
     public String getCurrentApiUrl() {
-        String apiUrl = Hawk.get(HawkConfig.API_URL, "");
+        String apiUrl = SP.INSTANCE.getApiUrl();
         if (apiUrl.isEmpty() && !defaultVodLines.isEmpty()) {
             apiUrl = defaultVodLines.get(0).getUrl();
-            Hawk.put(HawkConfig.API_URL, apiUrl);
+            SP.INSTANCE.setApiUrl(apiUrl);
             return apiUrl;
         }
         return apiUrl;

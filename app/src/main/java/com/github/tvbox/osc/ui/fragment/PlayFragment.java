@@ -43,6 +43,7 @@ import androidx.media3.common.text.Cue;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.github.catvod.crawler.Spider;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.App;
@@ -180,10 +181,10 @@ public class PlayFragment extends BaseLazyFragment {
     }
 
     private void setDanmuViewSettings(boolean reload) {
-        float speed = Hawk.get(HawkConfig.DANMU_SPEED, 1.5f);
-        float alpha = Hawk.get(HawkConfig.DANMU_ALPHA, 90 / 100.0f);
-        float sizeScale = Hawk.get(HawkConfig.DANMU_SIZESCALE, 0.8f);
-        int maxLine = Hawk.get(HawkConfig.DANMU_MAXLINE, 3);
+        float speed = SP.INSTANCE.getDanmuSpeed();
+        float alpha =  SP.INSTANCE.getDanmuAlpha();
+        float sizeScale = SP.INSTANCE.getDanmuSizescale();
+        int maxLine = SP.INSTANCE.getDanmuMaxline();
         HashMap<Integer, Integer> maxLines = new HashMap<>();
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
@@ -1039,9 +1040,9 @@ public class PlayFragment extends BaseLazyFragment {
     private void checkDanmu(String danmu) {
         danmuText = danmu;
         mDanmuView.release();
-        mDanmuView.setVisibility(TextUtils.isEmpty(danmuText) || !Hawk.get(HawkConfig.DANMU_OPEN, true)? View.GONE : View.VISIBLE);
+        mDanmuView.setVisibility(TextUtils.isEmpty(danmuText) || !SP.INSTANCE.getDanmuOpen()? View.GONE : View.VISIBLE);
         if (TextUtils.isEmpty(danmuText)
-                || !Hawk.get(HawkConfig.DANMU_OPEN, true)
+                || !SP.INSTANCE.getDanmuOpen()
                 || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && mActivity.isInPictureInPictureMode())) return;
         if (!danmuText.isEmpty()) {
             mController.setHasDanmu(true);

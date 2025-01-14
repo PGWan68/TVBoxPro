@@ -9,11 +9,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.server.RemoteServer;
-import com.github.tvbox.osc.util.HawkConfig;
-import com.orhanobut.hawk.Hawk;
 
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
@@ -41,8 +40,8 @@ public class PushDialog extends BaseDialog {
         // Push IP / Port
         etAddr = findViewById(R.id.etAddr);
         etPort = findViewById(R.id.etPort);
-        String cfgAddr = Hawk.get(HawkConfig.PUSH_TO_ADDR, "");
-        String cfgPort = Hawk.get(HawkConfig.PUSH_TO_PORT, "");
+        String cfgAddr = SP.INSTANCE.getPushToAddress();
+        String cfgPort = SP.INSTANCE.getPushToPort();
 
         if (cfgAddr.isEmpty()) {
             String ipAddress = RemoteServer.getLocalIPAddress(PushDialog.this.getContext());
@@ -75,8 +74,9 @@ public class PushDialog extends BaseDialog {
                     Toast.makeText(PushDialog.this.getContext(), "请输入远端tvbox端口", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Hawk.put(HawkConfig.PUSH_TO_ADDR, addr);
-                Hawk.put(HawkConfig.PUSH_TO_PORT, port);
+                SP.INSTANCE.setPushToAddress(addr);
+                SP.INSTANCE.setPushToPort(port);
+
                 List<String> list = new ArrayList<>();
                 list.add(addr);
                 list.add(port);

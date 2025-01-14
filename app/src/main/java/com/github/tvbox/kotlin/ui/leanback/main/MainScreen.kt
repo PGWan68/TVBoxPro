@@ -1,5 +1,6 @@
 package com.github.tvbox.kotlin.ui.leanback.main
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
@@ -27,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.tvbox.kotlin.activities.BaseLiveActivity
 import com.github.tvbox.kotlin.ui.leanback.components.LeanbackVisible
 import com.github.tvbox.kotlin.ui.leanback.main.components.LeanbackBackPressHandledArea
 import com.github.tvbox.kotlin.ui.leanback.main.components.LeanbackMainContent
@@ -47,6 +49,7 @@ import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 fun LeanbackMainScreen(
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit = {},
+    startActivity: (clazz: Class<*>) -> Unit = {},
     mainViewModel: LeanbackMainViewModel = viewModel(),
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
@@ -54,6 +57,7 @@ fun LeanbackMainScreen(
     when (val s = uiState) {
         is LeanbackMainUiState.Ready -> LeanbackMainContent(
             modifier = modifier,
+            startActivity = startActivity,
             iptvGroupList = s.iptvGroupList,
             epgList = s.epgList,
             onBackPressed = onBackPressed,

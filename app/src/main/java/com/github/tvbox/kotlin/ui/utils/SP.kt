@@ -194,6 +194,30 @@ object SP {
     }
 
 
+    var pushToAddress by SharedPreferenceDelegates.string()
+    var pushToPort by SharedPreferenceDelegates.string()
+
+
+    /* 弹幕相关 */
+
+    var danmuColor by SharedPreferenceDelegates.boolean()
+    var danmuSizescale by SharedPreferenceDelegates.float(defaultValue = 0.8f)
+    var danmuAlpha by SharedPreferenceDelegates.float(defaultValue = 0.9f)
+    var danmuSpeed by SharedPreferenceDelegates.float(defaultValue = 1.5f)
+    var danmuMaxline by SharedPreferenceDelegates.int(defaultValue = 3)
+    var danmuOpen by SharedPreferenceDelegates.boolean(defaultValue = true)
+
+
+    /* URL 相关配置 */
+    var apiUrl by SharedPreferenceDelegates.string()
+    var apiHistory by SharedPreferenceDelegates.stringSet()
+    var liveUrl by SharedPreferenceDelegates.string()
+    var liveHistory by SharedPreferenceDelegates.stringSet()
+    var epgUrl by SharedPreferenceDelegates.string()
+    var epgHistory by SharedPreferenceDelegates.stringSet()
+    var proxyServer by SharedPreferenceDelegates.string()
+
+
     private object SharedPreferenceDelegates {
 
         fun int(defaultValue: Int = 0) = object : ReadWriteProperty<SP, Int> {

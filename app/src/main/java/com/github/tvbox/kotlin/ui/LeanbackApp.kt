@@ -1,5 +1,6 @@
 package com.github.tvbox.kotlin.ui
 
+import android.content.Intent
 import androidx.annotation.IntRange
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -11,10 +12,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.github.tvbox.kotlin.activities.BaseLiveActivity
 import com.github.tvbox.kotlin.ui.leanback.components.LeanbackPadding
 import com.github.tvbox.kotlin.ui.leanback.main.LeanbackMainScreen
 import com.github.tvbox.kotlin.ui.leanback.toast.LeanbackToastScreen
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.debounce
 fun LeanbackApp(
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit = {},
+    startActivity: (clazz: Class<*>) -> Unit = {},
 ) {
 //    val context = LocalContext.current
 //    val doubleBackPressedExitState = rememberLeanbackDoubleBackPressedExitState()
@@ -34,6 +36,7 @@ fun LeanbackApp(
     LeanbackToastScreen()
     LeanbackMainScreen(
         modifier = modifier,
+        startActivity = startActivity,
         onBackPressed = {
 //            if (doubleBackPressedExitState.allowExit) {
 //                onBackPressed()

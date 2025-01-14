@@ -537,7 +537,7 @@ public class SourceViewModel extends ViewModel {
                     json(searchResult, "", sourceBean.getKey());
                 }
             } catch (Throwable th) {
-                th.printStackTrace();
+                LOG.e(th);
                 json(searchResult, "", sourceBean.getKey());
             }
         } else if (type == 0 || type == 1) {

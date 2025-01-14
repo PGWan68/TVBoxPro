@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SmartDisplay
 import androidx.compose.material.icons.filled.Star
@@ -21,6 +22,7 @@ enum class LeanbackSettingsCategories(
 ) {
     ABOUT(Icons.Default.Info, "关于"),
     APP(Icons.Default.Settings, "应用"),
+    VOD(Icons.Default.Movie, "点播源"),
     IPTV(Icons.Default.LiveTv, "直播源"),
     EPG(Icons.Default.Menu, "节目单"),
     UI(Icons.Default.DisplaySettings, "界面"),

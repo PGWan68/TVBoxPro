@@ -23,6 +23,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.exoplayer.trackselection.TrackSelectionArray;
 import androidx.media3.ui.PlayerView;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.PlayerHelper;
@@ -348,8 +349,8 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
     public void onPlayerError(@NonNull PlaybackException error) {
         errorCode = error.errorCode;
         Log.e("tag--", "" + error.errorCode);
-        String proxyServer = Hawk.get(HawkConfig.PROXY_SERVER, "");
-        if ("".equals(proxyServer)) {
+        String proxyServer = SP.INSTANCE.getProxyServer();
+        if (proxyServer.isEmpty()) {
             if (retriedTimes == 0) {
                 retriedTimes = 1;
                 setDataSource(path, headers);

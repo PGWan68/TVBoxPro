@@ -27,6 +27,7 @@ fun LeanbackSettingsCategoryContent(
             LeanbackSettingsCategories.ABOUT -> LeanbackSettingsCategoryAbout()
             LeanbackSettingsCategories.APP -> LeanbackSettingsCategoryApp()
             LeanbackSettingsCategories.IPTV -> LeanbackSettingsCategoryIptv()
+            LeanbackSettingsCategories.VOD -> LeanbackSettingsCategoryIptv()
             LeanbackSettingsCategories.EPG -> LeanbackSettingsCategoryEpg()
             LeanbackSettingsCategories.UI -> LeanbackSettingsCategoryUI()
             LeanbackSettingsCategories.FAVORITE -> LeanbackSettingsCategoryFavorite()

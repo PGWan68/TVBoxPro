@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.server.ControlManager;
@@ -17,16 +18,15 @@ import com.github.tvbox.osc.ui.activity.HomeActivity;
 import com.github.tvbox.osc.ui.adapter.ApiHistoryDialogAdapter;
 import com.github.tvbox.osc.ui.tv.QRCodeGen;
 import com.github.tvbox.osc.util.DefaultConfig;
-import com.github.tvbox.osc.util.HawkConfig;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.XXPermissions;
-import com.orhanobut.hawk.Hawk;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import me.jessyan.autosize.utils.AutoSizeUtils;
@@ -68,15 +68,15 @@ public class ApiDialog extends BaseDialog {
         ivQRCode = findViewById(R.id.ivQRCode);
         tvAddress = findViewById(R.id.tvAddress);
         inputApi = findViewById(R.id.input);
-        inputApi.setText(Hawk.get(HawkConfig.API_URL, ""));
+        inputApi.setText(SP.INSTANCE.getApiUrl());
 
         // takagen99: Add Live & EPG Address
         inputLive = findViewById(R.id.input_live);
-        inputLive.setText(Hawk.get(HawkConfig.LIVE_URL, ""));
+        inputLive.setText(SP.INSTANCE.getLiveUrl());
         inputEPG = findViewById(R.id.input_epg);
-        inputEPG.setText(Hawk.get(HawkConfig.EPG_URL, ""));
+        inputEPG.setText(SP.INSTANCE.getEpgUrl());
         inputProxy = findViewById(R.id.input_proxy);
-        inputProxy.setText(Hawk.get(HawkConfig.PROXY_SERVER, ""));
+        inputProxy.setText(SP.INSTANCE.getProxyServer());
 
         findViewById(R.id.inputSubmit).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,46 +92,48 @@ public class ApiDialog extends BaseDialog {
                     newApi = newApi.replace("./", "clan://localhost/");
                 }
                 if (!newApi.isEmpty()) {
-                    ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
+                    List<String> history = new ArrayList<>(SP.INSTANCE.getApiHistory());
                     if (!history.contains(newApi))
                         history.add(0, newApi);
                     if (history.size() > 20)
                         history.remove(20);
-                    Hawk.put(HawkConfig.API_HISTORY, history);
+                    SP.INSTANCE.setApiHistory(new HashSet<>(history));
+
                     listener.onchange(newApi);
                     dismiss();
                 }
                 // Capture Live input into Settings & Live History (max 20)
-                Hawk.put(HawkConfig.LIVE_URL, newLive);
+                SP.INSTANCE.setLiveUrl(newLive);
                 if (!newLive.isEmpty()) {
-                    ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_HISTORY, new ArrayList<String>());
+                    List<String> liveHistory = new ArrayList<>(SP.INSTANCE.getLiveHistory());
                     if (!liveHistory.contains(newLive))
                         liveHistory.add(0, newLive);
                     if (liveHistory.size() > 20)
                         liveHistory.remove(20);
-                    Hawk.put(HawkConfig.LIVE_HISTORY, liveHistory);
+                    SP.INSTANCE.setLiveHistory(new HashSet<>(liveHistory));
                 }
                 // Capture EPG input into Settings
-                Hawk.put(HawkConfig.EPG_URL, newEPG);
+                SP.INSTANCE.setEpgUrl(newEPG);
                 if (!newEPG.isEmpty()) {
-                    ArrayList<String> EPGHistory = Hawk.get(HawkConfig.EPG_HISTORY, new ArrayList<String>());
-                    if (!EPGHistory.contains(newEPG))
-                        EPGHistory.add(0, newEPG);
-                    if (EPGHistory.size() > 20)
-                        EPGHistory.remove(20);
-                    Hawk.put(HawkConfig.EPG_HISTORY, EPGHistory);
+                    List<String> epgHistory = new ArrayList<>(SP.INSTANCE.getEpgHistory());
+                    if (!epgHistory.contains(newEPG))
+                        epgHistory.add(0, newEPG);
+                    if (epgHistory.size() > 20)
+                        epgHistory.remove(20);
+                    SP.INSTANCE.setEpgHistory(new HashSet<>(epgHistory));
+
                 }
                 // Capture oroxy server input into Settings
-                Hawk.put(HawkConfig.PROXY_SERVER, newProxyServer);
+                SP.INSTANCE.setProxyServer(newProxyServer);
             }
         });
         findViewById(R.id.apiHistory).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
+                List<String> history = new ArrayList<>(SP.INSTANCE.getApiHistory());
                 if (history.isEmpty())
                     return;
-                String current = Hawk.get(HawkConfig.API_URL, "");
+                String current = SP.INSTANCE.getApiUrl();
                 int idx = 0;
                 if (history.contains(current))
                     idx = history.indexOf(current);
@@ -147,7 +149,7 @@ public class ApiDialog extends BaseDialog {
 
                     @Override
                     public void del(String value, ArrayList<String> data) {
-                        Hawk.put(HawkConfig.API_HISTORY, data);
+                        SP.INSTANCE.setApiHistory(new HashSet<>(data));
                     }
                 }, history, idx);
                 dialog.show();
@@ -156,10 +158,10 @@ public class ApiDialog extends BaseDialog {
         findViewById(R.id.liveHistory).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_HISTORY, new ArrayList<String>());
+                ArrayList<String> liveHistory = new ArrayList<>(SP.INSTANCE.getLiveHistory());
                 if (liveHistory.isEmpty())
                     return;
-                String current = Hawk.get(HawkConfig.LIVE_URL, "");
+                String current = SP.INSTANCE.getLiveUrl();
                 int idx = 0;
                 if (liveHistory.contains(current))
                     idx = liveHistory.indexOf(current);
@@ -169,13 +171,13 @@ public class ApiDialog extends BaseDialog {
                     @Override
                     public void click(String liveURL) {
                         inputLive.setText(liveURL);
-                        Hawk.put(HawkConfig.LIVE_URL, liveURL);
+                        SP.INSTANCE.setLiveUrl(liveURL);
                         dialog.dismiss();
                     }
 
                     @Override
                     public void del(String value, ArrayList<String> data) {
-                        Hawk.put(HawkConfig.LIVE_HISTORY, data);
+                        SP.INSTANCE.setLiveHistory(new HashSet<>(data));
                     }
                 }, liveHistory, idx);
                 dialog.show();
@@ -184,10 +186,10 @@ public class ApiDialog extends BaseDialog {
         findViewById(R.id.EPGHistory).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> EPGHistory = Hawk.get(HawkConfig.EPG_HISTORY, new ArrayList<String>());
+                ArrayList<String> EPGHistory = new ArrayList<>(SP.INSTANCE.getEpgHistory());
                 if (EPGHistory.isEmpty())
                     return;
-                String current = Hawk.get(HawkConfig.EPG_URL, "");
+                String current = SP.INSTANCE.getEpgUrl();
                 int idx = 0;
                 if (EPGHistory.contains(current))
                     idx = EPGHistory.indexOf(current);
@@ -197,13 +199,13 @@ public class ApiDialog extends BaseDialog {
                     @Override
                     public void click(String epgURL) {
                         inputEPG.setText(epgURL);
-                        Hawk.put(HawkConfig.EPG_URL, epgURL);
+                        SP.INSTANCE.setEpgUrl(epgURL);
                         dialog.dismiss();
                     }
 
                     @Override
                     public void del(String value, ArrayList<String> data) {
-                        Hawk.put(HawkConfig.EPG_HISTORY, data);
+                        SP.INSTANCE.setEpgHistory(new HashSet<>(data));
                     }
                 }, EPGHistory, idx);
                 dialog.show();

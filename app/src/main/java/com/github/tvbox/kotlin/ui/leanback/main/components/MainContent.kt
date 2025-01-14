@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.tvbox.kotlin.AppGlobal
+import com.github.tvbox.kotlin.activities.MainSettingActivity
 import com.github.tvbox.kotlin.data.entities.EpgList
 import com.github.tvbox.kotlin.data.entities.EpgList.Companion.currentProgrammes
 import com.github.tvbox.kotlin.data.entities.IptvGroupList
@@ -35,7 +36,6 @@ import com.github.tvbox.kotlin.ui.leanback.panel.LeanbackPanelScreen
 import com.github.tvbox.kotlin.ui.leanback.panel.LeanbackPanelTempScreen
 import com.github.tvbox.kotlin.ui.leanback.panel.rememberLeanbackPanelChannelNoSelectState
 import com.github.tvbox.kotlin.ui.leanback.quickpanel.LeanbackQuickPanelScreen
-import com.github.tvbox.kotlin.ui.leanback.settings.LeanbackSettingsScreenPreview
 import com.github.tvbox.kotlin.ui.leanback.settings.LeanbackSettingsViewModel
 import com.github.tvbox.kotlin.ui.leanback.toast.LeanbackToastState
 import com.github.tvbox.kotlin.ui.leanback.video.LeanbackVideoScreen
@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 fun LeanbackMainContent(
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit = {},
+    startActivity: (clazz: Class<*>) -> Unit = {},
     iptvGroupList: IptvGroupList = IptvGroupList(),
     epgList: EpgList = EpgList(),
     settingsViewModel: LeanbackSettingsViewModel = viewModel(),
@@ -274,6 +275,7 @@ fun LeanbackMainContent(
             }
         }
 
+        // Menu屏UI
         LeanbackVisible({ mainContentState.isQuickPanelVisible && !mainContentState.isSettingsVisible }) {
             LeanbackQuickPanelScreen(
                 currentIptvProvider = { mainContentState.currentIptv },
@@ -299,14 +301,19 @@ fun LeanbackMainContent(
                     }
                     LeanbackToastState.Companion.I.showToast("缓存已清除，请重启应用")
                 },
-                onMoreSettings = { mainContentState.isSettingsVisible = true },
+                onMoreSettings = {
+                    // 跳转到设置页面
+                    startActivity(MainSettingActivity::class.java);
+                    mainContentState.isSettingsVisible = true
+                },
                 onClose = { mainContentState.isQuickPanelVisible = false },
             )
         }
 
-        LeanbackVisible({ mainContentState.isSettingsVisible }) {
-            LeanbackSettingsScreenPreview()
-        }
+        // 设置页面
+//        LeanbackVisible({ mainContentState.isSettingsVisible }) {
+//            LeanbackSettingsScreenPreview()
+//        }
 
         LeanbackVisible({ settingsViewModel.debugShowFps }) {
             LeanbackMonitorScreen()
