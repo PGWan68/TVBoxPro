@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,10 +26,9 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import com.github.tvbox.kotlin.data.entities.Epg
 import com.github.tvbox.kotlin.data.entities.EpgList
 import com.github.tvbox.kotlin.data.entities.EpgProgramme
@@ -46,9 +46,10 @@ import com.github.tvbox.kotlin.ui.leanback.classicpanel.components.LeanbackClass
 import com.github.tvbox.kotlin.ui.leanback.components.LeanbackVisible
 import com.github.tvbox.kotlin.ui.leanback.panel.PanelAutoCloseState
 import com.github.tvbox.kotlin.ui.leanback.panel.rememberPanelAutoCloseState
-import com.github.tvbox.kotlin.ui.rememberLeanbackChildPadding
 import com.github.tvbox.kotlin.ui.theme.LeanbackTheme
 import com.github.tvbox.kotlin.ui.utils.handleLeanbackKeyEvents
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlin.math.max
 
 @Composable
@@ -100,7 +101,7 @@ private fun LeanbackClassicPanelScreenWrapper(
     onClose: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
-    val childPadding = rememberLeanbackChildPadding()
+//    val childPadding = rememberLeanbackChildPadding()
 
     Box(
         modifier = modifier
@@ -110,13 +111,18 @@ private fun LeanbackClassicPanelScreenWrapper(
         Box(
             modifier = Modifier
                 .pointerInput(Unit) { detectTapGestures(onTap = { }) }
-                .padding(
-                    top = childPadding.top,
-                    start = childPadding.start,
-                    bottom = childPadding.bottom,
-                    end = childPadding.end,
-                )
-                .clip(MaterialTheme.shapes.small),
+//                .padding(
+//                    top = childPadding.top,
+//                    start = childPadding.start,
+//                    bottom = childPadding.bottom,
+//                    end = childPadding.end,
+//                )
+                .clip(
+                    MaterialTheme.shapes.small.copy(
+                        topStart = CornerSize(size = 0f),
+                        bottomStart = CornerSize(size = 0f)
+                    )
+                ),
         ) {
             content()
         }
@@ -225,8 +231,8 @@ private fun LeanbackClassicPanelScreenContent(
         LeanbackVisible({ !epgListVisible }) {
             LeanbackClassicPanelVerticalTip(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background.copy(0.7f))
-                    .padding(horizontal = 4.dp),
+                    .background(MaterialTheme.colorScheme.background.copy(0.6f))
+                    .padding(horizontal = 8.dp),
                 text = "向右查看节目单",
                 onTap = { epgListVisible = true },
             )
@@ -255,7 +261,7 @@ private fun LeanbackClassicPanelVerticalTip(
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackClassicPanelScreenPreview() {
     LeanbackTheme {

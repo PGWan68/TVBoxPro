@@ -1,14 +1,11 @@
 package com.github.tvbox.osc.util;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 
 import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
-import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.subtitle.widget.SimpleSubtitleView;
-import com.orhanobut.hawk.Hawk;
 
 public class SubtitleHelper {
     private static int[][] subtitleTextColor = null;
@@ -38,21 +35,24 @@ public class SubtitleHelper {
     }
 
     public static int getTextSize(Activity activity) {
-        int autoSize = getSubtitleTextAutoSize(activity);
-
-        return Hawk.get(HawkConfig.SUBTITLE_TEXT_SIZE, autoSize);
+        int autoSize = SP.INSTANCE.getSubtitleTextSize();
+        if (autoSize == 0) {
+            autoSize = getSubtitleTextAutoSize(activity);
+            setTextSize(autoSize);
+        }
+        return autoSize;
     }
 
     public static void setTextSize(int size) {
-        Hawk.put(HawkConfig.SUBTITLE_TEXT_SIZE, size);
+        SP.INSTANCE.setSubtitleTextSize(size);
     }
 
     public static int getTimeDelay() {
-        return Hawk.get(HawkConfig.SUBTITLE_TIME_DELAY, 0);
+        return SP.INSTANCE.getSubtitleTimeDelay();
     }
 
     public static void setTimeDelay(int delay) {
-        Hawk.put(HawkConfig.SUBTITLE_TIME_DELAY, delay);
+        SP.INSTANCE.setSubtitleTimeDelay(delay);
     }
 
     public static void upTextStyle(SimpleSubtitleView mSubtitleView) {
@@ -60,11 +60,11 @@ public class SubtitleHelper {
     }
 
     public static void upTextStyle(SimpleSubtitleView mSubtitleView, int style) {
-        Integer colorIndex = style;
+        int colorIndex = style;
         if (style == -1) {
-            colorIndex = Hawk.get(HawkConfig.SUBTITLE_TEXT_STYLE, 0);
+            colorIndex = SP.INSTANCE.getSubtitleTextStyle();
         } else {
-            Hawk.put(HawkConfig.SUBTITLE_TEXT_STYLE, style);
+            SP.INSTANCE.setSubtitleTextStyle(style);
         }
         int[][] subtitleTextColor = getSubtitleTextColor();
         mSubtitleView.setTextColor(subtitleTextColor[0][colorIndex]);
@@ -73,7 +73,7 @@ public class SubtitleHelper {
     }
 
     public static int getTextStyle() {
-        return Hawk.get(HawkConfig.SUBTITLE_TEXT_STYLE, 0);
+        return SP.INSTANCE.getSubtitleTextStyle();
     }
 
     public static int getTextStyleSize() {

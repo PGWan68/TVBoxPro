@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,16 +32,13 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.tv.foundation.lazy.list.TvLazyColumn
-import androidx.tv.foundation.lazy.list.items
-import androidx.tv.foundation.lazy.list.rememberTvLazyListState
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
-import kotlinx.coroutines.flow.distinctUntilChanged
 import com.github.tvbox.kotlin.data.entities.IptvGroup
 import com.github.tvbox.kotlin.data.entities.IptvGroupList
 import com.github.tvbox.kotlin.ui.theme.LeanbackTheme
 import com.github.tvbox.kotlin.ui.utils.handleLeanbackKeyEvents
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.max
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -57,7 +57,7 @@ fun LeanbackClassicPanelIptvGroupList(
     val focusRequester = remember { FocusRequester() }
     var focusedIptvGroup by remember { mutableStateOf(initialIptvGroup) }
 
-    val listState = rememberTvLazyListState(max(0, iptvGroupList.indexOf(initialIptvGroup) - 2))
+    val listState = rememberLazyListState(max(0, iptvGroupList.indexOf(initialIptvGroup) - 2))
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.isScrollInProgress }
@@ -65,14 +65,14 @@ fun LeanbackClassicPanelIptvGroupList(
             .collect { _ -> onUserAction() }
     }
 
-    TvLazyColumn(
+    LazyColumn(
         state = listState,
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
-            .width(140.dp)
+            .width(150.dp)
             .fillMaxHeight()
-            .background(MaterialTheme.colorScheme.background.copy(0.9f))
+            .background(MaterialTheme.colorScheme.background.copy(0.8f))
             .focusRequester(focusRequester)
             .focusProperties {
                 exit = {

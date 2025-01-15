@@ -177,11 +177,10 @@ object SP {
     var dohUrl by SharedPreferenceDelegates.int()     //安全DNS: 0=关闭, 1=腾讯, 2=阿里, 3=360, 4=Google, 5=AdGuard, 6=Quad9
     var defaultParse by SharedPreferenceDelegates.string()
     var parseWebView by SharedPreferenceDelegates.boolean(defaultValue = true)    //嗅探Webview: true=系统自带, false=XWalkView
-    var checkedSourcesForSearch by SharedPreferenceDelegates.boolean()
     var storageDriveSort by SharedPreferenceDelegates.int()
     var subtitleTextSize by SharedPreferenceDelegates.int()
-    var subtitleTextStyle by SharedPreferenceDelegates.boolean()
-    var subtitleTimeDelay by SharedPreferenceDelegates.boolean()
+    var subtitleTextStyle by SharedPreferenceDelegates.int()
+    var subtitleTimeDelay by SharedPreferenceDelegates.int()
     var backgroundPlayType by SharedPreferenceDelegates.int()   //后台：0=关闭, 1=开启, 2=画中画
     var screenDisplay by SharedPreferenceDelegates.boolean()
     var searchFilterKey by SharedPreferenceDelegates.string()
@@ -192,7 +191,7 @@ object SP {
     var homeHotDay by SharedPreferenceDelegates.string()
     var homeApi by SharedPreferenceDelegates.string()
     var homeRec by SharedPreferenceDelegates.int()   //推荐: 0=豆瓣热播, 1=站点推荐, 2=观看历史
-    var homeRecStyle by SharedPreferenceDelegates.boolean()     //网格展示数据源，true=列表，false=一行
+    var homeRecStyle by SharedPreferenceDelegates.boolean(defaultValue = true)     //网格展示数据源，true=列表，false=一行
     var homeNum by SharedPreferenceDelegates.int(defaultValue = 4)    //历史条数: 0=20条, 1=40条, 2=60条, 3=80条, 4=100条
     var showSource by SharedPreferenceDelegates.boolean() //数据源显示: true=开启, false=关闭
     var language by SharedPreferenceDelegates.int()        //语言: 0=中文, 1=英文

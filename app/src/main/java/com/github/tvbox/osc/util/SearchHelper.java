@@ -11,31 +11,35 @@ import java.util.List;
 
 public class SearchHelper {
 
+    public static final String SOURCES_FOR_SEARCH = "checked_sources_for_search";
+
     public static HashMap<String, String> getSourcesForSearch() {
         String api = ApiConfig.get().getCurrentApiUrl();
         if (api.isEmpty()) {
             return null;
         }
-        HashMap<String, String> mCheckSources = new HashMap<>();
+
+        HashMap<String, String> checkSources = new HashMap<>();
+
         try {
-            HashMap<String, HashMap<String, String>> mCheckSourcesForApi = Hawk.get(HawkConfig.SOURCES_FOR_SEARCH, new HashMap<>());
-            mCheckSources = mCheckSourcesForApi.get(api);
+            HashMap<String, HashMap<String, String>> mCheckSourcesForApi = Hawk.get(SOURCES_FOR_SEARCH, new HashMap<>());
+            checkSources = mCheckSourcesForApi.get(api);
         } catch (Exception ignored) {
 
         }
-        if (mCheckSources == null || mCheckSources.size() <= 0) {
-            if (mCheckSources == null) {
-                mCheckSources = new HashMap<>();
+        if (checkSources == null || checkSources.isEmpty()) {
+            if (checkSources == null) {
+                checkSources = new HashMap<>();
             }
             for (SourceBean bean : ApiConfig.get()
                     .getSourceBeanList()) {
                 if (!bean.isSearchable()) {
                     continue;
                 }
-                mCheckSources.put(bean.getKey(), "1");
+                checkSources.put(bean.getKey(), "1");
             }
         }
-        return mCheckSources;
+        return checkSources;
     }
 
     public static void putCheckedSources(HashMap<String, String> mCheckSources) {
@@ -43,12 +47,12 @@ public class SearchHelper {
         if (api.isEmpty()) {
             return;
         }
-        HashMap<String, HashMap<String, String>> mCheckSourcesForApi = Hawk.get(HawkConfig.SOURCES_FOR_SEARCH, new HashMap<>());
+        HashMap<String, HashMap<String, String>> mCheckSourcesForApi = Hawk.get(SOURCES_FOR_SEARCH, new HashMap<>());
         if (mCheckSourcesForApi == null || mCheckSourcesForApi.isEmpty()) {
             mCheckSourcesForApi = new HashMap<>();
         }
         mCheckSourcesForApi.put(api, mCheckSources);
-        Hawk.put(HawkConfig.SOURCES_FOR_SEARCH, mCheckSourcesForApi);
+        Hawk.put(SOURCES_FOR_SEARCH, mCheckSourcesForApi);
     }
 
     public static void putCheckedSource(String siteKey, boolean checked) {
@@ -56,7 +60,7 @@ public class SearchHelper {
         if (api.isEmpty()) {
             return;
         }
-        HashMap<String, HashMap<String, String>> mCheckSourcesForApi = Hawk.get(HawkConfig.SOURCES_FOR_SEARCH, new HashMap<>());
+        HashMap<String, HashMap<String, String>> mCheckSourcesForApi = Hawk.get(SOURCES_FOR_SEARCH, new HashMap<>());
         if (mCheckSourcesForApi == null || mCheckSourcesForApi.isEmpty()) {
             mCheckSourcesForApi = new HashMap<>();
         }
@@ -70,7 +74,7 @@ public class SearchHelper {
                 mCheckSourcesForApi.get(api).remove(siteKey);
             }
         }
-        Hawk.put(HawkConfig.SOURCES_FOR_SEARCH, mCheckSourcesForApi);
+        Hawk.put(SOURCES_FOR_SEARCH, mCheckSourcesForApi);
     }
 
     public static List<String> splitWords(String text) {

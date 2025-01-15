@@ -1,9 +1,5 @@
 package com.github.tvbox.kotlin.data.repositories.iptv
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import com.github.tvbox.kotlin.data.entities.Iptv
 import com.github.tvbox.kotlin.data.entities.IptvGroup
 import com.github.tvbox.kotlin.data.entities.IptvGroupList
@@ -11,6 +7,11 @@ import com.github.tvbox.kotlin.data.entities.IptvList
 import com.github.tvbox.kotlin.data.repositories.FileCacheRepository
 import com.github.tvbox.kotlin.data.repositories.iptv.parser.IptvParser
 import com.github.tvbox.kotlin.utils.Logger
+import com.github.tvbox.osc.util.LOG
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 /**
  * 直播源获取
@@ -64,6 +65,9 @@ class IptvRepository : FileCacheRepository("iptv.txt") {
             val parser = IptvParser.instances.first { it.isSupport(sourceUrl, sourceData) }
             val groupList = parser.parse(sourceData)
             log.i("解析直播源完成：${groupList.size}个分组，${groupList.flatMap { it.iptvList }.size}个频道")
+
+            LOG.i("分组：${groupList.map { it.name }}")
+            LOG.i("频道：${groupList.flatMap { it.iptvList }}")
 
             if (simplify) {
                 return IptvGroupList(groupList.map { group ->

@@ -16,7 +16,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.github.tvbox.kotlin.ui.LeanbackApp
-import com.github.tvbox.kotlin.ui.screens.leanback.toast.LeanbackToastState
+import com.github.tvbox.kotlin.ui.leanback.toast.LeanbackToastState
 import com.github.tvbox.kotlin.ui.theme.LeanbackTheme
 import com.github.tvbox.kotlin.ui.utils.HttpServer
 import com.github.tvbox.kotlin.ui.utils.SP

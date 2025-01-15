@@ -1,12 +1,6 @@
 package com.github.tvbox.kotlin.data.repositories.epg
 
 import android.util.Xml
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import org.xmlpull.v1.XmlPullParser
 import com.github.tvbox.kotlin.data.entities.Epg
 import com.github.tvbox.kotlin.data.entities.EpgList
 import com.github.tvbox.kotlin.data.entities.EpgProgramme
@@ -14,9 +8,14 @@ import com.github.tvbox.kotlin.data.entities.EpgProgrammeList
 import com.github.tvbox.kotlin.data.repositories.FileCacheRepository
 import com.github.tvbox.kotlin.data.repositories.epg.fetcher.EpgFetcher
 import com.github.tvbox.kotlin.utils.Logger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.xmlpull.v1.XmlPullParser
 import java.io.StringReader
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Locale
 
 /**
@@ -95,10 +94,10 @@ class EpgRepository : FileCacheRepository("epg.json") {
         refreshTimeThreshold: Int,
     ) = withContext(Dispatchers.Default) {
         try {
-            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < refreshTimeThreshold) {
-                log.d("未到时间点，不刷新节目单")
-                return@withContext EpgList()
-            }
+//            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < refreshTimeThreshold) {
+//                log.d("未到时间点，不刷新节目单")
+//                return@withContext EpgList()
+//            }
 
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
@@ -108,7 +107,6 @@ class EpgRepository : FileCacheRepository("epg.json") {
                 val xmlString = epgXmlRepository.getEpgXml(xmlUrl)
                 Json.encodeToString(parseFromXml(xmlString, filteredChannels).value)
             }
-
             EpgList(Json.decodeFromString<List<Epg>>(xmlJson))
         } catch (ex: Exception) {
             log.e("获取节目单失败", ex)

@@ -2,6 +2,13 @@ package com.github.tvbox.kotlin.ui.leanback.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.tvbox.kotlin.data.entities.EpgList
+import com.github.tvbox.kotlin.data.entities.IptvGroupList
+import com.github.tvbox.kotlin.data.entities.IptvGroupList.Companion.iptvList
+import com.github.tvbox.kotlin.data.repositories.epg.EpgRepository
+import com.github.tvbox.kotlin.data.repositories.iptv.IptvRepository
+import com.github.tvbox.kotlin.data.utils.Constants
+import com.github.tvbox.kotlin.ui.utils.SP
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,13 +20,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.launch
-import com.github.tvbox.kotlin.data.entities.EpgList
-import com.github.tvbox.kotlin.data.entities.IptvGroupList
-import com.github.tvbox.kotlin.data.entities.IptvGroupList.Companion.iptvList
-import com.github.tvbox.kotlin.data.repositories.epg.EpgRepository
-import com.github.tvbox.kotlin.data.repositories.iptv.IptvRepository
-import com.github.tvbox.kotlin.data.utils.Constants
-import com.github.tvbox.kotlin.ui.utils.SP
 import kotlin.collections.minus
 import kotlin.collections.plus
 

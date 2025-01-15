@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,12 +36,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.tv.foundation.lazy.list.TvLazyColumn
-import androidx.tv.foundation.lazy.list.TvLazyListState
-import androidx.tv.foundation.lazy.list.itemsIndexed
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
-import kotlinx.coroutines.flow.distinctUntilChanged
 import com.github.tvbox.kotlin.data.entities.EpgList
 import com.github.tvbox.kotlin.data.entities.EpgList.Companion.currentProgrammes
 import com.github.tvbox.kotlin.data.entities.EpgProgramme.Companion.progress
@@ -48,6 +47,8 @@ import com.github.tvbox.kotlin.data.entities.IptvGroup
 import com.github.tvbox.kotlin.data.entities.IptvList
 import com.github.tvbox.kotlin.ui.theme.LeanbackTheme
 import com.github.tvbox.kotlin.ui.utils.handleLeanbackKeyEvents
+import com.github.tvbox.osc.util.LOG
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.max
 
 @Composable
@@ -88,7 +89,7 @@ fun LeanbackClassicPanelIptvList(
     }
 
     val listState = remember(iptvGroupProvider()) {
-        TvLazyListState(
+        LazyListState(
             if (hasFocused) 0
             else max(0, iptvList.indexOf(initialIptv) - 2)
         )
@@ -100,7 +101,7 @@ fun LeanbackClassicPanelIptvList(
             .collect { _ -> onUserAction() }
     }
 
-    TvLazyColumn(
+    LazyColumn(
         state = listState,
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),

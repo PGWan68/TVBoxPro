@@ -25,9 +25,7 @@ import androidx.media3.ui.PlayerView;
 
 import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.base.App;
-import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.PlayerHelper;
-import com.orhanobut.hawk.Hawk;
 
 import java.util.Locale;
 import java.util.Map;

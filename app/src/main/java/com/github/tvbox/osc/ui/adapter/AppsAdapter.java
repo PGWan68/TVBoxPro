@@ -9,7 +9,6 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.bean.AppInfo;
-import com.github.tvbox.osc.util.HawkConfig;
 
 import java.util.ArrayList;
 
