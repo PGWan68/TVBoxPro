@@ -597,7 +597,7 @@ public class HomeActivity extends BaseActivity {
         if (!sortAdapter.getData().isEmpty()) {
             for (MovieSort.SortData data : sortAdapter.getData()) {
                 if (data.id.equals("my0")) {
-                    if (Hawk.get(HawkConfig.HOME_REC, 0) == 1 && absXml != null && absXml.videoList != null && !absXml.videoList.isEmpty()) {
+                    if (SP.INSTANCE.getHomeRec() == 1 && absXml != null && absXml.videoList != null && !absXml.videoList.isEmpty()) {
                         fragments.add(UserFragment.newInstance(absXml.videoList));
                     } else {
                         fragments.add(UserFragment.newInstance(null));
@@ -680,7 +680,7 @@ public class HomeActivity extends BaseActivity {
 
         // takagen99 : Switch to show / hide source title
         SourceBean home = ApiConfig.get().getHomeSourceBean();
-        if (Hawk.get(HawkConfig.HOME_SHOW_SOURCE, false)) {
+        if (SP.INSTANCE.getShowSource()) {
             if (home != null && home.getName() != null && !home.getName().isEmpty()) {
                 tvName.setText(home.getName());
             }
@@ -689,12 +689,12 @@ public class HomeActivity extends BaseActivity {
         }
 
         // takagen99: Icon Placement
-        if (Hawk.get(HawkConfig.HOME_SEARCH_POSITION, true)) {
+        if (SP.INSTANCE.getSearchPosition()) {
             tvFind.setVisibility(View.VISIBLE);
         } else {
             tvFind.setVisibility(View.GONE);
         }
-        if (Hawk.get(HawkConfig.HOME_MENU_POSITION, true)) {
+        if (SP.INSTANCE.getMenuPosition()) {
             tvMenu.setVisibility(View.VISIBLE);
         } else {
             tvMenu.setVisibility(View.GONE);

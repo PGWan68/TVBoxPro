@@ -162,10 +162,10 @@ object SP {
 
     /* 播放器相关设置 */
     var showPreview by SharedPreferenceDelegates.boolean(defaultValue = true)
-    var ijkCodec by SharedPreferenceDelegates.string("软解码")
-    var playType by SharedPreferenceDelegates.int(defaultValue = 1)  //0 系统 1 ijk 2 exo 10 MXPlayer
+    var ijkCodec by SharedPreferenceDelegates.string("硬解码")    //IJK解码: 软解码, 硬解码
+    var playType by SharedPreferenceDelegates.int()  //播放器: 0=系统, 1=IJK, 2=Exo, 3=MX, 4=Reex, 5=Kodi
     var playRender by SharedPreferenceDelegates.int()  //0 texture 2
-    var playScale by SharedPreferenceDelegates.int()
+    var playScale by SharedPreferenceDelegates.int()  //画面缩放: 0=默认, 1=16:9, 2=4:3, 3=填充, 4=原始, 5=裁剪
     var playTimesStep by SharedPreferenceDelegates.boolean()
     var picInPic by SharedPreferenceDelegates.boolean()  // true = on, false = off
     var videoPurify by SharedPreferenceDelegates.boolean(defaultValue = true)
@@ -174,34 +174,34 @@ object SP {
     var exoRendererMode by SharedPreferenceDelegates.int(defaultValue = 1)
     var vodPlayerPreferred by SharedPreferenceDelegates.int()
 
-    /* 设置相关 */
-    var debugMode by SharedPreferenceDelegates.boolean()
-    var homeApi by SharedPreferenceDelegates.string()
-    var homeRec by SharedPreferenceDelegates.int()   // 0 豆瓣 1 推荐 2 历史
-    var homeRecStyle by SharedPreferenceDelegates.boolean()  // true=Grid, false=Line
-    var homeNum by SharedPreferenceDelegates.boolean()    // No. of History
-    var showSource by SharedPreferenceDelegates.boolean()
-    var language by SharedPreferenceDelegates.boolean()  // 0 中文 1 英文
-    var searchPosition by SharedPreferenceDelegates.boolean()
-    var menuPosition by SharedPreferenceDelegates.boolean()
-    var homeDefaultShow by SharedPreferenceDelegates.boolean()  //启动时直接进直播的开关
-    var searchResultWidth by SharedPreferenceDelegates.int(defaultValue = -1) // 搜索结果view宽度
-    var hotVodDelete by SharedPreferenceDelegates.boolean()
-
-    var dohUrl by SharedPreferenceDelegates.int()  // DNS
+    var dohUrl by SharedPreferenceDelegates.int()     //安全DNS: 0=关闭, 1=腾讯, 2=阿里, 3=360, 4=Google, 5=AdGuard, 6=Quad9
     var defaultParse by SharedPreferenceDelegates.string()
-    var parseWebView by SharedPreferenceDelegates.boolean() // true 系统 false xwalk
-    var searchView by SharedPreferenceDelegates.int(defaultValue = 1)   // 0 文字列表 1 缩略图
+    var parseWebView by SharedPreferenceDelegates.boolean()    //嗅探Webview: true=系统自带, false=XWalkView
     var checkedSourcesForSearch by SharedPreferenceDelegates.boolean()
     var storageDriveSort by SharedPreferenceDelegates.int()
     var subtitleTextSize by SharedPreferenceDelegates.int()
     var subtitleTextStyle by SharedPreferenceDelegates.boolean()
     var subtitleTimeDelay by SharedPreferenceDelegates.boolean()
-    var themeSelect by SharedPreferenceDelegates.boolean()
-    var backgroundPlayType by SharedPreferenceDelegates.boolean()
-    var fastSearchMode by SharedPreferenceDelegates.boolean()
+    var backgroundPlayType by SharedPreferenceDelegates.boolean()   //后台：0=关闭, 1=开启, 2=画中画
     var screenDisplay by SharedPreferenceDelegates.boolean()
     var searchFilterKey by SharedPreferenceDelegates.string()
+
+    /* 设置相关 */
+    var debugMode by SharedPreferenceDelegates.boolean()
+    var homeApi by SharedPreferenceDelegates.string()
+    var homeRec by SharedPreferenceDelegates.int()   //推荐: 0=豆瓣热播, 1=站点推荐, 2=观看历史
+    var homeRecStyle by SharedPreferenceDelegates.boolean()     //网格展示数据源，true=列表，false=一行
+    var homeNum by SharedPreferenceDelegates.int(defaultValue = 4)    //历史条数: 0=20条, 1=40条, 2=60条, 3=80条, 4=100条
+    var showSource by SharedPreferenceDelegates.boolean() //数据源显示: true=开启, false=关闭
+    var language by SharedPreferenceDelegates.int()        //语言: 0=中文, 1=英文
+    var searchPosition by SharedPreferenceDelegates.boolean()
+    var menuPosition by SharedPreferenceDelegates.boolean()
+    var homeDefaultShow by SharedPreferenceDelegates.boolean()  //启动时直接进直播的开关
+    var searchResultWidth by SharedPreferenceDelegates.int(defaultValue = -1) // 搜索结果view宽度
+    var hotVodDelete by SharedPreferenceDelegates.boolean()
+    var themeSelect by SharedPreferenceDelegates.boolean()            //主题: 0=奈飞, 1=哆啦, 2=百事, 3=鸣人, 4=小黄, 5=八神, 6=樱花
+    var fastSearchMode by SharedPreferenceDelegates.boolean()
+    var searchView by SharedPreferenceDelegates.int(defaultValue = 1)   //搜索展示: 0=文字列表, 1=缩略图
 
 
     /* 直播相关设置 */

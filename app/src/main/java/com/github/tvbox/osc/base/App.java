@@ -8,6 +8,9 @@ import androidx.core.os.HandlerCompat;
 import androidx.multidex.MultiDexApplication;
 
 import com.github.catvod.crawler.JsLoader;
+import com.github.tvbox.kotlin.AppGlobal;
+import com.github.tvbox.kotlin.UnsafeTrustManager;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.callback.EmptyCallback;
@@ -38,9 +41,6 @@ import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
 import me.jessyan.autosize.AutoSizeConfig;
 import me.jessyan.autosize.unit.Subunits;
-import com.github.tvbox.kotlin.AppGlobal;
-import com.github.tvbox.kotlin.UnsafeTrustManager;
-import com.github.tvbox.kotlin.ui.utils.SP;
 
 /**
  * @author pj567
@@ -67,7 +67,10 @@ public class App extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
+        initSP();
+
         SubtitleHelper.initSubtitleColor(this);
+
         initParams();
         // takagen99 : Initialize Locale
         initLocale();
@@ -122,14 +125,15 @@ public class App extends MultiDexApplication {
                     .build();
         }
 
-        initMyTV();
+
     }
 
 
-    private void initMyTV() {
+    private void initSP() {
         UnsafeTrustManager.Companion.enableUnsafeTrustManager();
         AppGlobal.cacheDir = getApplicationContext().getCacheDir();
         SP.INSTANCE.init(getApplicationContext());
+        SP.INSTANCE.setDebugMode(true);
     }
 
     public static P2PClass getp2p() {
@@ -148,33 +152,33 @@ public class App extends MultiDexApplication {
     private void initParams() {
         // Hawk
         Hawk.init(this).build();
-        SP.INSTANCE.setDebugMode(true);
+
 
         // 首页选项
-        putDefault(HawkConfig.HOME_SHOW_SOURCE, true);       //数据源显示: true=开启, false=关闭
-        putDefault(HawkConfig.HOME_SEARCH_POSITION, false);  //按钮位置-搜索: true=上方, false=下方
-        putDefault(HawkConfig.HOME_MENU_POSITION, false);     //按钮位置-设置: true=上方, false=下方
-        putDefault(HawkConfig.HOME_REC, 0);                  //推荐: 0=豆瓣热播, 1=站点推荐, 2=观看历史
-        putDefault(HawkConfig.HOME_NUM, 4);                  //历史条数: 0=20条, 1=40条, 2=60条, 3=80条, 4=100条
-        putDefault(HawkConfig.HOME_REC_STYLE, true);          //网格展示数据源，true=列表，false=一行
-
-        // 播放器选项
-
-        putDefault(HawkConfig.PLAY_SCALE, 0);                //画面缩放: 0=默认, 1=16:9, 2=4:3, 3=填充, 4=原始, 5=裁剪
-        putDefault(HawkConfig.BACKGROUND_PLAY_TYPE, 0);      //后台：0=关闭, 1=开启, 2=画中画
-        putDefault(HawkConfig.PLAY_TYPE, 1);                 //播放器: 0=系统, 1=IJK, 2=Exo, 3=MX, 4=Reex, 5=Kodi
-        putDefault(HawkConfig.IJK_CODEC, "硬解码");           //IJK解码: 软解码, 硬解码
-        // 系统选项
-        putDefault(HawkConfig.HOME_LOCALE, 0);               //语言: 0=中文, 1=英文
-        putDefault(HawkConfig.THEME_SELECT, 0);              //主题: 0=奈飞, 1=哆啦, 2=百事, 3=鸣人, 4=小黄, 5=八神, 6=樱花
-        putDefault(HawkConfig.SEARCH_VIEW, 1);               //搜索展示: 0=文字列表, 1=缩略图
-        putDefault(HawkConfig.PARSE_WEBVIEW, true);          //嗅探Webview: true=系统自带, false=XWalkView
-        putDefault(HawkConfig.DOH_URL, 0);                   //安全DNS: 0=关闭, 1=腾讯, 2=阿里, 3=360, 4=Google, 5=AdGuard, 6=Quad9
+//        putDefault(HawkConfig.HOME_SHOW_SOURCE, true);       //数据源显示: true=开启, false=关闭
+//        putDefault(HawkConfig.HOME_SEARCH_POSITION, false);  //按钮位置-搜索: true=上方, false=下方
+//        putDefault(HawkConfig.HOME_MENU_POSITION, false);     //按钮位置-设置: true=上方, false=下方
+//        putDefault(HawkConfig.HOME_REC, 0);                  //推荐: 0=豆瓣热播, 1=站点推荐, 2=观看历史
+//        putDefault(HawkConfig.HOME_NUM, 4);                  //历史条数: 0=20条, 1=40条, 2=60条, 3=80条, 4=100条
+//        putDefault(HawkConfig.HOME_REC_STYLE, true);          //网格展示数据源，true=列表，false=一行
+//
+//        // 播放器选项
+//
+//        putDefault(HawkConfig.PLAY_SCALE, 0);                //画面缩放: 0=默认, 1=16:9, 2=4:3, 3=填充, 4=原始, 5=裁剪
+//        putDefault(HawkConfig.BACKGROUND_PLAY_TYPE, 0);      //后台：0=关闭, 1=开启, 2=画中画
+//        putDefault(HawkConfig.PLAY_TYPE, 1);                 //播放器: 0=系统, 1=IJK, 2=Exo, 3=MX, 4=Reex, 5=Kodi
+//        putDefault(HawkConfig.IJK_CODEC, "硬解码");           //IJK解码: 软解码, 硬解码
+//        // 系统选项
+//        putDefault(HawkConfig.HOME_LOCALE, 0);               //语言: 0=中文, 1=英文
+//        putDefault(HawkConfig.THEME_SELECT, 0);              //主题: 0=奈飞, 1=哆啦, 2=百事, 3=鸣人, 4=小黄, 5=八神, 6=樱花
+//        putDefault(HawkConfig.SEARCH_VIEW, 1);               //搜索展示: 0=文字列表, 1=缩略图
+//        putDefault(HawkConfig.PARSE_WEBVIEW, true);          //嗅探Webview: true=系统自带, false=XWalkView
+//        putDefault(HawkConfig.DOH_URL, 0);                   //安全DNS: 0=关闭, 1=腾讯, 2=阿里, 3=360, 4=Google, 5=AdGuard, 6=Quad9
 
     }
 
     private void initLocale() {
-        if (Hawk.get(HawkConfig.HOME_LOCALE, 0) == 0) {
+        if (SP.INSTANCE.getLanguage() == 0) {
             LocaleHelper.setLocale(App.this, "zh");
         } else {
             LocaleHelper.setLocale(App.this, "");
@@ -183,12 +187,6 @@ public class App extends MultiDexApplication {
 
     public static App getInstance() {
         return instance;
-    }
-
-    private void putDefault(String key, Object value) {
-        if (!Hawk.contains(key)) {
-            Hawk.put(key, value);
-        }
     }
 
     @Override

@@ -105,7 +105,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
     @Override
     protected void init() {
         tvFastSearchText = findViewById(R.id.showFastSearchText);
-        tvFastSearchText.setText(Hawk.get(HawkConfig.FAST_SEARCH_MODE, false) ? "已开启" : "已关闭");
+        tvFastSearchText.setText(SP.INSTANCE.getFastSearchMode() ? "已开启" : "已关闭");
         tvDebugOpen = findViewById(R.id.tvDebugOpen);
         tvDebugOpen.setText(SP.INSTANCE.getDebugMode() ? "开启" : "关闭");
         tvApi = findViewById(R.id.tvApi);
@@ -114,11 +114,11 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvHomeApi = findViewById(R.id.tvHomeApi);
         tvHomeApi.setText(ApiConfig.get().getHomeSourceBean().getName());
         tvHomeShow = findViewById(R.id.tvHomeShow);
-        tvHomeShow.setText(Hawk.get(HawkConfig.HOME_SHOW_SOURCE, false) ? "开启" : "关闭");
+        tvHomeShow.setText(SP.INSTANCE.getShowSource()? "开启" : "关闭");
         tvHomeRec = findViewById(R.id.tvHomeRec);
-        tvHomeRec.setText(getHomeRecName(Hawk.get(HawkConfig.HOME_REC, 0)));
+        tvHomeRec.setText(getHomeRecName(SP.INSTANCE.getHomeRec()));
         tvHomeNum = findViewById(R.id.tvHomeNum);
-        tvHomeNum.setText(HistoryHelper.getHomeRecName(Hawk.get(HawkConfig.HOME_NUM, 0)));
+        tvHomeNum.setText(HistoryHelper.getHomeRecName(SP.INSTANCE.getHomeNum()));
         // Player Section
         tvShowPreviewText = findViewById(R.id.showPreviewText);
         tvShowPreviewText.setText(SP.INSTANCE.getShowPreview() ? "开启" : "关闭");
@@ -130,7 +130,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvVideoPurifyText.setText(SP.INSTANCE.getVideoPurify() ? "开启" : "关闭");
         // System Section
         tvLocale = findViewById(R.id.tvLocale);
-        tvLocale.setText(getLocaleView(Hawk.get(HawkConfig.HOME_LOCALE, 0)));
+        tvLocale.setText(getLocaleView(SP.INSTANCE.getLanguage()));
         tvTheme = findViewById(R.id.tvTheme);
         tvTheme.setText(getThemeView(Hawk.get(HawkConfig.THEME_SELECT, 0)));
         tvRender = findViewById(R.id.tvRenderType);

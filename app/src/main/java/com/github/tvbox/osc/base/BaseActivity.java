@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.PermissionChecker;
 import com.blankj.utilcode.util.ActivityUtils;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.callback.EmptyCallback;
 import com.github.tvbox.osc.callback.LoadingCallback;
@@ -59,7 +60,7 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
             newBase = ViewPumpContextWrapper.wrap(base, App.viewPump);
         }
 
-        if (Hawk.get(HawkConfig.HOME_LOCALE, 0) == 0) {
+        if (SP.INSTANCE.getLanguage() == 0) {
             super.attachBaseContext(LocaleHelper.onAttach(newBase, ""));
         } else {
             super.attachBaseContext(LocaleHelper.onAttach(newBase, "zh"));
