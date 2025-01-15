@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.github.catvod.utils.Path;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.util.StringUtils;
@@ -135,7 +136,7 @@ public class FileUtils {
             }
             Matcher m = URLJOIN.matcher(name);
             if (m.find()) {
-                if (!Hawk.get(HawkConfig.DEBUG_OPEN, false)) {
+                if (! SP.INSTANCE.getDebugMode()) {
                     String cache = getCache(MD5.encode(name));
                     if (StringUtils.isEmpty(cache)) {
                         String netStr = get(name);

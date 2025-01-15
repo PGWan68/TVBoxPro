@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.text.TextUtils;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.bean.IJKCode;
 import com.github.tvbox.osc.util.FileUtils;
@@ -71,7 +72,7 @@ public class IjkmPlayer extends IjkPlayer {
                     mMediaPlayer.setOption(1, "rtsp_transport", "tcp");
                     mMediaPlayer.setOption(1, "rtsp_flags", "prefer_tcp");
                 } else if (!path.contains(".m3u8") && (path.contains(".mp4") || path.contains(".mkv") || path.contains(".avi"))) {
-                    if (Hawk.get(HawkConfig.IJK_CACHE_PLAY, false)) {
+                    if (SP.INSTANCE.getIjkCachePlay()) {
                         String cachePath = FileUtils.getExternalCachePath() + "/ijkcaches/";
                         String cacheMapPath = cachePath;
                         File cacheFile = new File(cachePath);

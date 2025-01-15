@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.BaseActivity;
@@ -49,7 +50,7 @@ public class CollectActivity extends BaseActivity {
 
     private void toggleDelMode() {
         // takagen99: Toggle Delete Mode
-        HawkConfig.hotVodDelete = !HawkConfig.hotVodDelete;
+        SP.INSTANCE.setHotVodDelete(!SP.INSTANCE.getHotVodDelete());
         collectAdapter.notifyDataSetChanged();
 
         delMode = !delMode;

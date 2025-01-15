@@ -34,6 +34,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.blankj.utilcode.util.ServiceUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.BaseActivity;
@@ -146,7 +147,7 @@ public class DetailActivity extends BaseActivity {
 
     // preview : true 开启 false 关闭
     VodInfo previewVodInfo = null;
-    boolean showPreview = Hawk.get(HawkConfig.SHOW_PREVIEW, true);
+    boolean showPreview = SP.INSTANCE.getShowPreview();
     public boolean fullWindows = false;
     ViewGroup.LayoutParams windowsPreview = null;
     ViewGroup.LayoutParams windowsFull = null;
@@ -1234,7 +1235,6 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        boolean showPreview = Hawk.get(HawkConfig.SHOW_PREVIEW, true);
         if (fullWindows) {
             if (playFragment.onBackPressed())
                 return;
@@ -1247,7 +1247,7 @@ public class DetailActivity extends BaseActivity {
                 seriesFlagFocus.requestFocus();
                 return;
             }
-        } else if (showPreview) {
+        } else if (SP.INSTANCE.getShowPreview()) {
             playFragment.mVideoView.release();
         }
         super.onBackPressed();

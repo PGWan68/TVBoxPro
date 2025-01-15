@@ -21,7 +21,6 @@ import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.util.AES;
 import com.github.tvbox.osc.util.AdBlocker;
 import com.github.tvbox.osc.util.DefaultConfig;
-import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.M3U8;
 import com.github.tvbox.osc.util.MD5;
@@ -33,7 +32,6 @@ import com.google.gson.JsonObject;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.AbsCallback;
 import com.lzy.okgo.model.Response;
-import com.orhanobut.hawk.Hawk;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
@@ -390,8 +388,7 @@ public class ApiConfig {
             sourceBeanList.put(siteKey, sb);
         }
         if (!sourceBeanList.isEmpty()) {
-            String home = Hawk.get(HawkConfig.HOME_API, "");
-            SourceBean sh = getSource(home);
+            SourceBean sh = getSource(SP.INSTANCE.getHomeApi());
             if (sh == null || sh.getHide() == 1)
                 setSourceBean(firstSite);
             else
@@ -415,8 +412,8 @@ public class ApiConfig {
             }
         }
         // 获取默认解析
-        if (parseBeanList != null && parseBeanList.size() > 0) {
-            String defaultParse = Hawk.get(HawkConfig.DEFAULT_PARSE, "");
+        if (!parseBeanList.isEmpty()) {
+            String defaultParse = SP.INSTANCE.getDefaultParse();
             if (!TextUtils.isEmpty(defaultParse))
                 for (ParseBean pb : parseBeanList) {
                     if (pb.getName().equals(defaultParse))
@@ -500,7 +497,7 @@ public class ApiConfig {
 
                         for (JsonElement element : infoJson.get("lives").getAsJsonArray()) {
                             JsonObject liveObj = element.getAsJsonObject();
-                            Hawk.put(HawkConfig.LIVE_PLAYER_TYPE, DefaultConfig.safeJsonInt(liveObj, "playerType", -1));
+                            SP.INSTANCE.setLivePlayerType(DefaultConfig.safeJsonInt(liveObj, "playerType", -1));
                             String type = liveObj.get("type").getAsString();
                             if (type.equals("0")) {
                                 String url = liveObj.get("url").getAsString();
@@ -629,7 +626,7 @@ public class ApiConfig {
         if (ijkCodes == null) {
             ijkCodes = new ArrayList<>();
             boolean foundOldSelect = false;
-            String ijkCodec = Hawk.get(HawkConfig.IJK_CODEC, "");
+            String ijkCodec = SP.INSTANCE.getIjkCodec();
             JsonArray ijkJsonArray = infoJson.has("ijk") ? infoJson.get("ijk").getAsJsonArray() : defaultJson.get("ijk").getAsJsonArray();
             for (JsonElement opt : ijkJsonArray) {
                 JsonObject obj = (JsonObject) opt;
@@ -776,14 +773,14 @@ public class ApiConfig {
 
     public void setSourceBean(SourceBean sourceBean) {
         this.mHomeSource = sourceBean;
-        Hawk.put(HawkConfig.HOME_API, sourceBean.getKey());
+        SP.INSTANCE.setHomeApi(sourceBean.getKey());
     }
 
     public void setDefaultParse(ParseBean parseBean) {
         if (this.mDefaultParse != null)
             this.mDefaultParse.setDefault(false);
         this.mDefaultParse = parseBean;
-        Hawk.put(HawkConfig.DEFAULT_PARSE, parseBean.getName());
+        SP.INSTANCE.setDefaultParse(parseBean.getName());
         parseBean.setDefault(true);
     }
 
@@ -824,8 +821,7 @@ public class ApiConfig {
     }
 
     public IJKCode getCurrentIJKCode() {
-        String codeName = Hawk.get(HawkConfig.IJK_CODEC, "");
-        return getIJKCodec(codeName);
+        return getIJKCodec(SP.INSTANCE.getIjkCodec());
     }
 
     public IJKCode getIJKCodec(String name) {

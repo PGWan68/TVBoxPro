@@ -11,8 +11,6 @@ import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.ui.adapter.ButtonAdapter;
-import com.github.tvbox.osc.util.HawkConfig;
-import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -138,13 +136,13 @@ public class DanmuSettingDialog extends BaseDialog {
         ImageView sizeAdd = findViewById(R.id.sizeAdd);
         ImageView sizeSub = findViewById(R.id.sizeSub);
         List<Float> sizes = Arrays.asList(0.6f, 0.7f, 0.8f, 0.9f, 1.0f, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.0f);
-        int index = sizes.indexOf(SP.INSTANCE.getDanmuSizescale()) + 1;
+        int index = sizes.indexOf(SP.INSTANCE.getDanmuSizesCale()) + 1;
         AtomicReference<Integer> size = new AtomicReference<>(index);
         sizeText.setText(size + "倍");
         sizeAdd.setOnClickListener((v) -> {
             if (size.get() >= 15) return;
             size.set(size.get() + 1);
-            SP.INSTANCE.setDanmuSizescale(sizes.get(size.get() - 1));
+            SP.INSTANCE.setDanmuSizesCale(sizes.get(size.get() - 1));
 
             sizeText.setText(size + "倍");
             EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_SET_DANMU_SETTINGS, false));
@@ -152,7 +150,7 @@ public class DanmuSettingDialog extends BaseDialog {
         sizeSub.setOnClickListener((v) -> {
             if (size.get() <= 1) return;
             size.set(size.get() - 1);
-            SP.INSTANCE.setDanmuSizescale(sizes.get(size.get() - 1));
+            SP.INSTANCE.setDanmuSizesCale(sizes.get(size.get() - 1));
 
             sizeText.setText(size + "倍");
             EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_SET_DANMU_SETTINGS, false));
@@ -163,19 +161,19 @@ public class DanmuSettingDialog extends BaseDialog {
         TextView lineText = findViewById(R.id.line);
         ImageView lineAdd = findViewById(R.id.lineAdd);
         ImageView lineSub = findViewById(R.id.lineSub);
-        AtomicReference<Integer> line = new AtomicReference<>( SP.INSTANCE.getDanmuMaxline());
+        AtomicReference<Integer> line = new AtomicReference<>( SP.INSTANCE.getDanmuMaxLine());
         lineText.setText(line + "行");
         lineAdd.setOnClickListener((v) -> {
             if (line.get() >= 15) return;
             line.set(line.get() + 1);
-            SP.INSTANCE.setDanmuMaxline(line.get());
+            SP.INSTANCE.setDanmuMaxLine(line.get());
             lineText.setText(line + "行");
             EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_SET_DANMU_SETTINGS, false));
         });
         lineSub.setOnClickListener((v) -> {
             if (line.get() <= 1) return;
             line.set(line.get() - 1);
-            SP.INSTANCE.setDanmuMaxline(line.get());
+            SP.INSTANCE.setDanmuMaxLine(line.get());
             lineText.setText(line + "行");
             EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_SET_DANMU_SETTINGS, false));
         });

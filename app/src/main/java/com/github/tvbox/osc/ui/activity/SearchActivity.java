@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.catvod.crawler.JsLoader;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.App;
@@ -54,7 +55,6 @@ import com.github.tvbox.osc.ui.tv.widget.SearchKeyboard;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.SearchHelper;
-import com.github.tvbox.osc.util.SettingsUtil;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -214,7 +214,7 @@ public class SearchActivity extends BaseActivity {
         mGridViewWord.setLayoutManager(new V7LinearLayoutManager(this.mContext, 1, false));
         wordAdapter = new PinyinAdapter();
         mGridViewWord.setAdapter(wordAdapter);
-        searchResultWidth = Hawk.get(HawkConfig.SEARCH_RESULT_WIDTH, -1);
+        searchResultWidth = SP.INSTANCE.getSearchResultWidth();
         llLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -225,7 +225,7 @@ public class SearchActivity extends BaseActivity {
                 if (width != 0) {
                     // 计算item的宽度
                     searchResultWidth = (width - 3 * (int) (App.getInstance().getResources().getDimension(R.dimen.vs_5))) / 4;
-                    Hawk.put(HawkConfig.SEARCH_RESULT_WIDTH, searchResultWidth);
+                    SP.INSTANCE.setSearchResultWidth(searchResultWidth);
                     if (searchAdapter != null) {
                         searchAdapter.notifyDataSetChanged();
                     }
@@ -410,7 +410,7 @@ public class SearchActivity extends BaseActivity {
             }
         });
         setLoadSir(llLayout);
-        this.sKey = (String) SettingsUtil.hkGet(HawkConfig.SEARCH_FILTER_KEY, "");
+        this.sKey = SP.INSTANCE.getSearchFilterKey();
         String string;
         if (TextUtils.isEmpty(this.sKey)) {
             string = "全局搜索";
@@ -478,7 +478,7 @@ public class SearchActivity extends BaseActivity {
                         public void click(SourceBean value, int pos) {
                             filterBtn.setText(value.getName());
                             sKey = value.getKey();
-                            SettingsUtil.hkPut(HawkConfig.SEARCH_FILTER_KEY, sKey);
+                            SP.INSTANCE.setSearchFilterKey(sKey);
                             dialog.dismiss();
                             //search(wd)
                         }

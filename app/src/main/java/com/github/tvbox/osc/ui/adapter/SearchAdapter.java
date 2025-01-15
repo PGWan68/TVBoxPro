@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.App;
@@ -22,8 +23,8 @@ public class SearchAdapter extends BaseQuickAdapter<Movie.Video, BaseViewHolder>
     private int searchWidth;
 
     public SearchAdapter() {
-        super(Hawk.get(HawkConfig.SEARCH_VIEW, 0) == 0 ? R.layout.item_search_lite : R.layout.item_search, new ArrayList<>());
-        searchWidth = Hawk.get(HawkConfig.SEARCH_RESULT_WIDTH, -1);
+        super(SP.INSTANCE.getSearchView() == 0 ? R.layout.item_search_lite : R.layout.item_search, new ArrayList<>());
+        searchWidth = SP.INSTANCE.getSearchResultWidth();
     }
 
     @Override
@@ -41,7 +42,7 @@ public class SearchAdapter extends BaseQuickAdapter<Movie.Video, BaseViewHolder>
             FrameLayout flRootView = helper.getView(R.id.fl_root_view);
             // 动态设置item宽度
             if (searchWidth == -1) {
-                searchWidth = Hawk.get(HawkConfig.SEARCH_RESULT_WIDTH, -1);
+                searchWidth = SP.INSTANCE.getSearchResultWidth();
                 if (searchWidth != -1) {
                     setItemWidth(flRootView);
                 }

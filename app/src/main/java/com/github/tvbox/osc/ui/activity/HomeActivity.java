@@ -628,8 +628,8 @@ public class HomeActivity extends BaseActivity {
 
         // takagen99: Add check for VOD Delete Mode
 //        super.onBackPressed();
-        if (HawkConfig.hotVodDelete) {
-            HawkConfig.hotVodDelete = false;
+        if (SP.INSTANCE.getHotVodDelete()) {
+            SP.INSTANCE.setHotVodDelete(false);
             UserFragment.homeHotVodAdapter.notifyDataSetChanged();
         } else {
             int i;

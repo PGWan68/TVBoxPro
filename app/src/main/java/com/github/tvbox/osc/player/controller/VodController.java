@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.transition.TransitionManager;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.BaseActivity;
@@ -965,8 +966,7 @@ public class VodController extends BaseController {
         mBack.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean showPreview = Hawk.get(HawkConfig.SHOW_PREVIEW, true);
-                if (showPreview) {
+                if (SP.INSTANCE.getShowPreview()) {
                     mTopRoot.setVisibility(GONE);
                     mBottomRoot.setVisibility(GONE);
                     mBack.setVisibility(GONE);
@@ -990,12 +990,12 @@ public class VodController extends BaseController {
         });
 
         //屏显开关
-        mTopRoot2.setVisibility(Hawk.get(HawkConfig.SCREEN_DISPLAY, GONE));
+        mTopRoot2.setVisibility(SP.INSTANCE.getScreenDisplay() ? VISIBLE : GONE);
         mScreendisplay.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 mTopRoot2.setVisibility(mTopRoot2.getVisibility() == VISIBLE ? GONE : VISIBLE);
-                Hawk.put(HawkConfig.SCREEN_DISPLAY, mTopRoot2.getVisibility());
+                SP.INSTANCE.setScreenDisplay(mTopRoot2.getVisibility() == VISIBLE);
                 hideBottom();
                 //Toast.makeText(getContext(), "点击显示网速 播放进度 时间", Toast.LENGTH_SHORT).show();
             }
@@ -1619,15 +1619,15 @@ public class VodController extends BaseController {
         return false;
     }
 
-    public void updateDanmuBtn(){
-        if(hasDanmu){
+    public void updateDanmuBtn() {
+        if (hasDanmu) {
             mDanmuSetting.setVisibility(VISIBLE);
-        }else{
+        } else {
             mDanmuSetting.setVisibility(GONE);
         }
     }
 
-    public void setHasDanmu(boolean hasDanmu){
+    public void setHasDanmu(boolean hasDanmu) {
         this.hasDanmu = hasDanmu;
     }
 }

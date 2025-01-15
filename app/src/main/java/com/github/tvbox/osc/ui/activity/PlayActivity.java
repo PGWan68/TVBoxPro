@@ -200,8 +200,8 @@ public class PlayActivity extends BaseActivity {
     private void setDanmuViewSettings(boolean reload) {
         float speed = SP.INSTANCE.getDanmuSpeed();
         float alpha = SP.INSTANCE.getDanmuAlpha();
-        float sizeScale = SP.INSTANCE.getDanmuSizescale();
-        int maxLine =  SP.INSTANCE.getDanmuMaxline();
+        float sizeScale = SP.INSTANCE.getDanmuSizesCale();
+        int maxLine = SP.INSTANCE.getDanmuMaxLine();
         HashMap<Integer, Integer> maxLines = new HashMap<>();
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
@@ -697,7 +697,7 @@ public class PlayActivity extends BaseActivity {
     }
 
     void playUrl(String url, HashMap<String, String> headers) {
-        if (!Hawk.get(HawkConfig.VIDEO_PURIFY, true)) {
+        if (!SP.INSTANCE.getVideoPurify()) {
             startPlayUrl(url, headers);
             return;
         }
@@ -1086,7 +1086,7 @@ public class PlayActivity extends BaseActivity {
         try {
             if (!mVodPlayerCfg.has("pl")) {
                 int playType = Hawk.get(HawkConfig.PLAY_TYPE, 1);
-                boolean configurationFile = Hawk.get(HawkConfig.VOD_PLAYER_PREFERRED, 0) == 0;
+                boolean configurationFile = SP.INSTANCE.getVodPlayerPreferred() == 0;
                 int playerType = sourceBean.getPlayerType();
                 if (configurationFile && playerType != -1) {
                     playType = playerType;
@@ -1950,7 +1950,7 @@ public class PlayActivity extends BaseActivity {
         if (webView == null) {
             return;
         }
-        ViewGroup.LayoutParams layoutParams = Hawk.get(HawkConfig.DEBUG_OPEN, false)
+        ViewGroup.LayoutParams layoutParams = SP.INSTANCE.getDebugMode()
                 ? new ViewGroup.LayoutParams(800, 400) :
                 new ViewGroup.LayoutParams(1, 1);
         webView.setFocusable(false);
@@ -1972,7 +1972,7 @@ public class PlayActivity extends BaseActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             settings.setMediaPlaybackRequiresUserGesture(false);
         }
-        settings.setBlockNetworkImage(!Hawk.get(HawkConfig.DEBUG_OPEN, false));
+        settings.setBlockNetworkImage(!SP.INSTANCE.getDebugMode());
         settings.setUseWideViewPort(true);
         settings.setDomStorageEnabled(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
@@ -2133,7 +2133,7 @@ public class PlayActivity extends BaseActivity {
         if (webView == null) {
             return;
         }
-        ViewGroup.LayoutParams layoutParams = Hawk.get(HawkConfig.DEBUG_OPEN, false)
+        ViewGroup.LayoutParams layoutParams =  SP.INSTANCE.getDebugMode()
                 ? new ViewGroup.LayoutParams(800, 400) :
                 new ViewGroup.LayoutParams(1, 1);
         webView.setFocusable(false);
@@ -2151,7 +2151,7 @@ public class PlayActivity extends BaseActivity {
         settings.setDomStorageEnabled(true);
         settings.setJavaScriptEnabled(true);
 
-        settings.setBlockNetworkImage(!Hawk.get(HawkConfig.DEBUG_OPEN, false));
+        settings.setBlockNetworkImage(! SP.INSTANCE.getDebugMode());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             settings.setMediaPlaybackRequiresUserGesture(false);

@@ -5,6 +5,7 @@ import static okhttp3.ConnectionSpec.COMPATIBLE_TLS;
 import static okhttp3.ConnectionSpec.MODERN_TLS;
 import static okhttp3.ConnectionSpec.RESTRICTED_TLS;
 import com.github.catvod.net.SSLCompat;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.base.App;
 
 import com.lzy.okgo.OkGo;
@@ -58,7 +59,7 @@ public class OkGoHelper {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkExoPlayer");
 
-        if (Hawk.get(HawkConfig.DEBUG_OPEN, false)) {
+        if ( SP.INSTANCE.getDebugMode()) {
             loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.BASIC);
             loggingInterceptor.setColorLevel(Level.INFO);
         } else {
@@ -126,7 +127,7 @@ public class OkGoHelper {
         dnsHttpsList.add("Quad9");
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkExoPlayer");
-        if (Hawk.get(HawkConfig.DEBUG_OPEN, false)) {
+        if ( SP.INSTANCE.getDebugMode()) {
             loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.BODY);
             loggingInterceptor.setColorLevel(Level.INFO);
         } else {
@@ -163,7 +164,7 @@ public class OkGoHelper {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkGo");
 
-        if (Hawk.get(HawkConfig.DEBUG_OPEN, false)) {
+        if ( SP.INSTANCE.getDebugMode()) {
             loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.HEADERS);
             loggingInterceptor.setColorLevel(Level.INFO);
         } else {

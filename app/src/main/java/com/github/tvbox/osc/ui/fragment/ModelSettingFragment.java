@@ -107,7 +107,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvFastSearchText = findViewById(R.id.showFastSearchText);
         tvFastSearchText.setText(Hawk.get(HawkConfig.FAST_SEARCH_MODE, false) ? "已开启" : "已关闭");
         tvDebugOpen = findViewById(R.id.tvDebugOpen);
-        tvDebugOpen.setText(Hawk.get(HawkConfig.DEBUG_OPEN, false) ? "开启" : "关闭");
+        tvDebugOpen.setText(SP.INSTANCE.getDebugMode() ? "开启" : "关闭");
         tvApi = findViewById(R.id.tvApi);
         tvApi.setText(SP.INSTANCE.getApiUrl());
         // Home Section
@@ -121,13 +121,13 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvHomeNum.setText(HistoryHelper.getHomeRecName(Hawk.get(HawkConfig.HOME_NUM, 0)));
         // Player Section
         tvShowPreviewText = findViewById(R.id.showPreviewText);
-        tvShowPreviewText.setText(Hawk.get(HawkConfig.SHOW_PREVIEW, true) ? "开启" : "关闭");
+        tvShowPreviewText.setText(SP.INSTANCE.getShowPreview() ? "开启" : "关闭");
         tvScale = findViewById(R.id.tvScaleType);
         tvScale.setText(PlayerHelper.getScaleName(Hawk.get(HawkConfig.PLAY_SCALE, 0)));
         tvPlay = findViewById(R.id.tvPlay);
         tvPlay.setText(PlayerHelper.getPlayerName(Hawk.get(HawkConfig.PLAY_TYPE, 0)));
         tvVideoPurifyText = findViewById(R.id.tvVideoPurifyText);
-        tvVideoPurifyText.setText(Hawk.get(HawkConfig.VIDEO_PURIFY, true) ? "开启" : "关闭");
+        tvVideoPurifyText.setText(SP.INSTANCE.getVideoPurify() ? "开启" : "关闭");
         // System Section
         tvLocale = findViewById(R.id.tvLocale);
         tvLocale.setText(getLocaleView(Hawk.get(HawkConfig.HOME_LOCALE, 0)));
@@ -151,8 +151,8 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                Hawk.put(HawkConfig.DEBUG_OPEN, !Hawk.get(HawkConfig.DEBUG_OPEN, false));
-                tvDebugOpen.setText(Hawk.get(HawkConfig.DEBUG_OPEN, false) ? "开启" : "关闭");
+                SP.INSTANCE.setDebugMode(!SP.INSTANCE.getDebugMode());
+                tvDebugOpen.setText( SP.INSTANCE.getDebugMode() ? "开启" : "关闭");
             }
         });
         // Input Source URL ------------------------------------------------------------------------
@@ -359,8 +359,9 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                Hawk.put(HawkConfig.SHOW_PREVIEW, !Hawk.get(HawkConfig.SHOW_PREVIEW, true));
-                tvShowPreviewText.setText(Hawk.get(HawkConfig.SHOW_PREVIEW, true) ? "开启" : "关闭");
+                boolean isShowPreview = SP.INSTANCE.getShowPreview();
+                tvShowPreviewText.setText(isShowPreview ? "开启" : "关闭");
+                SP.INSTANCE.setShowPreview(!isShowPreview);
             }
         });
         // Select Screen Ratio -------------------------------------
@@ -502,8 +503,8 @@ public class ModelSettingFragment extends BaseLazyFragment {
         // toggle purify video -------------------------------------
         findViewById(R.id.llVideoPurify).setOnClickListener(v -> {
             FastClickCheckUtil.check(v);
-            Hawk.put(HawkConfig.VIDEO_PURIFY, !Hawk.get(HawkConfig.VIDEO_PURIFY, true));
-            tvVideoPurifyText.setText(Hawk.get(HawkConfig.VIDEO_PURIFY, true) ? "开启" : "关闭");
+            SP.INSTANCE.setVideoPurify(!SP.INSTANCE.getVideoPurify());
+            tvVideoPurifyText.setText(SP.INSTANCE.getVideoPurify() ? "开启" : "关闭");
         });
 
         // 3. SYSTEM Configuration -------------------------------------------------------------- //

@@ -136,6 +136,86 @@ object SP {
             priVideoPlayerAspectRatio = value.value;
         }
 
+
+    var pushToAddress by SharedPreferenceDelegates.string()
+    var pushToPort by SharedPreferenceDelegates.string()
+
+
+    /* 弹幕相关 */
+    var danmuColor by SharedPreferenceDelegates.boolean()
+    var danmuSizesCale by SharedPreferenceDelegates.float(defaultValue = 0.8f)
+    var danmuAlpha by SharedPreferenceDelegates.float(defaultValue = 0.9f)
+    var danmuSpeed by SharedPreferenceDelegates.float(defaultValue = 1.5f)
+    var danmuMaxLine by SharedPreferenceDelegates.int(defaultValue = 3)
+    var danmuOpen by SharedPreferenceDelegates.boolean(defaultValue = true)
+
+
+    /* URL 相关配置 */
+    var apiUrl by SharedPreferenceDelegates.string()
+    var apiHistory by SharedPreferenceDelegates.stringSet()
+    var liveUrl by SharedPreferenceDelegates.string()
+    var liveHistory by SharedPreferenceDelegates.stringSet()
+    var epgUrl by SharedPreferenceDelegates.string()
+    var epgHistory by SharedPreferenceDelegates.stringSet()
+    var proxyServer by SharedPreferenceDelegates.string()
+
+
+    /* 播放器相关设置 */
+    var showPreview by SharedPreferenceDelegates.boolean(defaultValue = true)
+    var ijkCodec by SharedPreferenceDelegates.string("软解码")
+    var playType by SharedPreferenceDelegates.int(defaultValue = 1)  //0 系统 1 ijk 2 exo 10 MXPlayer
+    var playRender by SharedPreferenceDelegates.int()  //0 texture 2
+    var playScale by SharedPreferenceDelegates.int()
+    var playTimesStep by SharedPreferenceDelegates.boolean()
+    var picInPic by SharedPreferenceDelegates.boolean()  // true = on, false = off
+    var videoPurify by SharedPreferenceDelegates.boolean(defaultValue = true)
+    var ijkCachePlay by SharedPreferenceDelegates.boolean()
+    var exoRenderer by SharedPreferenceDelegates.int()
+    var exoRendererMode by SharedPreferenceDelegates.int(defaultValue = 1)
+    var vodPlayerPreferred by SharedPreferenceDelegates.int()
+
+    /* 设置相关 */
+    var debugMode by SharedPreferenceDelegates.boolean()
+    var homeApi by SharedPreferenceDelegates.string()
+    var homeRec by SharedPreferenceDelegates.int()   // 0 豆瓣 1 推荐 2 历史
+    var homeRecStyle by SharedPreferenceDelegates.boolean()  // true=Grid, false=Line
+    var homeNum by SharedPreferenceDelegates.boolean()    // No. of History
+    var showSource by SharedPreferenceDelegates.boolean()
+    var language by SharedPreferenceDelegates.boolean()  // 0 中文 1 英文
+    var searchPosition by SharedPreferenceDelegates.boolean()
+    var menuPosition by SharedPreferenceDelegates.boolean()
+    var homeDefaultShow by SharedPreferenceDelegates.boolean()  //启动时直接进直播的开关
+    var searchResultWidth by SharedPreferenceDelegates.int(defaultValue = -1) // 搜索结果view宽度
+    var hotVodDelete by SharedPreferenceDelegates.boolean()
+
+    var dohUrl by SharedPreferenceDelegates.int()  // DNS
+    var defaultParse by SharedPreferenceDelegates.string()
+    var parseWebView by SharedPreferenceDelegates.boolean() // true 系统 false xwalk
+    var searchView by SharedPreferenceDelegates.int(defaultValue = 1)   // 0 文字列表 1 缩略图
+    var checkedSourcesForSearch by SharedPreferenceDelegates.boolean()
+    var storageDriveSort by SharedPreferenceDelegates.int()
+    var subtitleTextSize by SharedPreferenceDelegates.int()
+    var subtitleTextStyle by SharedPreferenceDelegates.boolean()
+    var subtitleTimeDelay by SharedPreferenceDelegates.boolean()
+    var themeSelect by SharedPreferenceDelegates.boolean()
+    var backgroundPlayType by SharedPreferenceDelegates.boolean()
+    var fastSearchMode by SharedPreferenceDelegates.boolean()
+    var screenDisplay by SharedPreferenceDelegates.boolean()
+    var searchFilterKey by SharedPreferenceDelegates.string()
+
+
+    /* 直播相关设置 */
+    var liveChannelName by SharedPreferenceDelegates.string()
+    var liveChannelGroupName by SharedPreferenceDelegates.string()
+    var liveChannelReverse by SharedPreferenceDelegates.boolean()
+    var liveCrossGroup by SharedPreferenceDelegates.boolean()
+    var liveConnectTimeout by SharedPreferenceDelegates.int(defaultValue = 2)
+    var liveShowNetSpeed by SharedPreferenceDelegates.boolean()
+    var liveShowTime by SharedPreferenceDelegates.boolean()
+    var liveSkipPassword by SharedPreferenceDelegates.boolean()
+    var livePlayerType by SharedPreferenceDelegates.int(defaultValue = 1)   // 0 系统 1 ijk 2 exo
+
+
     enum class UiTimeShowMode(val value: Int) {
         /** 隐藏 */
         HIDDEN(0),
@@ -192,31 +272,6 @@ object SP {
             }
         }
     }
-
-
-    var pushToAddress by SharedPreferenceDelegates.string()
-    var pushToPort by SharedPreferenceDelegates.string()
-
-
-    /* 弹幕相关 */
-
-    var danmuColor by SharedPreferenceDelegates.boolean()
-    var danmuSizescale by SharedPreferenceDelegates.float(defaultValue = 0.8f)
-    var danmuAlpha by SharedPreferenceDelegates.float(defaultValue = 0.9f)
-    var danmuSpeed by SharedPreferenceDelegates.float(defaultValue = 1.5f)
-    var danmuMaxline by SharedPreferenceDelegates.int(defaultValue = 3)
-    var danmuOpen by SharedPreferenceDelegates.boolean(defaultValue = true)
-
-
-    /* URL 相关配置 */
-    var apiUrl by SharedPreferenceDelegates.string()
-    var apiHistory by SharedPreferenceDelegates.stringSet()
-    var liveUrl by SharedPreferenceDelegates.string()
-    var liveHistory by SharedPreferenceDelegates.stringSet()
-    var epgUrl by SharedPreferenceDelegates.string()
-    var epgHistory by SharedPreferenceDelegates.stringSet()
-    var proxyServer by SharedPreferenceDelegates.string()
-
 
     private object SharedPreferenceDelegates {
 

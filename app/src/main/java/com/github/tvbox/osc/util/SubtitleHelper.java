@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.subtitle.widget.SimpleSubtitleView;
@@ -12,7 +13,7 @@ import com.orhanobut.hawk.Hawk;
 public class SubtitleHelper {
     private static int[][] subtitleTextColor = null;
 
-    //初始化字幕颜色
+    // 初始化字幕颜色
     public static void initSubtitleColor(Context context) {
         int[] subtitleColor = context.getApplicationContext().getResources().getIntArray(R.array.subtitle_text_color);
         int[] shadowColor = context.getApplicationContext().getResources().getIntArray(R.array.subtitle_text_shadow_color);
@@ -38,8 +39,8 @@ public class SubtitleHelper {
 
     public static int getTextSize(Activity activity) {
         int autoSize = getSubtitleTextAutoSize(activity);
-        int subtitleConfigSize = Hawk.get(HawkConfig.SUBTITLE_TEXT_SIZE, autoSize);
-        return subtitleConfigSize;
+
+        return Hawk.get(HawkConfig.SUBTITLE_TEXT_SIZE, autoSize);
     }
 
     public static void setTextSize(int size) {
@@ -47,8 +48,7 @@ public class SubtitleHelper {
     }
 
     public static int getTimeDelay() {
-        int subtitleConfigTimeDelay = Hawk.get(HawkConfig.SUBTITLE_TIME_DELAY, 0);
-        return subtitleConfigTimeDelay;
+        return Hawk.get(HawkConfig.SUBTITLE_TIME_DELAY, 0);
     }
 
     public static void setTimeDelay(int delay) {

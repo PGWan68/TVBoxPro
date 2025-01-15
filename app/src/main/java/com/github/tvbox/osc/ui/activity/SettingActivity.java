@@ -180,10 +180,10 @@ public class SettingActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if ((homeSourceKey != null && !homeSourceKey.equals(Hawk.get(HawkConfig.HOME_API, ""))) ||
+        if ((homeSourceKey != null && !homeSourceKey.equals(SP.INSTANCE.getHomeApi())) ||
                 !currentApi.equals(SP.INSTANCE.getApiUrl()) || !currentLive.equals(SP.INSTANCE.getLiveUrl()) ||
-                homeRec != Hawk.get(HawkConfig.HOME_REC, 0) ||
-                dnsOpt != Hawk.get(HawkConfig.DOH_URL, 0)) {
+                homeRec != SP.INSTANCE.getHomeRec() ||
+                dnsOpt != SP.INSTANCE.getDohUrl()) {
             AppManager.getInstance().finishAllActivity();
             if (currentApi.equals(SP.INSTANCE.getApiUrl()) & (currentLive.equals(SP.INSTANCE.getLiveUrl()))) {
                 Bundle bundle = new Bundle();

@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.base.BaseActivity;
@@ -30,7 +31,6 @@ import com.github.tvbox.osc.ui.dialog.AlistDriveDialog;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
 import com.github.tvbox.osc.ui.dialog.WebdavDialog;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
-import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.StorageDriveType;
 import com.github.tvbox.osc.util.StringUtils;
 import com.github.tvbox.osc.viewmodel.drive.AbstractDriveViewModel;
@@ -43,7 +43,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lzy.okgo.OkGo;
 import com.obsez.android.lib.filechooser.ChooserDialog;
-import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
 
@@ -300,14 +299,14 @@ public class DriveActivity extends BaseActivity {
 
     private void openSortDialog() {
         List<String> options = Arrays.asList("按名字升序", "按名字降序", "按修改时间升序", "按修改时间降序");
-        int sort = Hawk.get(HawkConfig.STORAGE_DRIVE_SORT, 0);
+        int sort = SP.INSTANCE.getStorageDriveSort();
         SelectDialog<String> dialog = new SelectDialog<>(DriveActivity.this);
         dialog.setTip("请选择列表排序方式");
         dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<String>() {
             @Override
             public void click(String value, int pos) {
                 sortType = pos;
-                Hawk.put(HawkConfig.STORAGE_DRIVE_SORT, pos);
+                SP.INSTANCE.setStorageDriveSort(pos);
                 dialog.dismiss();
                 loadDriveData();
             }
@@ -400,7 +399,7 @@ public class DriveActivity extends BaseActivity {
 
     private void initData() {
         this.txtTitle.setText(getString(R.string.act_drive));
-        sortType = Hawk.get(HawkConfig.STORAGE_DRIVE_SORT, 0);
+        sortType = SP.INSTANCE.getStorageDriveSort();
         btnSort.setVisibility(View.GONE);
         if (drives == null) {
             drives = new ArrayList<>();

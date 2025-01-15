@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.bean.SourceBean;
@@ -27,7 +28,7 @@ public class CollectAdapter extends BaseQuickAdapter<VodCollect, BaseViewHolder>
     protected void convert(BaseViewHolder helper, VodCollect item) {
         // takagen99: Add Delete Mode
         FrameLayout tvDel = helper.getView(R.id.delFrameLayout);
-        if (HawkConfig.hotVodDelete) {
+        if (SP.INSTANCE.getHotVodDelete()) {
             tvDel.setVisibility(View.VISIBLE);
         } else {
             tvDel.setVisibility(View.GONE);

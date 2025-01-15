@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.blankj.utilcode.util.LogUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.BuildConfig;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
@@ -86,12 +87,12 @@ public class MediaSettingDialog extends BaseDialog {
 
 
     public static void nextVodPlayerPreferred() {
-        int index = Hawk.get(HawkConfig.VOD_PLAYER_PREFERRED, 0);
+        int index = SP.INSTANCE.getVodPlayerPreferred();
         App app = App.getInstance();
         String[] array = app.getResources().getStringArray(R.array.media_content_General_VodPlayerPreferred);
         index++;
         index %= array.length;
-        Hawk.put(HawkConfig.VOD_PLAYER_PREFERRED, index);
+        SP.INSTANCE.setVodPlayerPreferred(index);
     }
 
     /**
@@ -100,7 +101,7 @@ public class MediaSettingDialog extends BaseDialog {
      * @return int
      */
     private static int getExoRenderer() {
-        return Hawk.get(HawkConfig.EXO_RENDERER, 0);
+        return SP.INSTANCE.getExoRenderer();
     }
 
 
@@ -110,12 +111,11 @@ public class MediaSettingDialog extends BaseDialog {
         int renderer = getExoRenderer();
         renderer++;
         renderer %= array.length;
-        Hawk.put(HawkConfig.EXO_RENDERER, renderer);
+        SP.INSTANCE.setExoRenderer(renderer);
     }
 
     private static void nextIJKCache() {
-        boolean ijkCache = getIJKCache();
-        Hawk.put(HawkConfig.IJK_CACHE_PLAY, !ijkCache);
+        SP.INSTANCE.setIjkCachePlay(!getIJKCache());
     }
 
     private void nextIJKCodec() {
@@ -219,7 +219,7 @@ public class MediaSettingDialog extends BaseDialog {
     public static String getVodPlayerPreferredDesc() {
         App app = App.getInstance();
         String[] array = app.getResources().getStringArray(R.array.media_content_General_VodPlayerPreferred);
-        return array[Hawk.get(HawkConfig.VOD_PLAYER_PREFERRED, 0)];
+        return array[SP.INSTANCE.getVodPlayerPreferred()];
     }
 
     /**
@@ -250,7 +250,7 @@ public class MediaSettingDialog extends BaseDialog {
      * @return int
      */
     public static int getExoRendererMode() {
-        return Hawk.get(HawkConfig.EXO_RENDERER_MODE, 1);
+        return SP.INSTANCE.getExoRendererMode();
     }
 
     public static void nextExoRendererMode() {
@@ -259,12 +259,12 @@ public class MediaSettingDialog extends BaseDialog {
         String[] array = app.getResources().getStringArray(R.array.media_content_ExoPlayer_renderer_mode);
         rendererMode++;
         rendererMode %= array.length;
-        Hawk.put(HawkConfig.EXO_RENDERER_MODE, rendererMode);
+        SP.INSTANCE.setExoRendererMode(rendererMode);
     }
 
 
     private static boolean getIJKCache() {
-        return Hawk.get(HawkConfig.IJK_CACHE_PLAY, false);
+        return SP.INSTANCE.getIjkCachePlay();
     }
 
     private static String getIJKCacheDesc() {

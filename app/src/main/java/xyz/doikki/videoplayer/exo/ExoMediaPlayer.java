@@ -71,14 +71,11 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
      * @return {@link DefaultRenderersFactory }
      */
     public DefaultRenderersFactory createExoRendererActualValue(Context context) {
-        int renderer = Hawk.get(HawkConfig.EXO_RENDERER, 0);
-        switch (renderer) {
-            case 1:
-                return new NextRenderersFactory(context);
-            case 0:
-            default:
-                return new DefaultRenderersFactory(context);
-        }
+        int renderer = SP.INSTANCE.getExoRenderer();
+        return switch (renderer) {
+            case 1 -> new NextRenderersFactory(context);
+            default -> new DefaultRenderersFactory(context);
+        };
     }
 
     @SuppressLint("UnsafeOptInUsageError")
@@ -121,13 +118,14 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
      * 返回程序 需要的值 exo渲染器模式
      */
     public static int getExoRendererModeActualValue() {
-        int i = Hawk.get(HawkConfig.EXO_RENDERER_MODE, 1);
+        int i = SP.INSTANCE.getExoRendererMode();
         return switch (i) {
             case 0 -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON;
             case 2 -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
             default -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER;
         };
     }
+
     public DefaultTrackSelector getTrackSelector() {
         return mTrackSelector;
     }
