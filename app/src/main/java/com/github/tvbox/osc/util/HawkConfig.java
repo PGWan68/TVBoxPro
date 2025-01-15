@@ -12,10 +12,8 @@ public class HawkConfig {
 
     // Settings
     public static final String HOME_REC = "home_rec";                    // 0 豆瓣 1 推荐 2 历史
-    public static final String HOME_REC_STYLE = "home_rec_style";        // true=Grid, false=Line
-    public static final String HOME_NUM = "home_num";                    // No. of History
-    public static final String HOME_SHOW_SOURCE = "show_source";
-    public static final String HOME_LOCALE = "language";                 // 0 中文 1 英文
+
+
     public static final String HOME_SEARCH_POSITION = "search_position"; // true=Up, false=Down
     public static final String HOME_MENU_POSITION = "menu_position";     // true=Up, false=Down
 

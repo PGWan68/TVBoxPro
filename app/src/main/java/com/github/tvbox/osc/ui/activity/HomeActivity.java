@@ -58,9 +58,8 @@ import com.github.tvbox.osc.ui.tv.widget.NoScrollViewPager;
 import com.github.tvbox.osc.ui.tv.widget.ViewObj;
 import com.github.tvbox.osc.util.AppManager;
 import com.github.tvbox.osc.util.DefaultConfig;
-import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
-import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7GridLayoutManager;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
@@ -86,7 +85,13 @@ public class HomeActivity extends BaseActivity {
 
     // takagen99: Added to allow read string
     private static Resources res;
-
+    private final List<BaseLazyFragment> fragments = new ArrayList<>();
+    private final Handler mHandler = new Handler();
+    public View sortFocusView = null;
+    boolean useCacheConfig = false;
+    // takagen99 : Switch to show / hide source title
+    boolean HomeShow = SP.INSTANCE.getShowSource();
+    byte topHide = 0;
     private View currentView;
     private LinearLayout topLayout;
     private LinearLayout contentLayout;
@@ -97,19 +102,6 @@ public class HomeActivity extends BaseActivity {
     private ImageView tvDraw;
     private ImageView tvMenu;
     private TextView tvDate;
-    private TvRecyclerView mGridView;
-    private NoScrollViewPager mViewPager;
-    private SourceViewModel sourceViewModel;
-    private SortAdapter sortAdapter;
-    private HomePageAdapter pageAdapter;
-    private final List<BaseLazyFragment> fragments = new ArrayList<>();
-    private boolean isDownOrUp = false;
-    private boolean sortChange = false;
-    private int currentSelected = 0;
-    private int sortFocused = 0;
-    public View sortFocusView = null;
-    private final Handler mHandler = new Handler();
-    private long mExitTime = 0;
     private final Runnable mRunnable = new Runnable() {
         @SuppressLint({"DefaultLocale", "SetTextI18n"})
         @Override
@@ -121,13 +113,59 @@ public class HomeActivity extends BaseActivity {
             mHandler.postDelayed(this, 1000);
         }
     };
+    private TvRecyclerView mGridView;
+    private NoScrollViewPager mViewPager;
+    private SourceViewModel sourceViewModel;
+    private SortAdapter sortAdapter;
+    private HomePageAdapter pageAdapter;
+    private boolean isDownOrUp = false;
+    private boolean sortChange = false;
+    private int currentSelected = 0;
+    private int sortFocused = 0;
+    private final Runnable mDataRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (sortChange) {
+                sortChange = false;
+                if (sortFocused != currentSelected) {
+                    currentSelected = sortFocused;
+                    mViewPager.setCurrentItem(sortFocused, false);
+                    changeTop(sortFocused != 0);
+                }
+            }
+        }
+    };
+    private long mExitTime = 0;
+    private boolean dataInitOk = false;
+    private boolean jarInitOk = false;
+
+    // takagen99: Added to allow read string
+    public static Resources getRes() {
+        return res;
+    }
+
+    public static boolean reHome(Context appContext) {
+        Intent intent = new Intent(appContext, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("useCache", true);
+        intent.putExtras(bundle);
+        appContext.startActivity(intent);
+        return true;
+    }
+
+    public static void homeRecf() { //站点切换
+        int homeRec = SP.INSTANCE.getHomeRec();
+        int limit = 2;
+        if (homeRec == limit) homeRec = -1;
+        homeRec++;
+        SP.INSTANCE.setHomeRec(homeRec);
+    }
 
     @Override
     protected int getLayoutResID() {
         return R.layout.activity_home;
     }
-
-    boolean useCacheConfig = false;
 
     @Override
     protected void init() {
@@ -148,11 +186,6 @@ public class HomeActivity extends BaseActivity {
             useCacheConfig = bundle.getBoolean("useCache", false);
         }
         initData();
-    }
-
-    // takagen99: Added to allow read string
-    public static Resources getRes() {
-        return res;
     }
 
     private void initView() {
@@ -284,8 +317,9 @@ public class HomeActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    Hawk.put(HawkConfig.HOME_REC_STYLE, !Hawk.get(HawkConfig.HOME_REC_STYLE, false));
-                    if (Hawk.get(HawkConfig.HOME_REC_STYLE, false)) {
+                    boolean homeRecStyle = !SP.INSTANCE.getHomeRecStyle();
+                    SP.INSTANCE.setHomeRecStyle(homeRecStyle);
+                    if (homeRecStyle) {
                         UserFragment.tvHotListForGrid.setVisibility(View.VISIBLE);
                         UserFragment.tvHotListForLine.setVisibility(View.GONE);
                         Toast.makeText(HomeActivity.this, getString(R.string.hm_style_grid), Toast.LENGTH_SHORT).show();
@@ -297,6 +331,7 @@ public class HomeActivity extends BaseActivity {
                         tvStyle.setImageResource(R.drawable.hm_left_right);
                     }
                 } catch (Exception ex) {
+                    LOG.e(ex);
                 }
             }
         });
@@ -381,7 +416,6 @@ public class HomeActivity extends BaseActivity {
         }
     }
 
-
     private void initViewModel() {
         sourceViewModel = new ViewModelProvider(this).get(SourceViewModel.class);
         sourceViewModel.sortResult.observe(this, new Observer<AbsSortXml>() {
@@ -403,9 +437,6 @@ public class HomeActivity extends BaseActivity {
         });
     }
 
-    // takagen99 : Switch to show / hide source title
-    boolean HomeShow = Hawk.get(HawkConfig.HOME_SHOW_SOURCE, false);
-
     // takagen99 : Check if network is available
     boolean isNetworkAvailable() {
         ConnectivityManager cm
@@ -413,10 +444,6 @@ public class HomeActivity extends BaseActivity {
         NetworkInfo activeNetworkInfo = cm.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
-
-
-    private boolean dataInitOk = false;
-    private boolean jarInitOk = false;
 
     private void initData() {
 
@@ -440,7 +467,7 @@ public class HomeActivity extends BaseActivity {
         }
 
         // takagen99: Set Style either Grid or Line
-        if (Hawk.get(HawkConfig.HOME_REC_STYLE, false)) {
+        if (SP.INSTANCE.getHomeRecStyle()) {
             tvStyle.setImageResource(R.drawable.hm_up_down);
         } else {
             tvStyle.setImageResource(R.drawable.hm_left_right);
@@ -732,20 +759,6 @@ public class HomeActivity extends BaseActivity {
         imgView.setColorFilter(activated ? this.getThemeColor() : Color.WHITE);
     }
 
-    private final Runnable mDataRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (sortChange) {
-                sortChange = false;
-                if (sortFocused != currentSelected) {
-                    currentSelected = sortFocused;
-                    mViewPager.setCurrentItem(sortFocused, false);
-                    changeTop(sortFocused != 0);
-                }
-            }
-        }
-    };
-
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (topHide < 0)
@@ -764,8 +777,6 @@ public class HomeActivity extends BaseActivity {
         }
         return super.dispatchKeyEvent(event);
     }
-
-    byte topHide = 0;
 
     private void changeTop(boolean hide) {
         ViewObj viewObj = new ViewObj(topLayout, (ViewGroup.MarginLayoutParams) topLayout.getLayoutParams());
@@ -907,24 +918,6 @@ public class HomeActivity extends BaseActivity {
         bundle.putBoolean("useCache", useCache);
         intent.putExtras(bundle);
         HomeActivity.this.startActivity(intent);
-    }
-
-    public static boolean reHome(Context appContext) {
-        Intent intent = new Intent(appContext, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("useCache", true);
-        intent.putExtras(bundle);
-        appContext.startActivity(intent);
-        return true;
-    }
-
-    public static void homeRecf() { //站点切换
-        int homeRec = Hawk.get(HawkConfig.HOME_REC, -1);
-        int limit = 2;
-        if (homeRec == limit) homeRec = -1;
-        homeRec++;
-        Hawk.put(HawkConfig.HOME_REC, homeRec);
     }
 
 

@@ -34,7 +34,6 @@ import com.github.tvbox.osc.ui.dialog.ResetDialog;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
 import com.github.tvbox.osc.ui.dialog.XWalkInitDialog;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
-import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.HistoryHelper;
 import com.github.tvbox.osc.util.OkGoHelper;
 import com.github.tvbox.osc.util.PlayerHelper;
@@ -42,7 +41,6 @@ import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.FileCallback;
 import com.lzy.okgo.model.Progress;
 import com.lzy.okgo.model.Response;
-import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7GridLayoutManager;
 
@@ -114,7 +112,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvHomeApi = findViewById(R.id.tvHomeApi);
         tvHomeApi.setText(ApiConfig.get().getHomeSourceBean().getName());
         tvHomeShow = findViewById(R.id.tvHomeShow);
-        tvHomeShow.setText(SP.INSTANCE.getShowSource()? "开启" : "关闭");
+        tvHomeShow.setText(SP.INSTANCE.getShowSource() ? "开启" : "关闭");
         tvHomeRec = findViewById(R.id.tvHomeRec);
         tvHomeRec.setText(getHomeRecName(SP.INSTANCE.getHomeRec()));
         tvHomeNum = findViewById(R.id.tvHomeNum);
@@ -123,24 +121,24 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvShowPreviewText = findViewById(R.id.showPreviewText);
         tvShowPreviewText.setText(SP.INSTANCE.getShowPreview() ? "开启" : "关闭");
         tvScale = findViewById(R.id.tvScaleType);
-        tvScale.setText(PlayerHelper.getScaleName(Hawk.get(HawkConfig.PLAY_SCALE, 0)));
+        tvScale.setText(PlayerHelper.getScaleName(SP.INSTANCE.getPlayScale()));
         tvPlay = findViewById(R.id.tvPlay);
-        tvPlay.setText(PlayerHelper.getPlayerName(Hawk.get(HawkConfig.PLAY_TYPE, 0)));
+        tvPlay.setText(PlayerHelper.getPlayerName(SP.INSTANCE.getPlayType()));
         tvVideoPurifyText = findViewById(R.id.tvVideoPurifyText);
         tvVideoPurifyText.setText(SP.INSTANCE.getVideoPurify() ? "开启" : "关闭");
         // System Section
         tvLocale = findViewById(R.id.tvLocale);
         tvLocale.setText(getLocaleView(SP.INSTANCE.getLanguage()));
         tvTheme = findViewById(R.id.tvTheme);
-        tvTheme.setText(getThemeView(Hawk.get(HawkConfig.THEME_SELECT, 0)));
+        tvTheme.setText(getThemeView(SP.INSTANCE.getThemeSelect()));
         tvRender = findViewById(R.id.tvRenderType);
-        tvRender.setText(PlayerHelper.getRenderName(Hawk.get(HawkConfig.PLAY_RENDER, 0)));
+        tvRender.setText(PlayerHelper.getRenderName(SP.INSTANCE.getPlayRender()));
         tvParseWebView = findViewById(R.id.tvParseWebView);
-        tvParseWebView.setText(Hawk.get(HawkConfig.PARSE_WEBVIEW, true) ? "系统自带" : "XWalkView");
+        tvParseWebView.setText(SP.INSTANCE.getParseWebView() ? "系统自带" : "XWalkView");
         tvSearchView = findViewById(R.id.tvSearchView);
-        tvSearchView.setText(getSearchView(Hawk.get(HawkConfig.SEARCH_VIEW, 0)));
+        tvSearchView.setText(getSearchView(SP.INSTANCE.getSearchView()));
         tvDns = findViewById(R.id.tvDns);
-        tvDns.setText(OkGoHelper.dnsHttpsList.get(Hawk.get(HawkConfig.DOH_URL, 0)));
+        tvDns.setText(OkGoHelper.dnsHttpsList.get(SP.INSTANCE.getDohUrl()));
         tvHomeDefaultShow = findViewById(R.id.tvHomeDefaultShow);
         tvHomeDefaultShow.setText(SP.INSTANCE.getHomeDefaultShow() ? "开启" : "关闭");
 
@@ -265,8 +263,9 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                Hawk.put(HawkConfig.HOME_SHOW_SOURCE, !Hawk.get(HawkConfig.HOME_SHOW_SOURCE, false));
-                tvHomeShow.setText(Hawk.get(HawkConfig.HOME_SHOW_SOURCE, true) ? "开启" : "关闭");
+                boolean isShowSource = SP.INSTANCE.getShowSource();
+                SP.INSTANCE.setShowSource(!isShowSource);
+                tvHomeShow.setText(!isShowSource ? "开启" : "关闭");
             }
         });
         findViewById(R.id.llHomeIcon).setOnClickListener(new View.OnClickListener() {
@@ -282,7 +281,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                int defaultPos = Hawk.get(HawkConfig.HOME_REC, 0);
+                int defaultPos = SP.INSTANCE.getHomeRec();
                 ArrayList<Integer> types = new ArrayList<>();
                 types.add(0);
                 types.add(1);
@@ -292,7 +291,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<Integer>() {
                     @Override
                     public void click(Integer value, int pos) {
-                        Hawk.put(HawkConfig.HOME_REC, value);
+                        SP.INSTANCE.setHomeRec(value);
                         tvHomeRec.setText(getHomeRecName(value));
                     }
 
@@ -319,7 +318,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                int defaultPos = Hawk.get(HawkConfig.HOME_NUM, 0);
+                int defaultPos = SP.INSTANCE.getHomeNum();
                 ArrayList<Integer> types = new ArrayList<>();
                 types.add(0);
                 types.add(1);
@@ -331,7 +330,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<Integer>() {
                     @Override
                     public void click(Integer value, int pos) {
-                        Hawk.put(HawkConfig.HOME_NUM, value);
+                        SP.INSTANCE.setHomeNum(value);
                         tvHomeNum.setText(HistoryHelper.getHomeRecName(value));
                     }
 
@@ -369,7 +368,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                int defaultPos = Hawk.get(HawkConfig.PLAY_SCALE, 0);
+                int defaultPos = SP.INSTANCE.getPlayScale();
                 ArrayList<Integer> players = new ArrayList<>();
                 players.add(0);
                 players.add(1);
@@ -382,7 +381,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<Integer>() {
                     @Override
                     public void click(Integer value, int pos) {
-                        Hawk.put(HawkConfig.PLAY_SCALE, value);
+                        SP.INSTANCE.setPlayScale(value);
                         tvScale.setText(PlayerHelper.getScaleName(value));
                     }
 
@@ -407,7 +406,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
         //后台播放
         View backgroundPlay = findViewById(R.id.llBackgroundPlay);
         TextView tvBgPlayType = findViewById(R.id.tvBackgroundPlayType);
-        Integer defaultBgPlayTypePos = Hawk.get(HawkConfig.BACKGROUND_PLAY_TYPE, 0);
+        Integer defaultBgPlayTypePos = SP.INSTANCE.getBackgroundPlayType();
         ArrayList<String> bgPlayTypes = new ArrayList<>();
         bgPlayTypes.add("关闭");
         bgPlayTypes.add("开启");
@@ -415,14 +414,14 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvBgPlayType.setText(bgPlayTypes.get(defaultBgPlayTypePos));
         backgroundPlay.setOnClickListener(view -> {
             FastClickCheckUtil.check(view);
-            int bgPlayTypePos = Hawk.get(HawkConfig.BACKGROUND_PLAY_TYPE, 0);
+            int bgPlayTypePos = SP.INSTANCE.getBackgroundPlayType();
             SelectDialog<String> dialog = new SelectDialog<>(mActivity);
             dialog.setTip("请选择");
             dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<String>() {
                 @Override
                 public void click(String value, int pos) {
                     tvBgPlayType.setText(value);
-                    Hawk.put(HawkConfig.BACKGROUND_PLAY_TYPE, pos);
+                    SP.INSTANCE.setBackgroundPlayType(pos);
                 }
 
                 @Override
@@ -447,7 +446,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                int defaultPos = Hawk.get(HawkConfig.PLAY_TYPE, 0);
+                int defaultPos = SP.INSTANCE.getPlayType();
                 ArrayList<Integer> players = new ArrayList<>();
                 players.add(0);
                 players.add(1);
@@ -467,7 +466,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<Integer>() {
                     @Override
                     public void click(Integer value, int pos) {
-                        Hawk.put(HawkConfig.PLAY_TYPE, value);
+                        SP.INSTANCE.setPlayType(value);
                         tvPlay.setText(PlayerHelper.getPlayerName(value));
                         PlayerHelper.init();
                     }
@@ -513,9 +512,9 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                boolean useSystem = !Hawk.get(HawkConfig.PARSE_WEBVIEW, true);
-                Hawk.put(HawkConfig.PARSE_WEBVIEW, useSystem);
-                tvParseWebView.setText(Hawk.get(HawkConfig.PARSE_WEBVIEW, true) ? "系统自带" : "XWalkView");
+                boolean useSystem = !SP.INSTANCE.getParseWebView();
+                SP.INSTANCE.setParseWebView(useSystem);
+                tvParseWebView.setText(useSystem ? "系统自带" : "XWalkView");
                 if (!useSystem) {
                     Toast.makeText(mContext, "注意: XWalkView只适用于部分低Android版本，Android5.0以上推荐使用系统自带", Toast.LENGTH_LONG).show();
                     XWalkInitDialog dialog = new XWalkInitDialog(mContext);
@@ -533,7 +532,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                int defaultPos = Hawk.get(HawkConfig.PLAY_RENDER, 0);
+                int defaultPos = SP.INSTANCE.getPlayRender();
                 ArrayList<Integer> renders = new ArrayList<>();
                 renders.add(0);
                 renders.add(1);
@@ -542,7 +541,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<Integer>() {
                     @Override
                     public void click(Integer value, int pos) {
-                        Hawk.put(HawkConfig.PLAY_RENDER, value);
+                        SP.INSTANCE.setPlayRender(value);
                         tvRender.setText(PlayerHelper.getRenderName(value));
                         PlayerHelper.init();
                     }
@@ -570,7 +569,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                int dohUrl = Hawk.get(HawkConfig.DOH_URL, 0);
+                int dohUrl = SP.INSTANCE.getDohUrl();
 
                 SelectDialog<String> dialog = new SelectDialog<>(mActivity);
                 dialog.setTip(getString(R.string.dia_dns));
@@ -578,7 +577,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                     @Override
                     public void click(String value, int pos) {
                         tvDns.setText(OkGoHelper.dnsHttpsList.get(pos));
-                        Hawk.put(HawkConfig.DOH_URL, pos);
+                        SP.INSTANCE.setDohUrl(pos);
                         String url = OkGoHelper.getDohUrl(pos);
                         OkGoHelper.dnsOverHttps.setUrl(url.isEmpty() ? null : HttpUrl.get(url));
                         IjkMediaPlayer.toggleDotPort(pos > 0);
@@ -661,7 +660,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                int defaultPos = Hawk.get(HawkConfig.SEARCH_VIEW, 0);
+                int defaultPos = SP.INSTANCE.getSearchView();
                 ArrayList<Integer> types = new ArrayList<>();
                 types.add(0);
                 types.add(1);
@@ -670,7 +669,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<Integer>() {
                     @Override
                     public void click(Integer value, int pos) {
-                        Hawk.put(HawkConfig.SEARCH_VIEW, value);
+                        SP.INSTANCE.setSearchView(value);
                         tvSearchView.setText(getSearchView(value));
                     }
 
@@ -696,18 +695,19 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                Hawk.put(HawkConfig.FAST_SEARCH_MODE, !Hawk.get(HawkConfig.FAST_SEARCH_MODE, false));
-                tvFastSearchText.setText(Hawk.get(HawkConfig.FAST_SEARCH_MODE, false) ? "已开启" : "已关闭");
+                boolean fastSearchMode = !SP.INSTANCE.getFastSearchMode();
+                tvFastSearchText.setText(fastSearchMode ? "已开启" : "已关闭");
+                SP.INSTANCE.setFastSearchMode(fastSearchMode);
             }
         });
         // Select App Language ( English / Chinese ) -----------------
         findViewById(R.id.llLocale).setOnClickListener(new View.OnClickListener() {
-            private final int chkLang = Hawk.get(HawkConfig.HOME_LOCALE, 0);
+            private final int chkLang = SP.INSTANCE.getLanguage();
 
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                int defaultPos = Hawk.get(HawkConfig.HOME_LOCALE, 0);
+                int defaultPos = SP.INSTANCE.getLanguage();
                 ArrayList<Integer> types = new ArrayList<>();
                 types.add(0);
                 types.add(1);
@@ -716,7 +716,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<Integer>() {
                     @Override
                     public void click(Integer value, int pos) {
-                        Hawk.put(HawkConfig.HOME_LOCALE, value);
+                        SP.INSTANCE.setLanguage(value);
                         tvLocale.setText(getLocaleView(value));
                     }
 
@@ -738,7 +738,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        if (chkLang != Hawk.get(HawkConfig.HOME_LOCALE, 0)) {
+                        if (chkLang != SP.INSTANCE.getLanguage()) {
                             reloadActivity();
                         }
                     }
@@ -748,12 +748,12 @@ public class ModelSettingFragment extends BaseLazyFragment {
         });
         // Select App Theme Color -------------------------------------
         findViewById(R.id.llTheme).setOnClickListener(new View.OnClickListener() {
-            private final int chkTheme = Hawk.get(HawkConfig.THEME_SELECT, 0);
+            private final int chkTheme = SP.INSTANCE.getThemeSelect();
 
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                int defaultPos = Hawk.get(HawkConfig.THEME_SELECT, 0);
+                int defaultPos = SP.INSTANCE.getThemeSelect();
                 ArrayList<Integer> types = new ArrayList<>();
                 types.add(0);
                 types.add(1);
@@ -767,7 +767,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<Integer>() {
                     @Override
                     public void click(Integer value, int pos) {
-                        Hawk.put(HawkConfig.THEME_SELECT, value);
+                        SP.INSTANCE.setThemeSelect(value);
                         tvTheme.setText(getThemeView(value));
                     }
 
@@ -789,7 +789,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        if (chkTheme != Hawk.get(HawkConfig.THEME_SELECT, 0)) {
+                        if (chkTheme != SP.INSTANCE.getThemeSelect()) {
                             reloadActivity();
                         }
                     }

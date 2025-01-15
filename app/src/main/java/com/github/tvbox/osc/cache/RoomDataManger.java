@@ -4,12 +4,13 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.api.ApiConfig;
-import com.github.tvbox.osc.util.HawkConfig;
-import com.github.tvbox.osc.util.HistoryHelper;
 import com.github.tvbox.osc.bean.SourceBean;
 import com.github.tvbox.osc.bean.VodInfo;
 import com.github.tvbox.osc.data.AppDataManager;
+import com.github.tvbox.osc.util.HistoryHelper;
+import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.StorageDriveType;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
@@ -17,7 +18,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.orhanobut.hawk.Hawk;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +34,7 @@ public class RoomDataManger {
             if (field.getDeclaringClass() == VodInfo.class && field.getName().equals("seriesFlags")) {
                 return true;
             }
-            if (field.getDeclaringClass() == VodInfo.class && field.getName().equals("seriesMap")) {
-                return true;
-            }
-            return false;
+            return field.getDeclaringClass() == VodInfo.class && field.getName().equals("seriesMap");
         }
 
         @Override
@@ -73,7 +70,7 @@ public class RoomDataManger {
                 return vodInfo;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.e(e);
         }
         return null;
     }
@@ -91,9 +88,9 @@ public class RoomDataManger {
         //if ( count > 60 ) {
         //    AppDataManager.get().getVodRecordDao().reserver(50);
         //}
-        Integer index = Hawk.get(HawkConfig.HOME_NUM, 0);
-        Integer hisNum = HistoryHelper.getHisNum(index);
-        if ( count > hisNum ) {
+        int index = SP.INSTANCE.getHomeNum();
+        int hisNum = HistoryHelper.getHisNum(index);
+        if (count > hisNum) {
             AppDataManager.get().getVodRecordDao().reserver(hisNum);
         }
 
@@ -112,7 +109,7 @@ public class RoomDataManger {
                             info = null;
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOG.e(e);
                 }
                 if (info != null)
                     vodInfoList.add(info);
@@ -158,6 +155,7 @@ public class RoomDataManger {
         VodCollect record = AppDataManager.get().getVodCollectDao().getVodCollect(sourceKey, vodId);
         return record != null;
     }
+
     public static List<VodCollect> getAllVodCollect() {
         return AppDataManager.get().getVodCollectDao().getAll();
     }

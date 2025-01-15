@@ -176,18 +176,20 @@ object SP {
 
     var dohUrl by SharedPreferenceDelegates.int()     //安全DNS: 0=关闭, 1=腾讯, 2=阿里, 3=360, 4=Google, 5=AdGuard, 6=Quad9
     var defaultParse by SharedPreferenceDelegates.string()
-    var parseWebView by SharedPreferenceDelegates.boolean()    //嗅探Webview: true=系统自带, false=XWalkView
+    var parseWebView by SharedPreferenceDelegates.boolean(defaultValue = true)    //嗅探Webview: true=系统自带, false=XWalkView
     var checkedSourcesForSearch by SharedPreferenceDelegates.boolean()
     var storageDriveSort by SharedPreferenceDelegates.int()
     var subtitleTextSize by SharedPreferenceDelegates.int()
     var subtitleTextStyle by SharedPreferenceDelegates.boolean()
     var subtitleTimeDelay by SharedPreferenceDelegates.boolean()
-    var backgroundPlayType by SharedPreferenceDelegates.boolean()   //后台：0=关闭, 1=开启, 2=画中画
+    var backgroundPlayType by SharedPreferenceDelegates.int()   //后台：0=关闭, 1=开启, 2=画中画
     var screenDisplay by SharedPreferenceDelegates.boolean()
     var searchFilterKey by SharedPreferenceDelegates.string()
 
     /* 设置相关 */
     var debugMode by SharedPreferenceDelegates.boolean()
+    var homeHot by SharedPreferenceDelegates.string()
+    var homeHotDay by SharedPreferenceDelegates.string()
     var homeApi by SharedPreferenceDelegates.string()
     var homeRec by SharedPreferenceDelegates.int()   //推荐: 0=豆瓣热播, 1=站点推荐, 2=观看历史
     var homeRecStyle by SharedPreferenceDelegates.boolean()     //网格展示数据源，true=列表，false=一行
@@ -199,7 +201,7 @@ object SP {
     var homeDefaultShow by SharedPreferenceDelegates.boolean()  //启动时直接进直播的开关
     var searchResultWidth by SharedPreferenceDelegates.int(defaultValue = -1) // 搜索结果view宽度
     var hotVodDelete by SharedPreferenceDelegates.boolean()
-    var themeSelect by SharedPreferenceDelegates.boolean()            //主题: 0=奈飞, 1=哆啦, 2=百事, 3=鸣人, 4=小黄, 5=八神, 6=樱花
+    var themeSelect by SharedPreferenceDelegates.int()            //主题: 0=奈飞, 1=哆啦, 2=百事, 3=鸣人, 4=小黄, 5=八神, 6=樱花
     var fastSearchMode by SharedPreferenceDelegates.boolean()
     var searchView by SharedPreferenceDelegates.int(defaultValue = 1)   //搜索展示: 0=文字列表, 1=缩略图
 

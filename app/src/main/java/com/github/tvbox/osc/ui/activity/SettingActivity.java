@@ -20,8 +20,6 @@ import com.github.tvbox.osc.ui.adapter.SettingMenuAdapter;
 import com.github.tvbox.osc.ui.adapter.SettingPageAdapter;
 import com.github.tvbox.osc.ui.fragment.ModelSettingFragment;
 import com.github.tvbox.osc.util.AppManager;
-import com.github.tvbox.osc.util.HawkConfig;
-import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
 
@@ -111,8 +109,8 @@ public class SettingActivity extends BaseActivity {
         currentApi = SP.INSTANCE.getApiUrl();
         currentLive = SP.INSTANCE.getLiveUrl();
         homeSourceKey = ApiConfig.get().getHomeSourceBean().getKey();
-        homeRec = Hawk.get(HawkConfig.HOME_REC, 0);
-        dnsOpt = Hawk.get(HawkConfig.DOH_URL, 0);
+        homeRec = SP.INSTANCE.getHomeRec();
+        dnsOpt = SP.INSTANCE.getDohUrl();
         List<String> sortList = new ArrayList<>();
         sortList.add("设置其他");
         sortAdapter.setNewData(sortList);

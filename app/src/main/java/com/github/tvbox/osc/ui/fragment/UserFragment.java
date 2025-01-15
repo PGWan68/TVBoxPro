@@ -29,6 +29,7 @@ import com.github.tvbox.osc.ui.activity.SettingActivity;
 import com.github.tvbox.osc.ui.adapter.HomeHotVodAdapter;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.UA;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -48,6 +49,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import okhttp3.ResponseBody;
 
 /**
  * @author pj567
@@ -96,7 +99,7 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         }
 
         super.onFragmentResume();
-        if (Hawk.get(HawkConfig.HOME_REC, 0) == 2) {
+        if (SP.INSTANCE.getHomeRec() == 2) {
             List<VodInfo> allVodRecord = RoomDataManger.getAllVodRecord(20);
             List<Movie.Video> vodList = new ArrayList<>();
             for (VodInfo vodInfo : allVodRecord) {
@@ -155,31 +158,35 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
                 Movie.Video vod = ((Movie.Video) adapter.getItem(position));
 
                 // takagen99: CHeck if in Delete Mode
-                if ((vod.id != null && !vod.id.isEmpty()) && (Hawk.get(HawkConfig.HOME_REC, 0) == 2) && SP.INSTANCE.getHotVodDelete()) {
-                    homeHotVodAdapter.remove(position);
-                    VodInfo vodInfo = RoomDataManger.getVodInfo(vod.sourceKey, vod.id);
-                    RoomDataManger.deleteVodRecord(vod.sourceKey, vodInfo);
-                    Toast.makeText(mContext, getString(R.string.hm_hist_del), Toast.LENGTH_SHORT).show();
-                } else if (vod.id != null && !vod.id.isEmpty()) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("id", vod.id);
-                    bundle.putString("sourceKey", vod.sourceKey);
-                    if (vod.id.startsWith("msearch:")) {
-                        bundle.putString("title", vod.name);
-                        jumpActivity(FastSearchActivity.class, bundle);
+                if (vod != null) {
+                    if ((vod.id != null && !vod.id.isEmpty()) && (SP.INSTANCE.getHomeRec() == 2) && SP.INSTANCE.getHotVodDelete()) {
+                        VodInfo vodInfo = RoomDataManger.getVodInfo(vod.sourceKey, vod.id);
+                        if (vodInfo != null) {
+                            homeHotVodAdapter.remove(position);
+                            RoomDataManger.deleteVodRecord(vod.sourceKey, vodInfo);
+                            Toast.makeText(mContext, getString(R.string.hm_hist_del), Toast.LENGTH_SHORT).show();
+                        }
+                    } else if (vod.id != null && !vod.id.isEmpty()) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vod.id);
+                        bundle.putString("sourceKey", vod.sourceKey);
+                        if (vod.id.startsWith("msearch:")) {
+                            bundle.putString("title", vod.name);
+                            jumpActivity(FastSearchActivity.class, bundle);
+                        } else {
+                            jumpActivity(DetailActivity.class, bundle);
+                        }
                     } else {
-                        jumpActivity(DetailActivity.class, bundle);
+                        Intent newIntent;
+                        if (SP.INSTANCE.getFastSearchMode()) {
+                            newIntent = new Intent(mContext, FastSearchActivity.class);
+                        } else {
+                            newIntent = new Intent(mContext, SearchActivity.class);
+                        }
+                        newIntent.putExtra("title", vod.name);
+                        newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        mActivity.startActivity(newIntent);
                     }
-                } else {
-                    Intent newIntent;
-                    if (Hawk.get(HawkConfig.FAST_SEARCH_MODE, false)) {
-                        newIntent = new Intent(mContext, FastSearchActivity.class);
-                    } else {
-                        newIntent = new Intent(mContext, SearchActivity.class);
-                    }
-                    newIntent.putExtra("title", vod.name);
-                    newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    mActivity.startActivity(newIntent);
                 }
             }
         });
@@ -191,14 +198,16 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
                     return false;
                 Movie.Video vod = ((Movie.Video) adapter.getItem(position));
                 // Additional Check if : Home Rec 0=豆瓣, 1=推荐, 2=历史
-                if ((vod.id != null && !vod.id.isEmpty()) && (Hawk.get(HawkConfig.HOME_REC, 0) == 2)) {
-                    SP.INSTANCE.setHotVodDelete(!SP.INSTANCE.getHotVodDelete());
-                    homeHotVodAdapter.notifyDataSetChanged();
-                } else {
-                    Intent newIntent = new Intent(mContext, FastSearchActivity.class);
-                    newIntent.putExtra("title", vod.name);
-                    newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    mActivity.startActivity(newIntent);
+                if (vod != null) {
+                    if ((vod.id != null && !vod.id.isEmpty()) && (SP.INSTANCE.getHomeRec() == 2)) {
+                        SP.INSTANCE.setHotVodDelete(!SP.INSTANCE.getHotVodDelete());
+                        homeHotVodAdapter.notifyDataSetChanged();
+                    } else {
+                        Intent newIntent = new Intent(mContext, FastSearchActivity.class);
+                        newIntent.putExtra("title", vod.name);
+                        newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        mActivity.startActivity(newIntent);
+                    }
                 }
                 return true;
             }
@@ -252,7 +261,7 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         initHomeHotVod(homeHotVodAdapter);
 
         // Swifly: Home Style
-        if (Hawk.get(HawkConfig.HOME_REC_STYLE, false)) {
+        if (SP.INSTANCE.getHomeRecStyle()) {
             tvHotListForGrid.setVisibility(View.VISIBLE);
             tvHotListForLine.setVisibility(View.GONE);
         } else {
@@ -262,12 +271,12 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
     }
 
     private void initHomeHotVod(HomeHotVodAdapter adapter) {
-        if (Hawk.get(HawkConfig.HOME_REC, 0) == 1) {
+        if (SP.INSTANCE.getHomeRec() == 1) {
             if (homeSourceRec != null) {
                 adapter.setNewData(homeSourceRec);
             }
             return;
-        } else if (Hawk.get(HawkConfig.HOME_REC, 0) == 2) {
+        } else if (SP.INSTANCE.getHomeRec() == 2) {
             return;
         }
         try {
@@ -276,9 +285,9 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
             int month = cal.get(Calendar.MONTH) + 1;
             int day = cal.get(Calendar.DATE);
             String today = String.format("%d%d%d", year, month, day);
-            String requestDay = Hawk.get("home_hot_day", "");
+            String requestDay = SP.INSTANCE.getHomeHotDay();
             if (requestDay.equals(today)) {
-                String json = Hawk.get("home_hot", "");
+                String json = SP.INSTANCE.getHomeHot();
                 if (!json.isEmpty()) {
                     adapter.setNewData(loadHots(json));
                     return;
@@ -290,8 +299,8 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
                 @Override
                 public void onSuccess(Response<String> response) {
                     String netJson = response.body();
-                    Hawk.put("home_hot_day", today);
-                    Hawk.put("home_hot", netJson);
+                    SP.INSTANCE.setHomeHotDay(today);
+                    SP.INSTANCE.setHomeHot(netJson);
                     mActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -302,11 +311,15 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
 
                 @Override
                 public String convertResponse(okhttp3.Response response) throws Throwable {
-                    return response.body().string();
+                    ResponseBody json = response.body();
+                    if (json != null) {
+                        return json.string();
+                    }
+                    return "";
                 }
             });
         } catch (Throwable th) {
-            th.printStackTrace();
+            LOG.e(th);
         }
     }
 
@@ -324,7 +337,7 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
                 result.add(vod);
             }
         } catch (Throwable th) {
-
+            LOG.e(th);
         }
         return result;
     }

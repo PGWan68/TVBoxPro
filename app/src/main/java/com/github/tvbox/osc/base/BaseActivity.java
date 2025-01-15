@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.PermissionChecker;
+
 import com.blankj.utilcode.util.ActivityUtils;
 import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
@@ -25,6 +26,7 @@ import com.github.tvbox.osc.callback.LoadingCallback;
 import com.github.tvbox.osc.ui.activity.DetailActivity;
 import com.github.tvbox.osc.util.AppManager;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.LocaleHelper;
 import com.kingja.loadsir.callback.Callback;
 import com.kingja.loadsir.core.LoadService;
@@ -78,21 +80,22 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
                 screenRatio = (float) Math.max(screenWidth, screenHeight) / (float) Math.min(screenWidth, screenHeight);
             }
         } catch (Throwable th) {
-            th.printStackTrace();
+            LOG.e(th);
         }
 
         // takagen99 : Set Theme Color
-        if (Hawk.get(HawkConfig.THEME_SELECT, 0) == 0) {
+        int themeSelect = SP.INSTANCE.getThemeSelect();
+        if (themeSelect == 0) {
             setTheme(R.style.NetfxTheme);
-        } else if (Hawk.get(HawkConfig.THEME_SELECT, 0) == 1) {
+        } else if (themeSelect == 1) {
             setTheme(R.style.DoraeTheme);
-        } else if (Hawk.get(HawkConfig.THEME_SELECT, 0) == 2) {
+        } else if (themeSelect == 2) {
             setTheme(R.style.PepsiTheme);
-        } else if (Hawk.get(HawkConfig.THEME_SELECT, 0) == 3) {
+        } else if (themeSelect == 3) {
             setTheme(R.style.NarutoTheme);
-        } else if (Hawk.get(HawkConfig.THEME_SELECT, 0) == 4) {
+        } else if (themeSelect == 4) {
             setTheme(R.style.MinionTheme);
-        } else if (Hawk.get(HawkConfig.THEME_SELECT, 0) == 5) {
+        } else if (themeSelect == 5) {
             setTheme(R.style.YagamiTheme);
         } else {
             setTheme(R.style.SakuraTheme);
@@ -246,7 +249,7 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
     }
 
     public void jumpActivity(Class<? extends BaseActivity> clazz, Bundle bundle) {
-    	if (DetailActivity.class.isAssignableFrom(clazz) && Hawk.get(HawkConfig.BACKGROUND_PLAY_TYPE, 0) == 2) {
+        if (DetailActivity.class.isAssignableFrom(clazz) && Hawk.get(HawkConfig.BACKGROUND_PLAY_TYPE, 0) == 2) {
             //1.重新打开singleTask的页面(关闭小窗) 2.关闭画中画，重进detail再开启画中画会闪退
             ActivityUtils.finishActivity(DetailActivity.class);
         }

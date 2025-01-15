@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.github.catvod.crawler.JsLoader;
 import com.github.catvod.crawler.Spider;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.bean.AbsJson;
@@ -20,7 +21,6 @@ import com.github.tvbox.osc.bean.MovieSort;
 import com.github.tvbox.osc.bean.SourceBean;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.util.DefaultConfig;
-import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.thunder.Thunder;
 import com.google.gson.Gson;
@@ -32,7 +32,6 @@ import com.google.gson.reflect.TypeToken;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.AbsCallback;
 import com.lzy.okgo.model.Response;
-import com.orhanobut.hawk.Hawk;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
@@ -42,6 +41,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -129,7 +129,7 @@ public class SourceViewModel extends ViewModel {
                 } finally {
                     if (sortJson != null) {
                         AbsSortXml sortXml = sortJsonFunc(sortJson);
-                        if (sortXml != null && Hawk.get(HawkConfig.HOME_REC, 0) == 1) {
+                        if (sortXml != null && SP.INSTANCE.getHomeRec() == 1) {
                             AbsXml absXml = json(null, sortJson, sourceBean.getKey());
                             if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && !absXml.movie.videoList.isEmpty()) {
                                 sortXml.videoList = absXml.movie.videoList;
@@ -180,7 +180,7 @@ public class SourceViewModel extends ViewModel {
                                 String json = response.body();
                                 sortXml = sortJsonFunc(json);
                             }
-                            if (sortXml != null && Hawk.get(HawkConfig.HOME_REC, 0) == 1 && sortXml.list != null && sortXml.list.videoList != null && sortXml.list.videoList.size() > 0) {
+                            if (sortXml != null && SP.INSTANCE.getHomeRec() == 1 && sortXml.list != null && sortXml.list.videoList != null && !sortXml.list.videoList.isEmpty()) {
                                 ArrayList<String> ids = new ArrayList<>();
                                 for (Movie.Video vod : sortXml.list.videoList) {
                                     ids.add(vod.id);
@@ -221,9 +221,9 @@ public class SourceViewModel extends ViewModel {
                             LOG.i(sortJson);
                             if (sortJson != null) {
                                 AbsSortXml sortXml = sortJsonFunc(sortJson);
-                                if (sortXml != null && Hawk.get(HawkConfig.HOME_REC, 0) == 1) {
+                                if (sortXml != null && SP.INSTANCE.getHomeRec() == 1) {
                                     AbsXml absXml = json(null, sortJson, sourceBean.getKey());
-                                    if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && absXml.movie.videoList.size() > 0) {
+                                    if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && !absXml.movie.videoList.isEmpty()) {
                                         sortXml.videoList = absXml.movie.videoList;
                                         sortResult.postValue(sortXml);
                                     } else {
@@ -310,13 +310,9 @@ public class SourceViewModel extends ViewModel {
         } else if (type == 4) {
             String ext = "";
             if (sortData.filterSelect != null && !sortData.filterSelect.isEmpty()) {
-                try {
-                    LOG.i(new JSONObject(sortData.filterSelect).toString());
-                    ext = Base64.encodeToString(new JSONObject(sortData.filterSelect).toString().getBytes("UTF-8"), Base64.DEFAULT | Base64.NO_WRAP);
-                    LOG.i(ext);
-                } catch (UnsupportedEncodingException e) {
-                    LOG.e(e);
-                }
+                LOG.i(new JSONObject(sortData.filterSelect).toString());
+                ext = Base64.encodeToString(new JSONObject(sortData.filterSelect).toString().getBytes(StandardCharsets.UTF_8), Base64.DEFAULT | Base64.NO_WRAP);
+                LOG.i(ext);
             }
             OkGo.<String>get(homeSourceBean.getApi())
                     .tag(homeSourceBean.getApi())
@@ -376,10 +372,10 @@ public class SourceViewModel extends ViewModel {
                     try {
                         sortJson = future.get(15, TimeUnit.SECONDS);
                     } catch (TimeoutException e) {
-                        e.printStackTrace();
+                        LOG.e(e);
                         future.cancel(true);
                     } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
+                        LOG.e(e);
                     } finally {
                         if (sortJson != null) {
                             AbsXml absXml = json(null, sortJson, sourceBean.getKey());
@@ -394,7 +390,7 @@ public class SourceViewModel extends ViewModel {
                         try {
                             executor.shutdown();
                         } catch (Throwable th) {
-                            th.printStackTrace();
+                            LOG.e(th);
                         }
                     }
                 }
