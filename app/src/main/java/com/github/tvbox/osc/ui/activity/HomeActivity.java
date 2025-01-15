@@ -456,7 +456,7 @@ public class HomeActivity extends BaseActivity {
 //            } else {
 //                LOG.e("无写入权限");
 //            }
-            if (Hawk.get(HawkConfig.HOME_DEFAULT_SHOW, false)) {
+            if (SP.INSTANCE.getHomeDefaultShow()) {
                 jumpActivity(LivePlayActivity.class);
             }
 

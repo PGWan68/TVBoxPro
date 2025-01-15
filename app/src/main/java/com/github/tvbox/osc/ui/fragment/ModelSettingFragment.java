@@ -142,7 +142,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvDns = findViewById(R.id.tvDns);
         tvDns.setText(OkGoHelper.dnsHttpsList.get(Hawk.get(HawkConfig.DOH_URL, 0)));
         tvHomeDefaultShow = findViewById(R.id.tvHomeDefaultShow);
-        tvHomeDefaultShow.setText(Hawk.get(HawkConfig.HOME_DEFAULT_SHOW, false) ? "开启" : "关闭");
+        tvHomeDefaultShow.setText(SP.INSTANCE.getHomeDefaultShow() ? "开启" : "关闭");
 
         //takagen99 : Set HomeApi as default
         findViewById(R.id.llHomeApi).requestFocus();
@@ -152,7 +152,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
                 SP.INSTANCE.setDebugMode(!SP.INSTANCE.getDebugMode());
-                tvDebugOpen.setText( SP.INSTANCE.getDebugMode() ? "开启" : "关闭");
+                tvDebugOpen.setText(SP.INSTANCE.getDebugMode() ? "开启" : "关闭");
             }
         });
         // Input Source URL ------------------------------------------------------------------------
@@ -811,8 +811,8 @@ public class ModelSettingFragment extends BaseLazyFragment {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                Hawk.put(HawkConfig.HOME_DEFAULT_SHOW, !Hawk.get(HawkConfig.HOME_DEFAULT_SHOW, false));
-                tvHomeDefaultShow.setText(Hawk.get(HawkConfig.HOME_DEFAULT_SHOW, true) ? "开启" : "关闭");
+                SP.INSTANCE.setHomeDefaultShow(!SP.INSTANCE.getHomeDefaultShow());
+                tvHomeDefaultShow.setText(SP.INSTANCE.getHomeDefaultShow() ? "开启" : "关闭");
             }
         });
 
