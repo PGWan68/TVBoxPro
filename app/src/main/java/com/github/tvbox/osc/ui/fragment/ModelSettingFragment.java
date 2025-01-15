@@ -271,9 +271,9 @@ public class ModelSettingFragment extends BaseLazyFragment {
         findViewById(R.id.llHomeIcon).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FastClickCheckUtil.check(v);
-                HomeIconDialog dialog = new HomeIconDialog(mActivity);
-                dialog.show();
+//                FastClickCheckUtil.check(v);
+//                HomeIconDialog dialog = new HomeIconDialog(mActivity);
+//                dialog.show();
             }
         });
         // Select Home Display Type : Douban / Recommended / History -----

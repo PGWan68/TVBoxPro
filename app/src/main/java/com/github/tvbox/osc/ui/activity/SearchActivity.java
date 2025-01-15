@@ -53,7 +53,7 @@ import com.github.tvbox.osc.ui.tv.QRCodeGen;
 import com.github.tvbox.osc.ui.tv.widget.CustomEditText;
 import com.github.tvbox.osc.ui.tv.widget.SearchKeyboard;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
-import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.SearchHelper;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.google.gson.Gson;
@@ -64,7 +64,6 @@ import com.google.gson.JsonParser;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.AbsCallback;
 import com.lzy.okgo.model.Response;
-import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7GridLayoutManager;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
@@ -90,6 +89,9 @@ import me.jessyan.autosize.utils.AutoSizeUtils;
  * @description:
  */
 public class SearchActivity extends BaseActivity {
+    private static ArrayList<String> hots = new ArrayList<>();
+    private static Boolean hasKeyBoard;
+    public String keyword;
     private LinearLayout llLayout;
     private TvRecyclerView mGridView;
     private TvRecyclerView mGridViewWord;
@@ -105,37 +107,18 @@ public class SearchActivity extends BaseActivity {
     private String searchTitle = "";
     private ImageView tvSearchCheckbox;
     private TextView filterBtn;
-
     private RelativeLayout searchTips;
     private FlowLayout tv_history;
     private LinearLayout llWord;
-
     private ImageView clearHistory;
     private SearchPresenter searchPresenter;
-
     private String sKey;
-    public String keyword;
-
     private TextView tHotSearchText;
-    private static ArrayList<String> hots = new ArrayList<>();
     private HashMap<String, String> mCheckSources = null;
     private SearchCheckboxDialog mSearchCheckboxDialog = null;
     private int searchResultWidth;
-
-    @Override
-    protected int getLayoutResID() {
-        return R.layout.activity_search;
-    }
-
-    private static Boolean hasKeyBoard;
-
-    @Override
-    protected void init() {
-        disableKeyboard(SearchActivity.this);
-        initView();
-        initViewModel();
-        initData();
-    }
+    private List<Runnable> pauseRunnable = null;
+    private AtomicInteger allRunCount = new AtomicInteger(0);
 
     /*
      * 禁止软键盘
@@ -153,6 +136,19 @@ public class SearchActivity extends BaseActivity {
     public static void enableKeyboard(Activity activity) {
         hasKeyBoard = true;
         activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+
+    @Override
+    protected int getLayoutResID() {
+        return R.layout.activity_search;
+    }
+
+    @Override
+    protected void init() {
+        disableKeyboard(SearchActivity.this);
+        initView();
+        initViewModel();
+        initData();
     }
 
     public void openSystemKeyBoard() {
@@ -173,8 +169,6 @@ public class SearchActivity extends BaseActivity {
         rootView.getWindowVisibleDisplayFrame(r);
         return rootView.getBottom() == r.bottom;
     }
-
-    private List<Runnable> pauseRunnable = null;
 
     @Override
     protected void onResume() {
@@ -240,7 +234,7 @@ public class SearchActivity extends BaseActivity {
                 String[] split = keyword.split("\uFEFF");
                 keyword = split[split.length - 1];
                 etSearch.setText(keyword);
-                if (Hawk.get(HawkConfig.FAST_SEARCH_MODE, false)) {
+                if (SP.INSTANCE.getFastSearchMode()) {
                     Bundle bundle = new Bundle();
                     bundle.putString("title", keyword);
                     refreshSearchHistory(keyword);
@@ -252,7 +246,7 @@ public class SearchActivity extends BaseActivity {
         });
         mGridView.setHasFixedSize(true);
         // lite
-        if (Hawk.get(HawkConfig.SEARCH_VIEW, 0) == 0)
+        if (SP.INSTANCE.getSearchView() == 0)
             mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, 1, false));
             // with preview
         else
@@ -272,7 +266,7 @@ public class SearchActivity extends BaseActivity {
                             sourceViewModel.destroyExecutor();
                         }
                     } catch (Throwable th) {
-                        th.printStackTrace();
+                        LOG.e(th);
                     }
                     Bundle bundle = new Bundle();
                     bundle.putString("id", video.id);
@@ -286,7 +280,7 @@ public class SearchActivity extends BaseActivity {
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
                 if (!TextUtils.isEmpty(keyword)) {
-                    if (Hawk.get(HawkConfig.FAST_SEARCH_MODE, false)) {
+                    if (SP.INSTANCE.getFastSearchMode()) {
                         Bundle bundle = new Bundle();
                         bundle.putString("title", keyword);
                         refreshSearchHistory(keyword);
@@ -546,7 +540,7 @@ public class SearchActivity extends BaseActivity {
         tv_history.setViews(historyList, new FlowLayout.OnItemClickListener() {
             public void onItemClick(String content) {
                 etSearch.setText(content);
-                if (Hawk.get(HawkConfig.FAST_SEARCH_MODE, false)) {
+                if (SP.INSTANCE.getFastSearchMode()) {
                     Bundle bundle = new Bundle();
                     bundle.putString("title", content);
                     refreshSearchHistory(content);
@@ -619,7 +613,7 @@ public class SearchActivity extends BaseActivity {
         if (intent != null && intent.hasExtra("title")) {
             String title = intent.getStringExtra("title");
             showLoading();
-            if (Hawk.get(HawkConfig.FAST_SEARCH_MODE, false)) {
+            if (SP.INSTANCE.getFastSearchMode()) {
                 Bundle bundle = new Bundle();
                 bundle.putString("title", title);
                 refreshSearchHistory(title);
@@ -680,7 +674,7 @@ public class SearchActivity extends BaseActivity {
         if (event.type == ServerEvent.SERVER_SEARCH) {
             String title = (String) event.obj;
             showLoading();
-            if (Hawk.get(HawkConfig.FAST_SEARCH_MODE, false)) {
+            if (SP.INSTANCE.getFastSearchMode()) {
                 Bundle bundle = new Bundle();
                 bundle.putString("title", title);
                 refreshSearchHistory(title);
@@ -720,8 +714,6 @@ public class SearchActivity extends BaseActivity {
         refreshSearchHistory(title);
         searchResult();
     }
-
-    private AtomicInteger allRunCount = new AtomicInteger(0);
 
     private void searchResult() {
         try {

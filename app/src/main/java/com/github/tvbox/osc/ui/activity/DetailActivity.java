@@ -45,7 +45,6 @@ import com.github.tvbox.osc.bean.VodInfo;
 import com.github.tvbox.osc.bean.VodSeriesGroup;
 import com.github.tvbox.osc.cache.RoomDataManger;
 import com.github.tvbox.osc.event.RefreshEvent;
-import com.github.tvbox.osc.player.controller.VodController;
 import com.github.tvbox.osc.server.PlayService;
 import com.github.tvbox.osc.ui.adapter.SeriesAdapter;
 import com.github.tvbox.osc.ui.adapter.SeriesFlagAdapter;
@@ -55,10 +54,8 @@ import com.github.tvbox.osc.ui.dialog.PushDialog;
 import com.github.tvbox.osc.ui.dialog.QuickSearchDialog;
 import com.github.tvbox.osc.ui.fragment.PlayFragment;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
-import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.ImgUtil;
 import com.github.tvbox.osc.util.SearchHelper;
-import com.github.tvbox.osc.util.StringUtils;
 import com.github.tvbox.osc.util.SubtitleHelper;
 import com.github.tvbox.osc.util.thunder.Thunder;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
@@ -68,7 +65,6 @@ import com.google.gson.JsonParser;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.AbsCallback;
 import com.lzy.okgo.model.Response;
-import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7GridLayoutManager;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
@@ -85,7 +81,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -97,6 +92,26 @@ import java.util.regex.Pattern;
  * @description:
  */
 public class DetailActivity extends BaseActivity {
+    public static final String BROADCAST_ACTION = "VOD_CONTROL";
+    public static final int BROADCAST_ACTION_PREV = 0;
+    public static final int BROADCAST_ACTION_PLAYPAUSE = 1;
+    public static final int BROADCAST_ACTION_NEXT = 2;
+    private final List<String> quickSearchWord = new ArrayList<>();
+    private final List<Movie.Video> quickSearchData = new ArrayList<>();
+    public String vodId;
+    public String sourceKey;
+    public String firstsourceKey;
+    public boolean fullWindows = false;
+    boolean seriesSelect = false;
+    // preview : true 开启 false 关闭
+    VodInfo previewVodInfo = null;
+    boolean showPreview = SP.INSTANCE.getShowPreview();
+    ViewGroup.LayoutParams windowsPreview = null;
+    ViewGroup.LayoutParams windowsFull = null;
+    /**
+     * 是否开启后台播放标记,不在广播开启,onPause根据标记开启
+     */
+    boolean openBackgroundPlay;
     private LinearLayout llLayout;
     private FragmentContainerView llPlayerFragmentContainer;
     private View llPlayerFragmentContainerBlock;
@@ -127,10 +142,6 @@ public class DetailActivity extends BaseActivity {
     private VodInfo vodInfo;
     private SeriesFlagAdapter seriesFlagAdapter;
     private SeriesAdapter seriesAdapter;
-    public String vodId;
-    public String sourceKey;
-    public String firstsourceKey;
-    boolean seriesSelect = false;
     private View seriesFlagFocus = null;
     private HashMap<String, String> mCheckSources = null;
     private V7GridLayoutManager mGridViewLayoutMgr = null;
@@ -138,36 +149,17 @@ public class DetailActivity extends BaseActivity {
     private List<Runnable> pauseRunnable = null;
     private String searchTitle = "";
     private boolean hadQuickStart = false;
-    private final List<String> quickSearchWord = new ArrayList<>();
     private ExecutorService searchExecutorService = null;
     private SeriesGroupAdapter seriesGroupAdapter;
     private List<List<VodInfo.VodSeries>> uu;
     private int GroupCount;
     private int GroupIndex = 0;
-
-    // preview : true 开启 false 关闭
-    VodInfo previewVodInfo = null;
-    boolean showPreview = SP.INSTANCE.getShowPreview();
-    public boolean fullWindows = false;
-    ViewGroup.LayoutParams windowsPreview = null;
-    ViewGroup.LayoutParams windowsFull = null;
-
-    private final List<Movie.Video> quickSearchData = new ArrayList<>();
     private BroadcastReceiver pipActionReceiver;
-    public static final String BROADCAST_ACTION = "VOD_CONTROL";
-    public static final int BROADCAST_ACTION_PREV = 0;
-    public static final int BROADCAST_ACTION_PLAYPAUSE = 1;
-    public static final int BROADCAST_ACTION_NEXT = 2;
-
     private ImageView tvPlayUrl;
     /**
      * Home键广播,用于触发后台服务
      */
     private BroadcastReceiver mHomeKeyReceiver;
-    /**
-     * 是否开启后台播放标记,不在广播开启,onPause根据标记开启
-     */
-    boolean openBackgroundPlay;
 
     public static int getNum(String str) {
         try {
@@ -223,10 +215,11 @@ public class DetailActivity extends BaseActivity {
                 public void onReceive(Context context, Intent intent) {
                     String action = intent.getAction();
                     if (action != null && action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
-                        openBackgroundPlay = Hawk.get(HawkConfig.BACKGROUND_PLAY_TYPE, 0) == 1 && playFragment.getPlayer() != null && playFragment.getPlayer().isPlaying();
+                        openBackgroundPlay = SP.INSTANCE.getBackgroundPlayType() == 1 && playFragment.getPlayer() != null && playFragment.getPlayer().isPlaying();
                     }
                 }
             };
+
             registerReceiver(mHomeKeyReceiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         }
     }
@@ -1118,7 +1111,7 @@ public class DetailActivity extends BaseActivity {
     @Override
     public void onUserLeaveHint() {
         // takagen99 : Additional check for external player
-        if (supportsPiPMode() && showPreview && !playFragment.extPlay && Hawk.get(HawkConfig.BACKGROUND_PLAY_TYPE, 0) == 2) {
+        if (supportsPiPMode() && showPreview && !playFragment.extPlay && SP.INSTANCE.getBackgroundPlayType() == 2) {
             // 创建一个Intent对象，模拟按下Home键
             try { //部分电视使用该方法启动首页闪退比如小米的澎湃OS
                 Intent intent = new Intent(Intent.ACTION_MAIN);

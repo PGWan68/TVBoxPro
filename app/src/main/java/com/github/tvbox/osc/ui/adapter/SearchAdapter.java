@@ -13,9 +13,7 @@ import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.bean.Movie;
-import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.ImgUtil;
-import com.orhanobut.hawk.Hawk;
 
 import java.util.ArrayList;
 
@@ -30,7 +28,7 @@ public class SearchAdapter extends BaseQuickAdapter<Movie.Video, BaseViewHolder>
     @Override
     protected void convert(BaseViewHolder helper, Movie.Video item) {
         // lite
-        if (Hawk.get(HawkConfig.SEARCH_VIEW, 0) == 0) {
+        if (SP.INSTANCE.getSearchView() == 0) {
             helper.setText(R.id.tvName, String.format("%s  %s %s %s", ApiConfig.get().getSource(item.sourceKey).getName(), item.name, item.type == null ? "" : item.type, item.note == null ? "" : item.note));
         } else {// with preview\
             helper.setText(R.id.tvName, item.name);

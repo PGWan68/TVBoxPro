@@ -82,7 +82,6 @@ import com.github.tvbox.osc.ui.dialog.SubtitleDialog;
 import com.github.tvbox.osc.util.AdBlocker;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.FileUtils;
-import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.M3U8;
 import com.github.tvbox.osc.util.MD5;
@@ -102,7 +101,6 @@ import com.lzy.okgo.callback.AbsCallback;
 import com.lzy.okgo.model.HttpHeaders;
 import com.lzy.okgo.model.Response;
 import com.obsez.android.lib.filechooser.ChooserDialog;
-import com.orhanobut.hawk.Hawk;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -144,6 +142,14 @@ import xyz.doikki.videoplayer.player.AbstractPlayer;
 import xyz.doikki.videoplayer.player.ProgressManager;
 
 public class PlayActivity extends BaseActivity {
+    public static final String BROADCAST_ACTION = "VOD_CONTROL";
+    public static final int BROADCAST_ACTION_PREV = 0;
+    public static final int BROADCAST_ACTION_PLAYPAUSE = 1;
+    public static final int BROADCAST_ACTION_NEXT = 2;
+    private final Map<String, Boolean> loadedUrls = new HashMap<>();
+    private final AtomicInteger loadFoundCount = new AtomicInteger(0);
+    ExecutorService executorService;
+    ExecutorService parseThreadPool;
     private MyVideoView mVideoView;
     private TextView mPlayLoadTip;
     private ImageView mPlayLoadErr;
@@ -151,21 +157,124 @@ public class PlayActivity extends BaseActivity {
     private VodController mController;
     private SourceViewModel sourceViewModel;
     private Handler mHandler;
-
     private String videoURL;
     private long videoDuration = -1;
     private List<String> videoSegmentationURL = new ArrayList<>();
-
     private BroadcastReceiver pipActionReceiver;
-    public static final String BROADCAST_ACTION = "VOD_CONTROL";
-    public static final int BROADCAST_ACTION_PREV = 0;
-    public static final int BROADCAST_ACTION_PLAYPAUSE = 1;
-    public static final int BROADCAST_ACTION_NEXT = 2;
-
-    ExecutorService executorService;
     private DanmakuView mDanmuView;
     private DanmakuContext mDanmakuContext;
     private String danmuText;
+    // takagen99 : Add check for external players not enter PIP
+    private boolean extPlay = false;
+    // takagen99 : Use onStopCalled to track close activity
+    private boolean onStopCalled;
+    private VodInfo mVodInfo;
+    private JSONObject mVodPlayerCfg;
+    private String sourceKey;
+    private SourceBean sourceBean;
+    private int autoRetryCount = 0;
+    private String playSubtitle;
+    private String subtitleCacheKey;
+    private String progressKey;
+    private String parseFlag;
+    private String webUrl;
+    private String webUserAgent;
+    private Map<String, String> webHeaderMap;
+    // webview
+    private XWalkView mXwalkWebView;
+    private XWalkWebClient mX5WebClient;
+    private WebView mSysWebView;
+    private SysWebClient mSysWebClient;
+    private LinkedList<String> loadFoundVideoUrls = new LinkedList<>();
+    private HashMap<String, HashMap<String, String>> loadFoundVideoUrlsHeader = new HashMap<>();
+    private final Observer<JSONObject> mObserverPlayResult = new Observer<JSONObject>() {
+        @Override
+        public void onChanged(JSONObject info) {
+            if (info != null) {
+                try {
+                    progressKey = info.optString("proKey", null);
+                    boolean parse = info.optString("parse", "1").equals("1");
+                    boolean jx = info.optString("jx", "0").equals("1");
+                    playSubtitle = info.optString("subt", /*"https://dash.akamaized.net/akamai/test/caption_test/ElephantsDream/ElephantsDream_en.vtt"*/"");
+                    if (playSubtitle.isEmpty() && info.has("subs")) {
+                        try {
+                            JSONObject obj = info.getJSONArray("subs").optJSONObject(0);
+                            String url = obj.optString("url", "");
+                            if (!TextUtils.isEmpty(url) && !FileUtils.hasExtension(url)) {
+                                String format = obj.optString("format", "");
+                                String name = obj.optString("name", "字幕");
+                                String ext = ".srt";
+                                switch (format) {
+                                    case "text/x-ssa":
+                                        ext = ".ass";
+                                        break;
+                                    case "text/vtt":
+                                        ext = ".vtt";
+                                        break;
+                                    case "application/x-subrip":
+                                        ext = ".srt";
+                                        break;
+                                    case "text/lrc":
+                                        ext = ".lrc";
+                                        break;
+                                }
+                                String filename = name + (name.toLowerCase().endsWith(ext) ? "" : ext);
+                                url += "#" + URLEncoder.encode(filename);
+                            }
+                            playSubtitle = url;
+                        } catch (Throwable th) {
+                        }
+                    }
+                    subtitleCacheKey = info.optString("subtKey", null);
+                    String playUrl = info.optString("playUrl", "");
+                    String msg = info.optString("msg", "");
+                    if (!msg.isEmpty()) {
+                        Toast.makeText(PlayActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                    String flag = info.optString("flag");
+                    String url = info.getString("url");
+                    String danmaku = info.optString("danmaku");
+                    HashMap<String, String> headers = null;
+                    webUserAgent = null;
+                    webHeaderMap = null;
+                    if (info.has("header")) {
+                        try {
+                            JSONObject hds = new JSONObject(info.getString("header"));
+                            Iterator<String> keys = hds.keys();
+                            while (keys.hasNext()) {
+                                String key = keys.next();
+                                if (headers == null) {
+                                    headers = new HashMap<>();
+                                }
+                                headers.put(key, hds.getString(key));
+                                if (key.equalsIgnoreCase("user-agent")) {
+                                    webUserAgent = hds.getString(key).trim();
+                                } else if (key.equalsIgnoreCase("cookie")) {
+                                    for (String split : hds.getString(key).split(";"))
+                                        CookieManager.getInstance().setCookie(url, split.trim());
+                                }
+                            }
+                            webHeaderMap = headers;
+                        } catch (Throwable th) {
+
+                        }
+                    }
+                    if (parse || jx) {
+                        boolean userJxList = (playUrl.isEmpty() && ApiConfig.get().getVipParseFlags().contains(flag)) || jx;
+                        initParse(flag, userJxList, playUrl, url);
+                    } else {
+                        mController.showParse(false);
+                        playUrl(playUrl + url, headers);
+                    }
+                    checkDanmu(danmaku);
+                } catch (Throwable th) {
+                    errorWithRetry("获取播放信息错误", true);
+                }
+            } else {
+                errorWithRetry("获取播放信息错误", true);
+            }
+        }
+    };
 
     @Override
     protected int getLayoutResID() {
@@ -962,95 +1071,6 @@ public class PlayActivity extends BaseActivity {
         sourceViewModel.playResult.observeForever(mObserverPlayResult);
     }
 
-    private final Observer<JSONObject> mObserverPlayResult = new Observer<JSONObject>() {
-        @Override
-        public void onChanged(JSONObject info) {
-            if (info != null) {
-                try {
-                    progressKey = info.optString("proKey", null);
-                    boolean parse = info.optString("parse", "1").equals("1");
-                    boolean jx = info.optString("jx", "0").equals("1");
-                    playSubtitle = info.optString("subt", /*"https://dash.akamaized.net/akamai/test/caption_test/ElephantsDream/ElephantsDream_en.vtt"*/"");
-                    if (playSubtitle.isEmpty() && info.has("subs")) {
-                        try {
-                            JSONObject obj = info.getJSONArray("subs").optJSONObject(0);
-                            String url = obj.optString("url", "");
-                            if (!TextUtils.isEmpty(url) && !FileUtils.hasExtension(url)) {
-                                String format = obj.optString("format", "");
-                                String name = obj.optString("name", "字幕");
-                                String ext = ".srt";
-                                switch (format) {
-                                    case "text/x-ssa":
-                                        ext = ".ass";
-                                        break;
-                                    case "text/vtt":
-                                        ext = ".vtt";
-                                        break;
-                                    case "application/x-subrip":
-                                        ext = ".srt";
-                                        break;
-                                    case "text/lrc":
-                                        ext = ".lrc";
-                                        break;
-                                }
-                                String filename = name + (name.toLowerCase().endsWith(ext) ? "" : ext);
-                                url += "#" + URLEncoder.encode(filename);
-                            }
-                            playSubtitle = url;
-                        } catch (Throwable th) {
-                        }
-                    }
-                    subtitleCacheKey = info.optString("subtKey", null);
-                    String playUrl = info.optString("playUrl", "");
-                    String msg = info.optString("msg", "");
-                    if (!msg.isEmpty()) {
-                        Toast.makeText(PlayActivity.this, msg, Toast.LENGTH_SHORT).show();
-                    }
-                    String flag = info.optString("flag");
-                    String url = info.getString("url");
-                    String danmaku = info.optString("danmaku");
-                    HashMap<String, String> headers = null;
-                    webUserAgent = null;
-                    webHeaderMap = null;
-                    if (info.has("header")) {
-                        try {
-                            JSONObject hds = new JSONObject(info.getString("header"));
-                            Iterator<String> keys = hds.keys();
-                            while (keys.hasNext()) {
-                                String key = keys.next();
-                                if (headers == null) {
-                                    headers = new HashMap<>();
-                                }
-                                headers.put(key, hds.getString(key));
-                                if (key.equalsIgnoreCase("user-agent")) {
-                                    webUserAgent = hds.getString(key).trim();
-                                } else if (key.equalsIgnoreCase("cookie")) {
-                                    for (String split : hds.getString(key).split(";"))
-                                        CookieManager.getInstance().setCookie(url, split.trim());
-                                }
-                            }
-                            webHeaderMap = headers;
-                        } catch (Throwable th) {
-
-                        }
-                    }
-                    if (parse || jx) {
-                        boolean userJxList = (playUrl.isEmpty() && ApiConfig.get().getVipParseFlags().contains(flag)) || jx;
-                        initParse(flag, userJxList, playUrl, url);
-                    } else {
-                        mController.showParse(false);
-                        playUrl(playUrl + url, headers);
-                    }
-                    checkDanmu(danmaku);
-                } catch (Throwable th) {
-                    errorWithRetry("获取播放信息错误", true);
-                }
-            } else {
-                errorWithRetry("获取播放信息错误", true);
-            }
-        }
-    };
-
     private void checkDanmu(String danmu) {
         danmuText = danmu;
         mDanmuView.release();
@@ -1085,7 +1105,7 @@ public class PlayActivity extends BaseActivity {
         }
         try {
             if (!mVodPlayerCfg.has("pl")) {
-                int playType = Hawk.get(HawkConfig.PLAY_TYPE, 1);
+                int playType = SP.INSTANCE.getPlayType();
                 boolean configurationFile = SP.INSTANCE.getVodPlayerPreferred() == 0;
                 int playerType = sourceBean.getPlayerType();
                 if (configurationFile && playerType != -1) {
@@ -1102,13 +1122,13 @@ public class PlayActivity extends BaseActivity {
             }
 
             if (!mVodPlayerCfg.has("pr")) {
-                mVodPlayerCfg.put("pr", Hawk.get(HawkConfig.PLAY_RENDER, 0));
+                mVodPlayerCfg.put("pr", SP.INSTANCE.getPlayRender());
             }
             if (!mVodPlayerCfg.has("ijk")) {
-                mVodPlayerCfg.put("ijk", Hawk.get(HawkConfig.IJK_CODEC, ""));
+                mVodPlayerCfg.put("ijk", SP.INSTANCE.getIjkCodec());
             }
             if (!mVodPlayerCfg.has("sc")) {
-                mVodPlayerCfg.put("sc", Hawk.get(HawkConfig.PLAY_SCALE, 0));
+                mVodPlayerCfg.put("sc", SP.INSTANCE.getPlayScale());
             }
             if (!mVodPlayerCfg.has("sp")) {
                 mVodPlayerCfg.put("sp", 1.0f);
@@ -1128,16 +1148,16 @@ public class PlayActivity extends BaseActivity {
     void initPlayerDrive() {
         try {
             if (!mVodPlayerCfg.has("pl")) {
-                mVodPlayerCfg.put("pl", Hawk.get(HawkConfig.PLAY_TYPE, 1));
+                mVodPlayerCfg.put("pl", SP.INSTANCE.getPlayType());
             }
             if (!mVodPlayerCfg.has("pr")) {
-                mVodPlayerCfg.put("pr", Hawk.get(HawkConfig.PLAY_RENDER, 0));
+                mVodPlayerCfg.put("pr", SP.INSTANCE.getPlayRender());
             }
             if (!mVodPlayerCfg.has("ijk")) {
-                mVodPlayerCfg.put("ijk", Hawk.get(HawkConfig.IJK_CODEC, ""));
+                mVodPlayerCfg.put("ijk", SP.INSTANCE.getIjkCodec());
             }
             if (!mVodPlayerCfg.has("sc")) {
-                mVodPlayerCfg.put("sc", Hawk.get(HawkConfig.PLAY_SCALE, 0));
+                mVodPlayerCfg.put("sc", SP.INSTANCE.getPlayScale());
             }
             if (!mVodPlayerCfg.has("sp")) {
                 mVodPlayerCfg.put("sp", 1.0f);
@@ -1154,12 +1174,9 @@ public class PlayActivity extends BaseActivity {
         mController.setPlayerConfig(mVodPlayerCfg);
     }
 
-    // takagen99 : Add check for external players not enter PIP    
-    private boolean extPlay = false;
-
     @Override
     public void onUserLeaveHint() {
-        if (supportsPiPMode() && !extPlay && Hawk.get(HawkConfig.BACKGROUND_PLAY_TYPE, 0) == 2) {
+        if (supportsPiPMode() && !extPlay && SP.INSTANCE.getBackgroundPlayType() == 2) {
             // Calculate Video Resolution
             int vWidth = mVideoView.getVideoSize()[0];
             int vHeight = mVideoView.getVideoSize()[1];
@@ -1211,9 +1228,6 @@ public class PlayActivity extends BaseActivity {
         }
         return super.dispatchKeyEvent(event);
     }
-
-    // takagen99 : Use onStopCalled to track close activity
-    private boolean onStopCalled;
 
     @Override
     protected void onResume() {
@@ -1306,11 +1320,6 @@ public class PlayActivity extends BaseActivity {
         App.getInstance().setDashData(null);
     }
 
-    private VodInfo mVodInfo;
-    private JSONObject mVodPlayerCfg;
-    private String sourceKey;
-    private SourceBean sourceBean;
-
     public void playNext(boolean inProgress) {
         boolean hasNext = true;
         if (mVodInfo == null || mVodInfo.seriesMap.get(mVodInfo.playFlag) == null) {
@@ -1358,8 +1367,6 @@ public class PlayActivity extends BaseActivity {
         }
         play(false);
     }
-
-    private int autoRetryCount = 0;
 
     boolean autoRetry() {
         switchPlayer();
@@ -1468,14 +1475,6 @@ public class PlayActivity extends BaseActivity {
         sourceViewModel.getPlay(sourceKey, mVodInfo.playFlag, progressKey, vs.url, subtitleCacheKey);
     }
 
-    private String playSubtitle;
-    private String subtitleCacheKey;
-    private String progressKey;
-    private String parseFlag;
-    private String webUrl;
-    private String webUserAgent;
-    private Map<String, String> webHeaderMap;
-
     private void initParse(String flag, boolean useParse, String playUrl, final String url) {
         parseFlag = flag;
         webUrl = url;
@@ -1548,8 +1547,6 @@ public class PlayActivity extends BaseActivity {
             }
         }
     }
-
-    ExecutorService parseThreadPool;
 
     private String encodeUrl(String url) {
         try {
@@ -1778,19 +1775,9 @@ public class PlayActivity extends BaseActivity {
         }
     }
 
-    // webview
-    private XWalkView mXwalkWebView;
-    private XWalkWebClient mX5WebClient;
-    private WebView mSysWebView;
-    private SysWebClient mSysWebClient;
-    private final Map<String, Boolean> loadedUrls = new HashMap<>();
-    private LinkedList<String> loadFoundVideoUrls = new LinkedList<>();
-    private HashMap<String, HashMap<String, String>> loadFoundVideoUrlsHeader = new HashMap<>();
-    private final AtomicInteger loadFoundCount = new AtomicInteger(0);
-
     void loadWebView(String url) {
         if (mSysWebView == null && mXwalkWebView == null) {
-            boolean useSystemWebView = Hawk.get(HawkConfig.PARSE_WEBVIEW, true);
+            boolean useSystemWebView = SP.INSTANCE.getParseWebView();
             if (!useSystemWebView) {
                 XWalkUtils.tryUseXWalk(mContext, new XWalkUtils.XWalkState() {
                     @Override
@@ -1909,42 +1896,6 @@ public class PlayActivity extends BaseActivity {
         return VideoParseRuler.checkIsVideoForParse(webUrl, url);
     }
 
-    class MyWebView extends WebView {
-        public MyWebView(@NonNull Context context) {
-            super(context);
-        }
-
-        @Override
-        public void setOverScrollMode(int mode) {
-            super.setOverScrollMode(mode);
-            if (mContext instanceof Activity)
-                AutoSize.autoConvertDensityOfCustomAdapt((Activity) mContext, PlayActivity.this);
-        }
-
-        @Override
-        public boolean dispatchKeyEvent(KeyEvent event) {
-            return false;
-        }
-    }
-
-    class MyXWalkView extends XWalkView {
-        public MyXWalkView(Context context) {
-            super(context);
-        }
-
-        @Override
-        public void setOverScrollMode(int mode) {
-            super.setOverScrollMode(mode);
-            if (mContext instanceof Activity)
-                AutoSize.autoConvertDensityOfCustomAdapt((Activity) mContext, PlayActivity.this);
-        }
-
-        @Override
-        public boolean dispatchKeyEvent(KeyEvent event) {
-            return false;
-        }
-    }
-
     @SuppressLint("SetJavaScriptEnabled")
     private void configWebViewSys(WebView webView) {
         if (webView == null) {
@@ -2015,6 +1966,107 @@ public class PlayActivity extends BaseActivity {
         mSysWebClient = new SysWebClient();
         webView.setWebViewClient(mSysWebClient);
         webView.setBackgroundColor(Color.BLACK);
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private void configWebViewX5(XWalkView webView) {
+        if (webView == null) {
+            return;
+        }
+        ViewGroup.LayoutParams layoutParams = SP.INSTANCE.getDebugMode()
+                ? new ViewGroup.LayoutParams(800, 400) :
+                new ViewGroup.LayoutParams(1, 1);
+        webView.setFocusable(false);
+        webView.setFocusableInTouchMode(false);
+        webView.clearFocus();
+        webView.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
+        addContentView(webView, layoutParams);
+        /* 添加webView配置 */
+        final XWalkSettings settings = webView.getSettings();
+        settings.setAllowContentAccess(true);
+        settings.setAllowFileAccess(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setDatabaseEnabled(true);
+        settings.setDomStorageEnabled(true);
+        settings.setJavaScriptEnabled(true);
+
+        settings.setBlockNetworkImage(!SP.INSTANCE.getDebugMode());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            settings.setMediaPlaybackRequiresUserGesture(false);
+        }
+        settings.setUseWideViewPort(true);
+        settings.setDomStorageEnabled(true);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setSupportMultipleWindows(false);
+        settings.setLoadWithOverviewMode(true);
+        settings.setBuiltInZoomControls(true);
+        settings.setSupportZoom(false);
+//        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        // settings.setUserAgentString(ANDROID_UA);
+
+        webView.setBackgroundColor(Color.BLACK);
+        webView.setUIClient(new XWalkUIClient(webView) {
+            @Override
+            public boolean onConsoleMessage(XWalkView view, String message, int lineNumber, String sourceId, ConsoleMessageType messageType) {
+                return false;
+            }
+
+            @Override
+            public boolean onJsAlert(XWalkView view, String url, String message, XWalkJavascriptResult result) {
+                return true;
+            }
+
+            @Override
+            public boolean onJsConfirm(XWalkView view, String url, String message, XWalkJavascriptResult result) {
+                return true;
+            }
+
+            @Override
+            public boolean onJsPrompt(XWalkView view, String url, String message, String defaultValue, XWalkJavascriptResult result) {
+                return true;
+            }
+        });
+        mX5WebClient = new XWalkWebClient(webView);
+        webView.setResourceClient(mX5WebClient);
+    }
+
+    class MyWebView extends WebView {
+        public MyWebView(@NonNull Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setOverScrollMode(int mode) {
+            super.setOverScrollMode(mode);
+            if (mContext instanceof Activity)
+                AutoSize.autoConvertDensityOfCustomAdapt((Activity) mContext, PlayActivity.this);
+        }
+
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent event) {
+            return false;
+        }
+    }
+
+    class MyXWalkView extends XWalkView {
+        public MyXWalkView(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setOverScrollMode(int mode) {
+            super.setOverScrollMode(mode);
+            if (mContext instanceof Activity)
+                AutoSize.autoConvertDensityOfCustomAdapt((Activity) mContext, PlayActivity.this);
+        }
+
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent event) {
+            return false;
+        }
     }
 
     private class SysWebClient extends WebViewClient {
@@ -2126,71 +2178,6 @@ public class PlayActivity extends BaseActivity {
         public void onLoadResource(WebView webView, String url) {
             super.onLoadResource(webView, url);
         }
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
-    private void configWebViewX5(XWalkView webView) {
-        if (webView == null) {
-            return;
-        }
-        ViewGroup.LayoutParams layoutParams =  SP.INSTANCE.getDebugMode()
-                ? new ViewGroup.LayoutParams(800, 400) :
-                new ViewGroup.LayoutParams(1, 1);
-        webView.setFocusable(false);
-        webView.setFocusableInTouchMode(false);
-        webView.clearFocus();
-        webView.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
-        addContentView(webView, layoutParams);
-        /* 添加webView配置 */
-        final XWalkSettings settings = webView.getSettings();
-        settings.setAllowContentAccess(true);
-        settings.setAllowFileAccess(true);
-        settings.setAllowUniversalAccessFromFileURLs(true);
-        settings.setAllowFileAccessFromFileURLs(true);
-        settings.setDatabaseEnabled(true);
-        settings.setDomStorageEnabled(true);
-        settings.setJavaScriptEnabled(true);
-
-        settings.setBlockNetworkImage(! SP.INSTANCE.getDebugMode());
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            settings.setMediaPlaybackRequiresUserGesture(false);
-        }
-        settings.setUseWideViewPort(true);
-        settings.setDomStorageEnabled(true);
-        settings.setJavaScriptCanOpenWindowsAutomatically(true);
-        settings.setSupportMultipleWindows(false);
-        settings.setLoadWithOverviewMode(true);
-        settings.setBuiltInZoomControls(true);
-        settings.setSupportZoom(false);
-//        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        // settings.setUserAgentString(ANDROID_UA);
-
-        webView.setBackgroundColor(Color.BLACK);
-        webView.setUIClient(new XWalkUIClient(webView) {
-            @Override
-            public boolean onConsoleMessage(XWalkView view, String message, int lineNumber, String sourceId, ConsoleMessageType messageType) {
-                return false;
-            }
-
-            @Override
-            public boolean onJsAlert(XWalkView view, String url, String message, XWalkJavascriptResult result) {
-                return true;
-            }
-
-            @Override
-            public boolean onJsConfirm(XWalkView view, String url, String message, XWalkJavascriptResult result) {
-                return true;
-            }
-
-            @Override
-            public boolean onJsPrompt(XWalkView view, String url, String message, String defaultValue, XWalkJavascriptResult result) {
-                return true;
-            }
-        });
-        mX5WebClient = new XWalkWebClient(webView);
-        webView.setResourceClient(mX5WebClient);
     }
 
     private class XWalkWebClient extends XWalkResourceClient {

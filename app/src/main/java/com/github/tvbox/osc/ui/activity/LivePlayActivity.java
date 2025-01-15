@@ -347,7 +347,7 @@ public class LivePlayActivity extends BaseActivity {
         });
     }
 
-    boolean PiPON = Hawk.get(HawkConfig.BACKGROUND_PLAY_TYPE, 0) == 2;
+    boolean PiPON = SP.INSTANCE.getBackgroundPlayType() == 2;
 
     // takagen99 : Enter PIP if supported
     @Override

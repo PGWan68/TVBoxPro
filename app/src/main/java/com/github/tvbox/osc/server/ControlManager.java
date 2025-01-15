@@ -6,11 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.receiver.DetailReceiver;
 import com.github.tvbox.osc.receiver.SearchReceiver;
-import com.github.tvbox.osc.util.HawkConfig;
-import com.orhanobut.hawk.Hawk;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -24,9 +23,9 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
  * @description:
  */
 public class ControlManager {
+    public static Context mContext;
     private static ControlManager instance;
     private RemoteServer mServer = null;
-    public static Context mContext;
 
     private ControlManager() {
 
@@ -114,7 +113,7 @@ public class ControlManager {
             });
             try {
                 mServer.start();
-                IjkMediaPlayer.setDotPort(Hawk.get(HawkConfig.DOH_URL, 0) > 0, RemoteServer.serverPort);
+                IjkMediaPlayer.setDotPort(SP.INSTANCE.getDohUrl() > 0, RemoteServer.serverPort);
                 break;
             } catch (IOException ex) {
                 RemoteServer.serverPort++;

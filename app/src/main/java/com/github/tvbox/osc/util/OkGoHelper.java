@@ -4,23 +4,22 @@ import static okhttp3.ConnectionSpec.CLEARTEXT;
 import static okhttp3.ConnectionSpec.COMPATIBLE_TLS;
 import static okhttp3.ConnectionSpec.MODERN_TLS;
 import static okhttp3.ConnectionSpec.RESTRICTED_TLS;
+
 import com.github.catvod.net.SSLCompat;
 import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.base.App;
-
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.https.HttpsUtils;
 import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.lzy.okgo.model.HttpHeaders;
-import com.orhanobut.hawk.Hawk;
 
 import java.io.File;
-import java.util.List;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -40,26 +39,30 @@ public class OkGoHelper {
     public static final long DEFAULT_MILLISECONDS = 10000;      //默认的超时时间
 
     //https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200
-    public static HashMap<Integer, String > httpPhaseMap  = new HashMap<Integer, String>(){{
-        put(200,"OK");
-        put(301,"Moved Permanently");
-        put(302,"Found");
-        put(400,"Bad Request");
-        put(401,"Unauthorized");
-        put(403,"Forbidden");
-        put(404,"Not Found");
-        put(429,"Too Many Requests");
-        put(500,"Internal Server Error");
-        put(502,"Bad Gateway");
-        put(503,"Service Unavailable");
-        put(504,"Gateway Timeout");
+    public static HashMap<Integer, String> httpPhaseMap = new HashMap<Integer, String>() {{
+        put(200, "OK");
+        put(301, "Moved Permanently");
+        put(302, "Found");
+        put(400, "Bad Request");
+        put(401, "Unauthorized");
+        put(403, "Forbidden");
+        put(404, "Not Found");
+        put(429, "Too Many Requests");
+        put(500, "Internal Server Error");
+        put(502, "Bad Gateway");
+        put(503, "Service Unavailable");
+        put(504, "Gateway Timeout");
     }};
+    public static DnsOverHttps dnsOverHttps = null;
+    public static ArrayList<String> dnsHttpsList = new ArrayList<>();
+    static OkHttpClient defaultClient = null;
+    static OkHttpClient noRedirectClient = null;
 
     static void initExoOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkExoPlayer");
 
-        if ( SP.INSTANCE.getDebugMode()) {
+        if (SP.INSTANCE.getDebugMode()) {
             loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.BASIC);
             loggingInterceptor.setColorLevel(Level.INFO);
         } else {
@@ -83,14 +86,9 @@ public class OkGoHelper {
         ExoMediaSourceHelper.getInstance(App.getInstance()).setOkClient(builder.build());
     }
 
-    public static DnsOverHttps dnsOverHttps = null;
-
-    public static ArrayList<String> dnsHttpsList = new ArrayList<>();
-
     public static List<ConnectionSpec> getConnectionSpec() {
         return Util.immutableList(RESTRICTED_TLS, MODERN_TLS, COMPATIBLE_TLS, CLEARTEXT);
     }
-
 
     public static String getDohUrl(int type) {
         switch (type) {
@@ -127,7 +125,7 @@ public class OkGoHelper {
         dnsHttpsList.add("Quad9");
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkExoPlayer");
-        if ( SP.INSTANCE.getDebugMode()) {
+        if (SP.INSTANCE.getDebugMode()) {
             loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.BODY);
             loggingInterceptor.setColorLevel(Level.INFO);
         } else {
@@ -143,12 +141,9 @@ public class OkGoHelper {
         builder.connectionSpecs(getConnectionSpec());
         builder.cache(new Cache(new File(App.getInstance().getCacheDir().getAbsolutePath(), "dohcache"), 10 * 1024 * 1024));
         OkHttpClient dohClient = builder.build();
-        String dohUrl = getDohUrl(Hawk.get(HawkConfig.DOH_URL, 0));
+        String dohUrl = getDohUrl(SP.INSTANCE.getDohUrl());
         dnsOverHttps = new DnsOverHttps.Builder().client(dohClient).url(dohUrl.isEmpty() ? null : HttpUrl.get(dohUrl)).build();
     }
-
-    static OkHttpClient defaultClient = null;
-    static OkHttpClient noRedirectClient = null;
 
     public static OkHttpClient getDefaultClient() {
         return defaultClient;
@@ -164,7 +159,7 @@ public class OkGoHelper {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkGo");
 
-        if ( SP.INSTANCE.getDebugMode()) {
+        if (SP.INSTANCE.getDebugMode()) {
             loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.HEADERS);
             loggingInterceptor.setColorLevel(Level.INFO);
         } else {
@@ -194,7 +189,7 @@ public class OkGoHelper {
         builder.followSslRedirects(false);
         noRedirectClient = builder.build();
 
-        initExoOkHttpClient();        
+        initExoOkHttpClient();
     }
 
     private static synchronized void setOkHttpSsl(OkHttpClient.Builder builder) {

@@ -87,16 +87,8 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
     public void onFragmentResume() {
 
         // takagen99: Initialize Icon Placement
-        if (!Hawk.get(HawkConfig.HOME_SEARCH_POSITION, true)) {
-            tvSearch.setVisibility(View.VISIBLE);
-        } else {
-            tvSearch.setVisibility(View.GONE);
-        }
-        if (!Hawk.get(HawkConfig.HOME_MENU_POSITION, true)) {
-            tvSetting.setVisibility(View.VISIBLE);
-        } else {
-            tvSetting.setVisibility(View.GONE);
-        }
+        tvSearch.setVisibility(View.VISIBLE);
+        tvSetting.setVisibility(View.VISIBLE);
 
         super.onFragmentResume();
         if (SP.INSTANCE.getHomeRec() == 2) {
