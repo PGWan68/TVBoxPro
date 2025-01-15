@@ -166,7 +166,7 @@ object SP {
     var playType by SharedPreferenceDelegates.int()  //播放器: 0=系统, 1=IJK, 2=Exo, 3=MX, 4=Reex, 5=Kodi
     var playRender by SharedPreferenceDelegates.int()  //0 texture 2
     var playScale by SharedPreferenceDelegates.int()  //画面缩放: 0=默认, 1=16:9, 2=4:3, 3=填充, 4=原始, 5=裁剪
-    var playTimesStep by SharedPreferenceDelegates.boolean()
+    var playTimesStep by SharedPreferenceDelegates.int(defaultValue = 5)
     var picInPic by SharedPreferenceDelegates.boolean()  // true = on, false = off
     var videoPurify by SharedPreferenceDelegates.boolean(defaultValue = true)
     var ijkCachePlay by SharedPreferenceDelegates.boolean()

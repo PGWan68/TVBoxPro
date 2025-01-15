@@ -3,6 +3,7 @@ package com.github.tvbox.osc.util;
 import android.content.Context;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.bean.IJKCode;
 import com.github.tvbox.osc.player.EXOmPlayer;
@@ -28,10 +29,10 @@ public class PlayerHelper {
     }
 
     public static void updateCfg(VideoView videoView, JSONObject playerCfg, int forcePlayerType) {
-        int playerType = Hawk.get(HawkConfig.PLAY_TYPE, 0);
-        int renderType = Hawk.get(HawkConfig.PLAY_RENDER, 0);
-        String ijkCode = Hawk.get(HawkConfig.IJK_CODEC, "软解码");
-        int scale = Hawk.get(HawkConfig.PLAY_SCALE, 0);
+        int playerType = SP.INSTANCE.getPlayType();
+        int renderType = SP.INSTANCE.getPlayRender();
+        String ijkCode = SP.INSTANCE.getIjkCodec();
+        int scale = SP.INSTANCE.getPlayScale();
         try {
             playerType = playerCfg.getInt("pl");
             //就我遇到的问题是 Exo 在 TextureView 黑屏 调整设置中的渲染模式无法生效
@@ -84,7 +85,7 @@ public class PlayerHelper {
     }
 
     public static void updateCfg(VideoView videoView) {
-        int playType = Hawk.get(HawkConfig.PLAY_TYPE, 0);
+        int playType = SP.INSTANCE.getPlayType();
         PlayerFactory playerFactory;
         if (playType == 1) {
             playerFactory = new PlayerFactory<IjkmPlayer>() {
@@ -106,7 +107,7 @@ public class PlayerHelper {
         } else {
             playerFactory = AndroidMediaPlayerFactory.create();
         }
-        int renderType = Hawk.get(HawkConfig.PLAY_RENDER, 0);
+        int renderType = SP.INSTANCE.getPlayRender();
         RenderViewFactory renderViewFactory = null;
         switch (renderType) {
             case 0:

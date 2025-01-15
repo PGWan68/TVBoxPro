@@ -1,5 +1,6 @@
 package com.github.tvbox.osc.bean;
 
+import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.orhanobut.hawk.Hawk;
 
@@ -18,7 +19,7 @@ public class IJKCode {
     public void selected(boolean selected) {
         this.selected = selected;
         if (selected) {
-            Hawk.put(HawkConfig.IJK_CODEC, name);
+            SP.INSTANCE.setIjkCodec(name);
         }
     }
 

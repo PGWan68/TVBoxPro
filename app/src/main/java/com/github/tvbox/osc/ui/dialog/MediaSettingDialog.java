@@ -120,7 +120,7 @@ public class MediaSettingDialog extends BaseDialog {
 
     private void nextIJKCodec() {
         List<IJKCode> ijkCodes = ApiConfig.get().getIjkCodes();
-        String ijkCodec = Hawk.get(HawkConfig.IJK_CODEC, "");
+        String ijkCodec = SP.INSTANCE.getIjkCodec();
         int index = 0;
         for (int i = 0; i < ijkCodes.size(); i++) {
             IJKCode ijkCode = ijkCodes.get(i);
@@ -198,7 +198,7 @@ public class MediaSettingDialog extends BaseDialog {
             MediaSettingEnum mediaSettingEnum = MediaSettingEnum.valueOf(item.tag);
             switch (mediaSettingEnum) {
                 case IjkMediaCodecMode:
-                    tvContent.setText(Hawk.get(HawkConfig.IJK_CODEC, ""));
+                    tvContent.setText(SP.INSTANCE.getIjkCodec());
                     break;
                 case IjkCache:
                     tvContent.setText(getIJKCacheDesc());

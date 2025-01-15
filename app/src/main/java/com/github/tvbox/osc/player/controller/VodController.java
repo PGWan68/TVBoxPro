@@ -936,12 +936,12 @@ public class VodController extends BaseController {
         mPlayerTimeStepBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                int step = Hawk.get(HawkConfig.PLAY_TIME_STEP, 5);
+                int step = SP.INSTANCE.getPlayTimesStep();
                 step += 5;
                 if (step > 30) {
                     step = 5;
                 }
-                Hawk.put(HawkConfig.PLAY_TIME_STEP, step);
+                SP.INSTANCE.setPlayTimesStep(step);
                 updatePlayerCfgView();
             }
         });
@@ -949,7 +949,7 @@ public class VodController extends BaseController {
         mPlayerTimeStepBtn.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                Hawk.put(HawkConfig.PLAY_TIME_STEP, 5);
+                SP.INSTANCE.setPlayTimesStep(5);
                 updatePlayerCfgView();
                 return true;
             }
@@ -1068,7 +1068,7 @@ public class VodController extends BaseController {
             mFFwdTxt.setText("x" + mPlayerConfig.getDouble("sp"));
             mPlayerTimeStartBtn.setText(PlayerUtils.stringForTime(mPlayerConfig.getInt("st") * 1000));
             mPlayerTimeSkipBtn.setText(PlayerUtils.stringForTime(mPlayerConfig.getInt("et") * 1000));
-            mPlayerTimeStepBtn.setText(Hawk.get(HawkConfig.PLAY_TIME_STEP, 5) + "s");
+            mPlayerTimeStepBtn.setText(SP.INSTANCE.getPlayTimesStep() + "s");
 //            mSubtitleBtn.setVisibility(playerType == 1 ? VISIBLE : GONE);
 //            mAudioTrackBtn.setVisibility(playerType == 1 ? VISIBLE : GONE);
         } catch (JSONException e) {
@@ -1336,7 +1336,7 @@ public class VodController extends BaseController {
 
     void increaseTime(String type) {
         try {
-            int step = Hawk.get(HawkConfig.PLAY_TIME_STEP, 5);
+            int step = SP.INSTANCE.getPlayTimesStep();
             int time = mPlayerConfig.getInt(type);
             time += step;
             if (time > 30 * 10)
@@ -1358,7 +1358,7 @@ public class VodController extends BaseController {
 
     void decreaseTime(String type) {
         try {
-            int step = Hawk.get(HawkConfig.PLAY_TIME_STEP, 5);
+            int step = SP.INSTANCE.getPlayTimesStep();
             int time = mPlayerConfig.getInt(type);
             time -= step;
             if (time < 0)
