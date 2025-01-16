@@ -17,8 +17,8 @@ object Constants {
     /**
      * IPTV源地址
      */
-    const val IPTV_SOURCE_URL =
-        "https://mirror.ghproxy.com/https://raw.githubusercontent.com/YanG-1989/m3u/refs/heads/main/Gather.m3u"
+    const val IPTV_SOURCE_URL = "http://192.168.1.4:35456/m3u/2"
+//        "https://mirror.ghproxy.com/https://raw.githubusercontent.com/YanG-1989/m3u/refs/heads/main/Gather.m3u"
     // "https://mirror.ghproxy.com/https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u"
 
 
