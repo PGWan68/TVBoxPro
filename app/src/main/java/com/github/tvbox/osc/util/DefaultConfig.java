@@ -22,10 +22,7 @@ import com.hjq.permissions.Permission;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -72,12 +69,12 @@ public class DefaultConfig {
             PackageInfo packageInfo = pm.getPackageInfo(mContext.getPackageName(), 0);
             return packageInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            LOG.e(e);
         }
         return -1;
     }
 
-    public static void resetApp(Context mContext){
+    public static void resetApp(Context mContext) {
         //使用
         clearPublic(mContext);
         clearPrivate(mContext);
@@ -119,7 +116,7 @@ public class DefaultConfig {
     /**
      * 清空私有目录
      */
-    public static  void clearPrivate(Context mContext) {
+    public static void clearPrivate(Context mContext) {
         //清空文件夹
         File dir = new File(Objects.requireNonNull(mContext.getFilesDir().getParent()));
         File[] files = dir.listFiles();
@@ -143,6 +140,7 @@ public class DefaultConfig {
         }
         return "";
     }
+
     public static String getAppVersionName(Context mContext) {
         //包管理操作管理类
         PackageManager pm = mContext.getPackageManager();
@@ -200,6 +198,7 @@ public class DefaultConfig {
                     "https.*?\\.66yk\\.cn.*|" +
                     "http((?!http).)*?netease\\.com/file/.*"
     );
+
     public static boolean isVideoFormat(String url) {
         if (url.contains("=http")) {
             return false;
@@ -257,8 +256,8 @@ public class DefaultConfig {
     }
 
     public static String[] StoragePermissionGroup() {
-        return new String[] {
-                Permission.MANAGE_EXTERNAL_STORAGE                
+        return new String[]{
+                Permission.MANAGE_EXTERNAL_STORAGE
         };
     }
 

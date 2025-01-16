@@ -123,7 +123,6 @@ public class App extends MultiDexApplication {
                     .build();
         }
 
-
     }
 
 

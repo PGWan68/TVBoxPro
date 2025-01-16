@@ -37,6 +37,7 @@ class LeanbackActivity : BaseLiveActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             // 隐藏状态栏、导航栏
             WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -60,7 +61,7 @@ class LeanbackActivity : BaseLiveActivity() {
                         },
 
                         startActivity = {
-                            this@LeanbackActivity.startActivity(Intent(this@LeanbackActivity,it))
+                            this@LeanbackActivity.startActivity(Intent(this@LeanbackActivity, it))
                         }
                     )
                 }

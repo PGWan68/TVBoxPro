@@ -9,10 +9,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 import androidx.tv.material3.Button
-import com.github.tvbox.kotlin.data.entities.GitRelease
+import com.github.tvbox.kotlin.data.entities.UpdateRelease
 import com.github.tvbox.kotlin.ui.theme.LeanbackTheme
 import com.github.tvbox.kotlin.ui.utils.handleLeanbackKeyEvents
 
@@ -21,7 +22,7 @@ fun LeanbackUpdateDialog(
     modifier: Modifier = Modifier,
     showDialogProvider: () -> Boolean = { false },
     onDismissRequest: () -> Unit = {},
-    releaseProvider: () -> GitRelease = { GitRelease() },
+    releaseProvider: () -> UpdateRelease = { UpdateRelease() },
     onUpdateAndInstall: () -> Unit = {},
 ) {
     if (showDialogProvider()) {
@@ -64,7 +65,7 @@ fun LeanbackUpdateDialog(
             text = {
                 LazyColumn {
                     item {
-                        Text(text = release.description)
+                        Text(text = release.buildUpdateDescription)
                     }
                 }
             }
@@ -72,16 +73,16 @@ fun LeanbackUpdateDialog(
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackUpdateDialogPreview() {
     LeanbackTheme {
         LeanbackUpdateDialog(
             showDialogProvider = { true },
             releaseProvider = {
-                GitRelease(
+                UpdateRelease(
                     version = "1.0.0",
-                    description = "版本更新日志".repeat(100),
+                    buildUpdateDescription = "版本更新日志".repeat(100),
                 )
             }
         )

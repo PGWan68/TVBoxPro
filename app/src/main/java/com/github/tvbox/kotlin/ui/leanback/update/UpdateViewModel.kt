@@ -4,14 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.github.tvbox.kotlin.data.entities.GitRelease
-import com.github.tvbox.kotlin.data.repositories.git.GitRepository
-import com.github.tvbox.kotlin.data.utils.Constants
+import com.github.tvbox.kotlin.data.entities.UpdateRelease
+import com.github.tvbox.kotlin.data.repositories.UpgradeRepository
 import com.github.tvbox.kotlin.ui.leanback.toast.LeanbackToastProperty
 import com.github.tvbox.kotlin.ui.leanback.toast.LeanbackToastState
 import com.github.tvbox.kotlin.utils.Downloader
 import com.github.tvbox.kotlin.utils.Logger
-import com.github.tvbox.kotlin.utils.compareVersion
 import java.io.File
 
 class LeanBackUpdateViewModel : ViewModel() {
@@ -26,7 +24,7 @@ class LeanBackUpdateViewModel : ViewModel() {
     private var _updateDownloaded by mutableStateOf(false)
     val updateDownloaded get() = _updateDownloaded
 
-    private var _latestRelease by mutableStateOf(GitRelease())
+    private var _latestRelease by mutableStateOf(UpdateRelease())
     val latestRelease get() = _latestRelease
 
     var showDialog by mutableStateOf(false)
@@ -37,8 +35,8 @@ class LeanBackUpdateViewModel : ViewModel() {
 
         try {
             _isChecking = true
-            _latestRelease = GitRepository().latestRelease(Constants.GIT_RELEASE_LATEST_URL)
-            _isUpdateAvailable = _latestRelease.version.compareVersion(currentVersion) > 0
+            _latestRelease = UpgradeRepository().latestRelease()
+            _isUpdateAvailable = _latestRelease.buildHaveNewVersion
         } catch (e: Exception) {
             log.e("检查更新失败", e)
         } finally {
@@ -58,13 +56,16 @@ class LeanBackUpdateViewModel : ViewModel() {
         )
 
         try {
-            Downloader.downloadTo(_latestRelease.downloadUrl, latestFile.path) {
-                LeanbackToastState.Companion.I.showToast(
-                    "正在下载更新: $it%",
-                    LeanbackToastProperty.Duration.Custom(10_000),
-                    "downloadProcess"
-                )
-            }
+            Downloader.downloadTo(_latestRelease.downloadURL, latestFile.path,
+                callback = object : Downloader.Callback {
+                    override fun onProgress(progress: Int) {
+                        LeanbackToastState.Companion.I.showToast(
+                            "正在下载更新: $progress%",
+                            LeanbackToastProperty.Duration.Custom(10_000),
+                            "downloadProcess"
+                        )
+                    }
+                })
 
             _updateDownloaded = true
             LeanbackToastState.Companion.I.showToast("下载更新成功")
