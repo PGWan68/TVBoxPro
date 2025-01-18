@@ -7,7 +7,7 @@ object Constants {
     /**
      * 应用 标题
      */
-    const val APP_TITLE = "我的电视"
+    const val APP_TITLE = "影视盒"
 
     /**
      * 应用 代码仓库
@@ -26,7 +26,7 @@ object Constants {
      * IPTV源缓存时间（毫秒）
      */
 //    const val IPTV_SOURCE_CACHE_TIME = 1000 * 60 * 60 * 24L // 24小时
-    const val IPTV_SOURCE_CACHE_TIME = 0L // 1小时
+    const val IPTV_SOURCE_CACHE_TIME = 1000 * 60 * 60 * 1L // 1小时
 
     /**
      * 节目单XML地址
