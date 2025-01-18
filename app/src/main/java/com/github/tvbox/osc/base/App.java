@@ -10,6 +10,7 @@ import androidx.multidex.MultiDexApplication;
 import com.github.catvod.crawler.JsLoader;
 import com.github.tvbox.kotlin.AppGlobal;
 import com.github.tvbox.kotlin.UnsafeTrustManager;
+import com.github.tvbox.kotlin.ui.utils.HttpServer;
 import com.github.tvbox.kotlin.ui.utils.SP;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
@@ -123,6 +124,12 @@ public class App extends MultiDexApplication {
                     .build();
         }
 
+        initServer();
+
+    }
+
+    private void initServer() {
+        HttpServer.INSTANCE.start(this);
     }
 
 

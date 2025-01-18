@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.tvbox.kotlin.ui.leanback.panel.components.LeanbackPanelChannelNo
 import com.github.tvbox.kotlin.ui.rememberLeanbackChildPadding
@@ -38,7 +39,7 @@ fun LeanbackPanelChannelNoSelectScreen(
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackPanelChannelNoSelectScreenPreview() {
     LeanbackTheme {

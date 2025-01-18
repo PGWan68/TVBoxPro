@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -106,7 +107,7 @@ private fun LeanbackToastContentIcon(
     }
 }
 
-@Preview(device = "id:Android TV (720p)", showBackground = true)
+@Preview(device = Devices.TV_1080p, showBackground = true)
 @Composable
 private fun LeanbackToastScreenAnimationPreview() {
     LeanbackTheme {

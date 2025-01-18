@@ -17,7 +17,7 @@ object Constants {
     /**
      * IPTV源地址
      */
-    const val IPTV_SOURCE_URL = "http://192.168.1.4:35456/m3u/2"
+    const val IPTV_SOURCE_URL = "http://nanbo.me:35456/m3u/2"
 //        "https://mirror.ghproxy.com/https://raw.githubusercontent.com/YanG-1989/m3u/refs/heads/main/Gather.m3u"
     // "https://mirror.ghproxy.com/https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u"
 
@@ -26,7 +26,7 @@ object Constants {
      * IPTV源缓存时间（毫秒）
      */
 //    const val IPTV_SOURCE_CACHE_TIME = 1000 * 60 * 60 * 24L // 24小时
-    const val IPTV_SOURCE_CACHE_TIME = 1000 * 60 * 60 * 1L // 1小时
+    const val IPTV_SOURCE_CACHE_TIME = 0L // 1小时
 
     /**
      * 节目单XML地址

@@ -79,6 +79,8 @@ public class ApiConfig {
 
     private final String requestAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
 
+    private final String defaultLineApi = "https://gh-proxy.com/https://raw.githubusercontent.com/jspgwan/tv_api/refs/heads/master/assets/default_lines.json?token=GHSAT0AAAAAAC4ZI7VCZVE3YGEYVNNAYTIKZ4LVTWQ";
+
     private final List<LineBean> defaultVodLines;
     private final List<LineBean> defaultLiveLines;
 

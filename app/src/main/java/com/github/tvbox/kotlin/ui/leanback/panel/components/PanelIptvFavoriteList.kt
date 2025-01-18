@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -22,12 +26,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.tv.foundation.lazy.grid.TvGridCells
-import androidx.tv.foundation.lazy.grid.TvLazyVerticalGrid
-import androidx.tv.foundation.lazy.grid.itemsIndexed
-import androidx.tv.foundation.lazy.grid.rememberTvLazyGridState
 import kotlinx.coroutines.flow.distinctUntilChanged
 import com.github.tvbox.kotlin.data.entities.Epg
 import com.github.tvbox.kotlin.data.entities.Epg.Companion.currentProgrammes
@@ -57,7 +58,7 @@ fun LeanbackPanelIptvFavoriteList(
 
     var key by remember { mutableIntStateOf(0) }
     val iptvList = remember(key) { iptvListProvider() }
-    val listState = rememberTvLazyGridState(max(0, iptvList.indexOf(currentIptvProvider())))
+    val listState = rememberLazyGridState(max(0, iptvList.indexOf(currentIptvProvider())))
 
     var hasFocused by rememberSaveable { mutableStateOf(false) }
 
@@ -88,9 +89,9 @@ fun LeanbackPanelIptvFavoriteList(
             }
         }
 
-        TvLazyVerticalGrid(
+        LazyVerticalGrid(
             state = listState,
-            columns = TvGridCells.Fixed(favoriteListSize),
+            columns = GridCells.Fixed(favoriteListSize),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             contentPadding = PaddingValues(
@@ -154,7 +155,7 @@ fun LeanbackPanelIptvFavoriteList(
     )
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackPanelIptvFavoriteListPreview() {
     LeanbackTheme {

@@ -23,6 +23,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
@@ -81,6 +82,12 @@ fun LeanbackQuickPanelScreen(
         LeanbackPanelScreenTopRight(
             channelNoProvider = currentIptvChannelNoProvider
         )
+
+        // 显示当前线路，并且提供选择线路
+        TODO("重新刷新整个页面")
+//        LeanbackPanelScreenCurrentLine(
+//            channelNoProvider = currentIptvChannelNoProvider
+//        )
 
         Box(
             modifier = Modifier
@@ -219,7 +226,7 @@ private fun LeanbackQuickPanelActionVideoAspectRatio(
     )
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackQuickPanelScreenPreview() {
     LeanbackTheme {

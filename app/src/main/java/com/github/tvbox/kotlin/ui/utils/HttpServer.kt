@@ -2,6 +2,14 @@ package com.github.tvbox.kotlin.ui.utils
 
 import android.content.Context
 import android.widget.Toast
+import com.github.tvbox.kotlin.AppGlobal
+import com.github.tvbox.kotlin.data.repositories.epg.EpgRepository
+import com.github.tvbox.kotlin.data.repositories.iptv.IptvRepository
+import com.github.tvbox.kotlin.data.utils.Constants
+import com.github.tvbox.kotlin.utils.ApkInstaller
+import com.github.tvbox.kotlin.utils.Loggable
+import com.github.tvbox.kotlin.utils.Logger
+import com.github.tvbox.osc.R
 import com.koushikdutta.async.AsyncServer
 import com.koushikdutta.async.http.body.JSONObjectBody
 import com.koushikdutta.async.http.body.MultipartFormDataBody
@@ -13,18 +21,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import com.github.tvbox.kotlin.AppGlobal
-import com.github.tvbox.kotlin.data.repositories.epg.EpgRepository
-import com.github.tvbox.kotlin.data.repositories.iptv.IptvRepository
-import com.github.tvbox.kotlin.data.utils.Constants
-import com.github.tvbox.kotlin.utils.ApkInstaller
-import com.github.tvbox.kotlin.utils.Loggable
-import com.github.tvbox.kotlin.utils.Logger
 import java.io.File
 import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.net.SocketException
-import com.github.tvbox.osc.R;
 
 object HttpServer : Loggable() {
     private const val SERVER_PORT = 10481
@@ -39,7 +39,7 @@ object HttpServer : Loggable() {
         "http://${getLocalIpAddress()}:${SERVER_PORT}"
     }
 
-    fun start(context: Context, showToast: (String) -> Unit) {
+    fun start(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val server = AsyncHttpServer()
@@ -67,7 +67,7 @@ object HttpServer : Loggable() {
                     handleUploadApk(request, response, context)
                 }
 
-                HttpServer.showToast = showToast
+//                HttpServer.showToast = showToast
                 log.i("服务已启动: $serverUrl")
             } catch (ex: Exception) {
                 log.e("服务启动失败: ${ex.message}", ex)

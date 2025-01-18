@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +45,7 @@ import com.github.tvbox.kotlin.ui.leanback.classicpanel.components.LeanbackClass
 import com.github.tvbox.kotlin.ui.leanback.components.LeanbackVisible
 import com.github.tvbox.kotlin.ui.leanback.panel.PanelAutoCloseState
 import com.github.tvbox.kotlin.ui.leanback.panel.rememberPanelAutoCloseState
+import com.github.tvbox.kotlin.ui.rememberLeanbackChildPadding
 import com.github.tvbox.kotlin.ui.theme.LeanbackTheme
 import com.github.tvbox.kotlin.ui.utils.handleLeanbackKeyEvents
 import kotlinx.collections.immutable.ImmutableList
@@ -101,7 +101,7 @@ private fun LeanbackClassicPanelScreenWrapper(
     onClose: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
-//    val childPadding = rememberLeanbackChildPadding()
+    val childPadding = rememberLeanbackChildPadding()
 
     Box(
         modifier = modifier
@@ -111,18 +111,13 @@ private fun LeanbackClassicPanelScreenWrapper(
         Box(
             modifier = Modifier
                 .pointerInput(Unit) { detectTapGestures(onTap = { }) }
-//                .padding(
-//                    top = childPadding.top,
-//                    start = childPadding.start,
-//                    bottom = childPadding.bottom,
-//                    end = childPadding.end,
-//                )
-                .clip(
-                    MaterialTheme.shapes.small.copy(
-                        topStart = CornerSize(size = 0f),
-                        bottomStart = CornerSize(size = 0f)
-                    )
-                ),
+                .padding(
+                    top = childPadding.top + 8.dp,
+                    start = childPadding.start,
+                    bottom = childPadding.bottom + 8.dp,
+                    end = childPadding.end,
+                )
+                .clip(MaterialTheme.shapes.small),
         ) {
             content()
         }

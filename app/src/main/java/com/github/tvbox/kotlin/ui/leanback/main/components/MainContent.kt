@@ -246,6 +246,7 @@ fun LeanbackMainContent(
                 )
             }
 
+            /// 经典模式选台
             LeanbackVisible({ settingsViewModel.uiUseClassicPanelScreen && mainContentState.isPanelVisible }) {
                 LeanbackClassicPanelScreen(
                     iptvGroupListProvider = { iptvGroupList },
@@ -303,8 +304,10 @@ fun LeanbackMainContent(
                 },
                 onMoreSettings = {
                     // 跳转到设置页面
-                    startActivity(MainSettingActivity::class.java);
-                    mainContentState.isSettingsVisible = true
+                    startActivity(MainSettingActivity::class.java)
+                    // 隐藏当前组件
+                    mainContentState.isQuickPanelVisible = false
+//                    mainContentState.isSettingsVisible = true
                 },
                 onClose = { mainContentState.isQuickPanelVisible = false },
             )

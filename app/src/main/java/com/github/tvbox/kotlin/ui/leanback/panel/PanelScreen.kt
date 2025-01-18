@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
@@ -132,6 +133,40 @@ fun LeanbackPanelScreenTopRight(
         }
     }
 }
+
+
+@Composable
+fun LeanbackPanelScreenCurrentLine(
+    modifier: Modifier = Modifier,
+    channelNoProvider: () -> String = { "" },
+) {
+    val childPadding = rememberLeanbackChildPadding()
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = childPadding.top, end = childPadding.end),
+    ) {
+        Row(
+            modifier = Modifier.align(Alignment.TopEnd),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            LeanbackPanelChannelNo(channelNoProvider = channelNoProvider)
+
+            Box(modifier = Modifier.padding(horizontal = 8.dp)) {
+                Spacer(
+                    modifier = Modifier
+                        .background(Color.White)
+                        .width(2.dp)
+                        .height(30.dp),
+                )
+            }
+
+            LeanbackPanelDateTime()
+        }
+    }
+}
+
 
 @Composable
 private fun LeanbackPanelScreenBottom(
@@ -251,7 +286,7 @@ fun LeanbackPanelScreenBottomIptvList(
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackPanelScreenTopRightPreview() {
     LeanbackTheme {
@@ -261,7 +296,7 @@ private fun LeanbackPanelScreenTopRightPreview() {
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackPanelScreenBottomPreview() {
     LeanbackTheme {
@@ -273,7 +308,7 @@ private fun LeanbackPanelScreenBottomPreview() {
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackPanelScreenPreview() {
     LeanbackTheme {

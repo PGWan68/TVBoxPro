@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -16,12 +19,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.tv.foundation.lazy.list.TvLazyColumn
-import androidx.tv.foundation.lazy.list.itemsIndexed
-import androidx.tv.foundation.lazy.list.rememberTvLazyListState
-import kotlinx.coroutines.flow.distinctUntilChanged
 import com.github.tvbox.kotlin.data.entities.EpgList
 import com.github.tvbox.kotlin.data.entities.Iptv
 import com.github.tvbox.kotlin.data.entities.IptvGroupList
@@ -29,6 +29,7 @@ import com.github.tvbox.kotlin.data.entities.IptvGroupList.Companion.iptvGroupId
 import com.github.tvbox.kotlin.ui.rememberLeanbackChildPadding
 import com.github.tvbox.kotlin.ui.theme.LeanbackTheme
 import com.github.tvbox.kotlin.ui.utils.handleLeanbackKeyEvents
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.max
 
 @Composable
@@ -46,7 +47,7 @@ fun LeanbackPanelIptvGroupList(
     val iptvGroupList = iptvGroupListProvider()
 
     val listState =
-        rememberTvLazyListState(max(0, iptvGroupList.iptvGroupIdx(currentIptvProvider())))
+        rememberLazyListState(max(0, iptvGroupList.iptvGroupIdx(currentIptvProvider())))
     val childPadding = rememberLeanbackChildPadding()
 
     LaunchedEffect(listState) {
@@ -55,7 +56,7 @@ fun LeanbackPanelIptvGroupList(
             .collect { _ -> onUserAction() }
     }
 
-    TvLazyColumn(
+    LazyColumn(
         modifier = modifier,
         state = listState,
         verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -95,7 +96,7 @@ fun LeanbackPanelIptvGroupList(
     }
 }
 
-@Preview(device = "id:Android TV (720p)")
+@Preview(device = Devices.TV_1080p)
 @Composable
 private fun LeanbackPanelIptvGroupListPreview() {
     LeanbackTheme {
