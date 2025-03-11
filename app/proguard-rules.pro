@@ -212,14 +212,7 @@
     <methods>;
 }
 
--keep class com.github.catvod.** {*;}
-
-# Gson
--keepattributes Signature
--keep class com.google.gson.reflect.TypeToken { *; }
--keep class * extends com.google.gson.reflect.TypeToken
--keepattributes AnnotationDefault,RuntimeVisibleAnnotations
-
+-keep class com.github.catvod.crawler.*{*;}
 
 # magnet：解决模拟器推送 磁力链接 闪退
 -keep class com.xunlei.downloadlib.** {*;}
@@ -238,13 +231,6 @@
 -dontwarn com.alivc.**
 -dontwarn com.aliyun.**
 -dontwarn com.cicada.**
-
--dontwarn javax.xml.stream.Location
--dontwarn javax.xml.stream.XMLInputFactory
--dontwarn javax.xml.stream.XMLOutputFactory
--dontwarn javax.xml.stream.XMLStreamException
--dontwarn javax.xml.stream.XMLStreamReader
--dontwarn javax.xml.stream.XMLStreamWriter
 
 # from app -> build -> outputs -> mapping -> your_app_name -> missing_rules.txt
 # Please add these rules to your existing keep rules in order to suppress warnings.
@@ -332,5 +318,3 @@
 -keepclassmembers,allowobfuscation class * { @org.simpleframework.xml.Element <fields>; }
 -keepclassmembers,allowobfuscation class * { @org.simpleframework.xml.Attribute <fields>; }
 -keepclassmembers,allowobfuscation class * { @org.simpleframework.xml.ElementList <fields>; }
-
--printconfiguration ./tmp/full-r8-config.txt
