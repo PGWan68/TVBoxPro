@@ -15,12 +15,14 @@ import com.github.tvbox.osc.bean.LiveChannelGroup;
 import com.github.tvbox.osc.bean.LiveChannelItem;
 import com.github.tvbox.osc.bean.ParseBean;
 import com.github.tvbox.osc.bean.SourceBean;
+import com.github.tvbox.osc.bean.UrlBean;
 import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.activity.HomeActivity;
 import com.github.tvbox.osc.util.AES;
 import com.github.tvbox.osc.util.AdBlocker;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.M3U8;
 import com.github.tvbox.osc.util.MD5;
 import com.github.tvbox.osc.util.VideoParseRuler;
@@ -29,7 +31,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lzy.okgo.OkGo;
+import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.callback.AbsCallback;
+import com.lzy.okgo.callback.Callback;
+import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.orhanobut.hawk.Hawk;
 
@@ -61,6 +66,9 @@ public class ApiConfig {
     private ParseBean mDefaultParse;
     private final List<LiveChannelGroup> liveChannelGroupList;
     private final List<ParseBean> parseBeanList;
+
+    private final List<UrlBean> urlBeans;
+
     private List<String> vipParseFlags;
     private List<IJKCode> ijkCodes;
     private String spider = null;
@@ -79,6 +87,7 @@ public class ApiConfig {
         sourceBeanList = new LinkedHashMap<>();
         liveChannelGroupList = new ArrayList<>();
         parseBeanList = new ArrayList<>();
+        urlBeans = new ArrayList<>();
     }
 
     public static ApiConfig get() {
@@ -131,11 +140,12 @@ public class ApiConfig {
 
     public void loadConfig(boolean useCache, LoadConfigCallback callback, Activity activity) {
         // Embedded Source : Update in Strings.xml if required
-        String apiUrl = Hawk.get(HawkConfig.API_URL, HomeActivity.getRes().getString(R.string.app_source));
+        String apiUrl = getCurrentApiUrl();
         if (apiUrl.isEmpty()) {
             callback.error("源地址为空");
             return;
         }
+
         File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/" + MD5.encode(apiUrl));
         if (useCache && cache.exists()) {
             try {
@@ -381,7 +391,7 @@ public class ApiConfig {
         // takagen99: Check if Live URL is setup in Settings, if no, get from File Config
         liveChannelGroupList.clear();           //修复从后台切换重复加载频道列表
         String liveURL = Hawk.get(HawkConfig.LIVE_URL, "");
-        String epgURL  = Hawk.get(HawkConfig.EPG_URL, "");
+        String epgURL = Hawk.get(HawkConfig.EPG_URL, "");
 
         String liveURL_final = null;
         try {
@@ -507,7 +517,7 @@ public class ApiConfig {
         // Video parse rule for host
         if (infoJson.has("rules")) {
             VideoParseRuler.clearRule();
-            for(JsonElement oneHostRule : infoJson.getAsJsonArray("rules")) {
+            for (JsonElement oneHostRule : infoJson.getAsJsonArray("rules")) {
                 JsonObject obj = (JsonObject) oneHostRule;
                 if (obj.has("host")) {
                     String host = obj.get("host").getAsString();
@@ -757,6 +767,10 @@ public class ApiConfig {
         return liveChannelGroupList;
     }
 
+    public List<UrlBean> getUrlBeans() {
+        return urlBeans;
+    }
+
     public List<IJKCode> getIjkCodes() {
         return ijkCodes;
     }
@@ -809,6 +823,71 @@ public class ApiConfig {
 
         }
         return url;
+    }
+
+
+    public void clear() {
+        mHomeSource = null;
+        sourceBeanList.clear();
+    }
+
+    public String getCurrentApiUrl() {
+        String apiUrl = Hawk.get(HawkConfig.API_URL, HomeActivity.getRes().getString(R.string.app_source));
+        if (apiUrl.isEmpty() && !urlBeans.isEmpty()) {
+            apiUrl = urlBeans.get(0).getUrl();
+            Hawk.put(HawkConfig.API_URL, apiUrl);
+            return apiUrl;
+        }
+        return apiUrl;
+    }
+
+
+    /**
+     * 拉取远程配置
+     */
+    public void fetchRemoteSources() {
+        String remoteUrl = "https://gcore.jsdelivr.net/gh/PGWan68/tvbox-api/tv/1/collection.json";
+
+        OkGo.<String>get(remoteUrl)
+                .cacheKey(remoteUrl)
+                .cacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
+                .execute(new StringCallback() {
+
+                    @Override
+                    public void onCacheSuccess(Response<String> response) {
+                        onSuccess(response);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        try {
+                            if (response != null) {
+                                String result = response.body();
+                                if (result != null && !result.isEmpty()) {
+
+                                    urlBeans.clear();
+                                    JsonObject json = new Gson().fromJson(result, JsonObject.class);
+                                    JsonArray urls = json.get("urls").getAsJsonArray();
+                                    for (JsonElement element : urls) {
+                                        JsonObject obj = (JsonObject) element;
+                                        String name = obj.get("name").getAsString();
+                                        String url = obj.get("url").getAsString();
+
+                                        // url单独处理
+                                        String regex = remoteUrl.split("collection")[0];
+
+                                        url = regex + url.substring(2);
+
+                                        urlBeans.add(new UrlBean(name, url));
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            LOG.e(e);
+                        }
+
+                    }
+                });
     }
 
 }

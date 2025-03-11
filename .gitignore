@@ -92,3 +92,8 @@ lint/tmp/
 
 
 .kotlin
+
+/app/tmp/
+
+/app/schemas/
+

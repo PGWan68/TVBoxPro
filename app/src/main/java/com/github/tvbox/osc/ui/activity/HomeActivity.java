@@ -42,6 +42,7 @@ import com.github.tvbox.osc.base.BaseLazyFragment;
 import com.github.tvbox.osc.bean.AbsSortXml;
 import com.github.tvbox.osc.bean.MovieSort;
 import com.github.tvbox.osc.bean.SourceBean;
+import com.github.tvbox.osc.bean.UrlBean;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.adapter.HomePageAdapter;
@@ -77,6 +78,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import me.jessyan.autosize.utils.AutoSizeUtils;
 
@@ -91,7 +93,7 @@ public class HomeActivity extends BaseActivity {
     private TextView tvName;
     private ImageView tvWifi;
     private ImageView tvFind;
-    private ImageView tvStyle;
+    private ImageView tvClear;
     private ImageView tvDraw;
     private ImageView tvMenu;
     private TextView tvDate;
@@ -143,6 +145,10 @@ public class HomeActivity extends BaseActivity {
             Bundle bundle = intent.getExtras();
             useCacheConfig = bundle.getBoolean("useCache", false);
         }
+
+        // Fetch remote urls
+        ApiConfig.get().fetchRemoteSources();
+
         initData();
     }
 
@@ -156,7 +162,7 @@ public class HomeActivity extends BaseActivity {
         this.tvName = findViewById(R.id.tvName);
         this.tvWifi = findViewById(R.id.tvWifi);
         this.tvFind = findViewById(R.id.tvFind);
-        this.tvStyle = findViewById(R.id.tvStyle);
+        this.tvClear = findViewById(R.id.tvClear);
         this.tvDraw = findViewById(R.id.tvDrawer);
         this.tvMenu = findViewById(R.id.tvMenu);
         this.tvDate = findViewById(R.id.tvDate);
@@ -240,20 +246,13 @@ public class HomeActivity extends BaseActivity {
         tvName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                dataInitOk = false;
-//                jarInitOk = true;
-//                showSiteSwitch();
-                File dir = getCacheDir();
-                FileUtils.recursiveDelete(dir);
-                dir = getExternalCacheDir();
-                FileUtils.recursiveDelete(dir);
-                Toast.makeText(HomeActivity.this, getString(R.string.hm_cache_del), Toast.LENGTH_SHORT).show();
+                showUrlSelectDialog();
             }
         });
         tvName.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                reloadHome();
+                reloadHome(true);
                 return true;
             }
         });
@@ -263,7 +262,7 @@ public class HomeActivity extends BaseActivity {
             public void onClick(View view) {
                 try {
                     startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
             }
         });
@@ -275,24 +274,14 @@ public class HomeActivity extends BaseActivity {
             }
         });
         // Button : Style --------------------------------------------
-        tvStyle.setOnClickListener(new View.OnClickListener() {
+        tvClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    Hawk.put(HawkConfig.HOME_REC_STYLE, !Hawk.get(HawkConfig.HOME_REC_STYLE, false));
-                    if (Hawk.get(HawkConfig.HOME_REC_STYLE, false)) {
-                        UserFragment.tvHotListForGrid.setVisibility(View.VISIBLE);
-                        UserFragment.tvHotListForLine.setVisibility(View.GONE);
-                        Toast.makeText(HomeActivity.this, getString(R.string.hm_style_grid), Toast.LENGTH_SHORT).show();
-                        tvStyle.setImageResource(R.drawable.hm_up_down);
-                    } else {
-                        UserFragment.tvHotListForGrid.setVisibility(View.GONE);
-                        UserFragment.tvHotListForLine.setVisibility(View.VISIBLE);
-                        Toast.makeText(HomeActivity.this, getString(R.string.hm_style_line), Toast.LENGTH_SHORT).show();
-                        tvStyle.setImageResource(R.drawable.hm_left_right);
-                    }
-                } catch (Exception ex) {
-                }
+                File dir = getCacheDir();
+                FileUtils.recursiveDelete(dir);
+                dir = getExternalCacheDir();
+                FileUtils.recursiveDelete(dir);
+                Toast.makeText(HomeActivity.this, getString(R.string.hm_cache_del), Toast.LENGTH_SHORT).show();
             }
         });
         // Button : Drawer >> To go into App Drawer -------------------
@@ -327,7 +316,7 @@ public class HomeActivity extends BaseActivity {
         setLoadSir(this.contentLayout);
         //mHandler.postDelayed(mFindFocus, 250);
     }
-    
+
     public static boolean reHome(Context appContext) {
         Intent intent = new Intent(appContext, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -337,7 +326,7 @@ public class HomeActivity extends BaseActivity {
         appContext.startActivity(intent);
         return true;
     }
-    
+
     public static void homeRecf() { //站点切换
         int homeRec = Hawk.get(HawkConfig.HOME_REC, -1);
         int limit = 2;
@@ -397,13 +386,6 @@ public class HomeActivity extends BaseActivity {
             }
         }
 
-        // takagen99: Set Style either Grid or Line
-        if (Hawk.get(HawkConfig.HOME_REC_STYLE, false)) {
-            tvStyle.setImageResource(R.drawable.hm_up_down);
-        } else {
-            tvStyle.setImageResource(R.drawable.hm_left_right);
-        }
-
         mGridView.requestFocus();
 
         if (dataInitOk && jarInitOk) {
@@ -416,7 +398,7 @@ public class HomeActivity extends BaseActivity {
             }
             if (Hawk.get(HawkConfig.HOME_DEFAULT_SHOW, false)) {
                 jumpActivity(LivePlayActivity.class);
-            }         
+            }
             return;
         }
         showLoading();
@@ -575,6 +557,7 @@ public class HomeActivity extends BaseActivity {
             mViewPager.setPageTransformer(true, new DefaultTransformer());
             mViewPager.setAdapter(pageAdapter);
             mViewPager.setCurrentItem(currentSelected, false);
+            mGridView.setSelection(currentSelected);
         }
     }
 
@@ -759,7 +742,7 @@ public class HomeActivity extends BaseActivity {
             tvName.setFocusable(false);
             tvWifi.setFocusable(false);
             tvFind.setFocusable(false);
-            tvStyle.setFocusable(false);
+            tvClear.setFocusable(false);
             tvDraw.setFocusable(false);
             tvMenu.setFocusable(false);
             return;
@@ -778,7 +761,7 @@ public class HomeActivity extends BaseActivity {
             tvName.setFocusable(true);
             tvWifi.setFocusable(true);
             tvFind.setFocusable(true);
-            tvStyle.setFocusable(true);
+            tvClear.setFocusable(true);
             tvDraw.setFocusable(true);
             tvMenu.setFocusable(true);
         }
@@ -819,7 +802,7 @@ public class HomeActivity extends BaseActivity {
                 @Override
                 public void click(SourceBean value, int pos) {
                     ApiConfig.get().setSourceBean(value);
-                    reloadHome();
+                    reloadHome(true);
                 }
 
                 @Override
@@ -854,14 +837,16 @@ public class HomeActivity extends BaseActivity {
         }
     }
 
-    void reloadHome() {
+
+    void reloadHome(boolean useCache) {
         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         Bundle bundle = new Bundle();
-        bundle.putBoolean("useCache", true);
+        bundle.putBoolean("useCache", useCache);
         intent.putExtras(bundle);
         HomeActivity.this.startActivity(intent);
     }
+
 
 //    public void onClick(View v) {
 //        FastClickCheckUtil.check(v);
@@ -871,5 +856,55 @@ public class HomeActivity extends BaseActivity {
 //            jumpActivity(SettingActivity.class);
 //        }
 //    }
+
+
+    // 点播线路选择
+    private void showUrlSelectDialog() {
+        List<UrlBean> urlBeans = ApiConfig.get().getUrlBeans();
+
+        if (!urlBeans.isEmpty()) {
+            SelectDialog<UrlBean> dialog = new SelectDialog<>(HomeActivity.this);
+
+            TvRecyclerView tvRecyclerView = dialog.findViewById(R.id.list);
+            tvRecyclerView.setLayoutManager(new V7GridLayoutManager(dialog.getContext(), 1));
+
+            String url = ApiConfig.get().getCurrentApiUrl();
+            int position = 0;
+            for (UrlBean vodLine : urlBeans) {
+                if (Objects.equals(vodLine.getUrl(), url)) {
+                    position = urlBeans.indexOf(vodLine);
+                }
+            }
+
+            dialog.setTip(getString(R.string.dia_lines));
+            dialog.setAdapter(tvRecyclerView, new SelectDialogAdapter.SelectDialogInterface<UrlBean>() {
+                @Override
+                public void click(UrlBean value, int pos) {
+                    Hawk.put(HawkConfig.API_URL, value.getUrl());
+                    ApiConfig.get().clear();
+                    reloadHome(false);
+                }
+
+                @Override
+                public String getDisplay(UrlBean val) {
+                    return val.getUrl();
+                }
+            }, new DiffUtil.ItemCallback<UrlBean>() {
+                @Override
+                public boolean areItemsTheSame(@NonNull @NotNull UrlBean oldItem, @NonNull @NotNull UrlBean newItem) {
+                    return oldItem == newItem;
+                }
+
+                @Override
+                public boolean areContentsTheSame(@NonNull @NotNull UrlBean oldItem, @NonNull @NotNull UrlBean newItem) {
+                    return oldItem.getUrl().equals(newItem.getUrl());
+                }
+            }, urlBeans, position);
+            dialog.setOnDismissListener(dialog1 -> {
+            });
+            dialog.show();
+        }
+    }
+
 
 }

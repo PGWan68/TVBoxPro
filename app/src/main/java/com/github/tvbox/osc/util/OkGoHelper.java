@@ -4,6 +4,9 @@ import static okhttp3.ConnectionSpec.CLEARTEXT;
 import static okhttp3.ConnectionSpec.COMPATIBLE_TLS;
 import static okhttp3.ConnectionSpec.MODERN_TLS;
 import static okhttp3.ConnectionSpec.RESTRICTED_TLS;
+
+import android.app.Application;
+
 import com.github.catvod.net.SSLCompat;
 import com.github.tvbox.osc.base.App;
 
@@ -157,7 +160,10 @@ public class OkGoHelper {
         return noRedirectClient;
     }
 
-    public static void init() {
+    public static void init(Application app) {
+
+        OkGo.getInstance().init(app);
+
         initDnsOverHttps();
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();

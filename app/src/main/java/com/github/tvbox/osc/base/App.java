@@ -10,6 +10,7 @@ import androidx.multidex.MultiDexApplication;
 import com.github.catvod.crawler.JarLoader;
 import com.github.catvod.crawler.JsLoader;
 import com.github.tvbox.osc.R;
+import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.callback.EmptyCallback;
 import com.github.tvbox.osc.callback.LoadingCallback;
 import com.github.tvbox.osc.data.AppDataManager;
@@ -66,7 +67,7 @@ public class App extends MultiDexApplication {
         // takagen99 : Initialize Locale
         initLocale();
         // OKGo
-        OkGoHelper.init();
+        OkGoHelper.init(this);
         // 闭关检查模式
         XXPermissions.setCheckMode(false);
         // Get EPG Info
@@ -108,6 +109,7 @@ public class App extends MultiDexApplication {
                                     .build()))
                     .build();
         }
+
     }
 
     public static P2PClass getp2p() {
@@ -129,10 +131,10 @@ public class App extends MultiDexApplication {
         Hawk.put(HawkConfig.DEBUG_OPEN, false);
 
         // 首页选项
-        putDefault(HawkConfig.HOME_SHOW_SOURCE, true);       //数据源显示: true=开启, false=关闭
+        putDefault(HawkConfig.HOME_SHOW_SOURCE, false);       //数据源显示: true=开启, false=关闭
         putDefault(HawkConfig.HOME_SEARCH_POSITION, false);  //按钮位置-搜索: true=上方, false=下方
-        putDefault(HawkConfig.HOME_MENU_POSITION, true);     //按钮位置-设置: true=上方, false=下方
-        putDefault(HawkConfig.HOME_REC, 1);                  //推荐: 0=豆瓣热播, 1=站点推荐, 2=观看历史
+        putDefault(HawkConfig.HOME_MENU_POSITION, false);     //按钮位置-设置: true=上方, false=下方
+        putDefault(HawkConfig.HOME_REC, 0);                  //推荐: 0=豆瓣热播, 1=站点推荐, 2=观看历史
         putDefault(HawkConfig.HOME_NUM, 4);                  //历史条数: 0=20条, 1=40条, 2=60条, 3=80条, 4=100条
         // 播放器选项
         putDefault(HawkConfig.SHOW_PREVIEW, true);           //窗口预览: true=开启, false=关闭
