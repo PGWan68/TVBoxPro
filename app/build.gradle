@@ -218,5 +218,7 @@ dependencies {
     implementation 'com.koushikdutta.async:androidasync:3.1.0'
     implementation 'io.github.alexzhirkevich:qrose:1.0.1'
 
+    // https://mvnrepository.com/artifact/org.xwalk/xwalk_core_library
+//    implementation 'org.xwalk:xwalk_core_library:20.50.533.12'
 
 }
