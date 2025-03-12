@@ -17,7 +17,8 @@ def keyKeyAlias = properties.getProperty('keyAlias')
 def keyKeyAliasPassword = properties.getProperty('keyAliasPassword')
 
 def versionCodeConf = properties.getProperty('versionCode').toInteger()
-def versionNameConf = properties.getProperty('versionName').concat("_" + buildTime())
+//def versionNameConf = properties.getProperty('versionName').concat("_" + buildTime())
+def versionNameConf = properties.getProperty('versionName')
 
 
 android {

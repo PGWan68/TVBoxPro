@@ -1,14 +1,24 @@
-package com.github.tvbox.osc.util;
+package com.github.tvbox.osc.util.update;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Build;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.*;
 
+import com.github.tvbox.osc.base.App;
+import com.github.tvbox.osc.util.Config;
+import com.github.tvbox.osc.util.DefaultConfig;
+import com.github.tvbox.osc.util.FileUtils;
+import com.github.tvbox.osc.util.LOG;
+import com.github.tvbox.osc.util.ToastHelper;
 import com.google.gson.Gson;
 
 
@@ -36,20 +46,20 @@ public class UpdateChecker {
     }
 
 
-    public void CheckUpdate(BiConsumer<String, String> callback) {
-        this.WebClient.DownloadHtml(Config.GITHUB_URL, (html) ->
-        {
-            LatestReleases latest = GetLatestReleases(html);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                callback.accept(latest.tag_name, latest.body);
+    public void checkThenUpgrade(Context context) {
+        checkUpdate(latestReleases -> {
+            if (hasNewVersion(latestReleases)) {
+                App.post(() -> {
+                    LatestReleases.Assets assets = latestReleases.assets.get(0);
+                    showUpdateDialog(context, assets);
+                }, 800);
             }
         });
     }
 
 
-    public void CheckUpdate(Consumer<LatestReleases> callback) {
-        this.WebClient.DownloadHtml(Config.GITHUB_URL, (html) ->
-        {
+    private void checkUpdate(Consumer<LatestReleases> callback) {
+        this.WebClient.DownloadHtml(Config.GITHUB_URL, (html) -> {
             LatestReleases latest = GetLatestReleases(html);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 callback.accept(latest);
@@ -57,12 +67,44 @@ public class UpdateChecker {
         });
     }
 
+    private boolean hasNewVersion(LatestReleases latest) {
+        return VersionComparer.CompareVersion(latest.tag_name, this.CurrentVersion) > 0;
+    }
 
-    public void HasNewVersion(Consumer<Boolean> callback) {
-        CheckUpdate((latest) ->
-        {
-            int result = VersionComparer.CompareVersion(latest.tag_name, this.CurrentVersion);
-            callback.accept(result > 0);
+
+    private void showUpdateDialog(Context context, LatestReleases.Assets assets) {
+        File apkFile = new File(FileUtils.getCacheDir(), CurrentVersion + ".apk");
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle("新版本提示");
+        builder.setMessage("更新内容：\n" + assets.label);
+
+        builder.setNegativeButton("取消", (dialog, which) -> dialog.dismiss());
+        builder.setPositiveButton("确认", (dialog, which) -> {
+            dialog.dismiss();
+            downloadApk(context, assets.browser_download_url, apkFile.getPath());
+        });
+
+        builder.create().show();
+    }
+
+    private void downloadApk(Context context, String url, String apkPath) {
+        Downloader.INSTANCE.downloadApk(url, apkPath, new Downloader.Callback() {
+            @Override
+            public void onStart() {
+                ToastHelper.showToast(context, "后台下载中...，下载完自动安装");
+            }
+
+            @Override
+            public void onProgress(int progress) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                ApkInstaller.INSTANCE.installApk(context, apkPath);
+                LOG.i("下载完成，开始安装APK");
+            }
         });
     }
 
@@ -76,6 +118,7 @@ public class UpdateChecker {
     public static class VersionComparer {
 
         public static int CompareVersion(String target, String current) {
+
             String target_f = Filter(target);
             String current_f = Filter(current);
             String[] tsplit = target_f.split("\\.");
@@ -131,6 +174,7 @@ public class UpdateChecker {
         public class Assets {
             public String name;
             public String size;
+            public String label;
             public String download_count;
             public String created_at;
             public String updated_at;
@@ -142,8 +186,7 @@ public class UpdateChecker {
     public class MyWebClient implements IWebClient {
 
         public void DownloadHtml(String url, Consumer<String> callback) {
-            Thread thread = new Thread(() ->
-            {
+            Thread thread = new Thread(() -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     callback.accept(HttpConnection(url));
                 }

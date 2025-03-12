@@ -61,7 +61,7 @@ import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.FileUtils;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
-import com.github.tvbox.osc.util.UpdateChecker;
+import com.github.tvbox.osc.util.update.UpdateChecker;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
@@ -151,8 +151,6 @@ public class HomeActivity extends BaseActivity {
         ApiConfig.get().fetchRemoteSources();
 
         initData();
-
-        checkUpdate();
     }
 
     // takagen99: Added to allow read string
@@ -350,6 +348,9 @@ public class HomeActivity extends BaseActivity {
                     sortAdapter.setNewData(DefaultConfig.adjustSort(ApiConfig.get().getHomeSourceBean().getKey(), new ArrayList<>(), true));
                 }
                 initViewPager(absXml);
+
+                // 检查更新
+                checkUpdate();
             }
         });
     }
@@ -892,7 +893,7 @@ public class HomeActivity extends BaseActivity {
                 public String getDisplay(UrlBean val) {
                     return val.getName();
                 }
-            }, new DiffUtil.ItemCallback<UrlBean>() {
+            }, new DiffUtil.ItemCallback<>() {
                 @Override
                 public boolean areItemsTheSame(@NonNull @NotNull UrlBean oldItem, @NonNull @NotNull UrlBean newItem) {
                     return oldItem == newItem;
@@ -910,15 +911,12 @@ public class HomeActivity extends BaseActivity {
     }
 
 
-    // TODO
+    /**
+     * 调用Github的接口去检查更新
+     */
     private void checkUpdate() {
-        String currentVersion = "0.0.1";
-        UpdateChecker checker = new UpdateChecker(currentVersion);
-        checker.CheckUpdate((result) -> {
-
-            LOG.e("最新版本：" + result.tag_name + "/n 下载链接： " + (result.assets).get(0).browser_download_url);
-
-        });
+        final UpdateChecker checker = new UpdateChecker(DefaultConfig.getAppVersionName(this));
+        checker.checkThenUpgrade(this);
     }
 
 
