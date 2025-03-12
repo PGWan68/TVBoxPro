@@ -51,6 +51,9 @@ jobs:
           gradle-version: current
           arguments: assembleRelease
 
+      # build-tools可能不存在，用step查看下支持哪些
+      - run: ls /usr/local/lib/android/sdk/build-tools/
+
       # 签名apk
       - uses: r0adkll/sign-android-release@v1
         name: Sign app APK
@@ -66,8 +69,6 @@ jobs:
 #          # override default build-tools version (29.0.3) -- optional
 #          BUILD_TOOLS_VERSION: "34.0.0"
 
-      # build-tools可能不存在，用step查看下支持哪些
-      - run: ls /usr/local/lib/android/sdk/build-tools/
 
       # 重命名apk
       # GITHUB_REF_NAME是“触发workflow的分支或tag名称”

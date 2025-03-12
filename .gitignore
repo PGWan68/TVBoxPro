@@ -97,6 +97,6 @@ lint/tmp/
 
 /app/schemas/
 /app/debug/
-#/app/release/
+/app/release/
 /app/tvboxpro.jks.base64.txt
 
