@@ -866,7 +866,7 @@ public class HomeActivity extends BaseActivity {
             SelectDialog<UrlBean> dialog = new SelectDialog<>(HomeActivity.this);
 
             TvRecyclerView tvRecyclerView = dialog.findViewById(R.id.list);
-            tvRecyclerView.setLayoutManager(new V7GridLayoutManager(dialog.getContext(), 1));
+            tvRecyclerView.setLayoutManager(new V7GridLayoutManager(dialog.getContext(), 2));
 
             String url = ApiConfig.get().getCurrentApiUrl();
             int position = 0;
@@ -887,7 +887,7 @@ public class HomeActivity extends BaseActivity {
 
                 @Override
                 public String getDisplay(UrlBean val) {
-                    return val.getUrl();
+                    return val.getName();
                 }
             }, new DiffUtil.ItemCallback<UrlBean>() {
                 @Override

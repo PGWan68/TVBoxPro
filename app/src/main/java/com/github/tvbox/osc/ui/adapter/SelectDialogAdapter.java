@@ -85,18 +85,21 @@ public class SelectDialogAdapter<T> extends ListAdapter<T, SelectDialogAdapter.S
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull SelectDialogAdapter.SelectViewHolder holder, @SuppressLint("RecyclerView") int position) {    
+    public void onBindViewHolder(@NonNull @NotNull SelectDialogAdapter.SelectViewHolder holder, @SuppressLint("RecyclerView") int position) {
         T value = data.get(position);
         String name = dialogInterface.getDisplay(value);
-        if (!muteCheck && position == select)
+
+        TextView tvView = holder.itemView.findViewById(R.id.tvName);
+        if (!muteCheck && position == select) {
             name = "√ " + name;
-        ((TextView) holder.itemView.findViewById(R.id.tvName)).setText(name);
+        }
+        tvView.setText(name);
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!muteCheck && position == select)
                     return;
-                notifyItemChanged(select);
                 select = position;
                 notifyItemChanged(select);
                 dialogInterface.click(value, position);
