@@ -96,4 +96,6 @@ lint/tmp/
 /app/tmp/
 
 /app/schemas/
+/app/debug/
+/app/release/
 
