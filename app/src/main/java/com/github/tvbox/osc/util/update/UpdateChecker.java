@@ -3,6 +3,9 @@ package com.github.tvbox.osc.util.update;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Build;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,7 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.*;
 
+import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.base.App;
+import com.github.tvbox.osc.ui.activity.HomeActivity;
 import com.github.tvbox.osc.util.Config;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.FileUtils;
@@ -92,18 +97,27 @@ public class UpdateChecker {
         Downloader.INSTANCE.downloadApk(url, apkPath, new Downloader.Callback() {
             @Override
             public void onStart() {
-                ToastHelper.showToast(context, "后台下载中...，下载完自动安装");
+                Toast.makeText(context, "后台下载中...，下载完自动安装", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onProgress(int progress) {
+                LOG.i("下载中：" + progress);
+                if (progress == 100) {
+                    LOG.i("下载完成，开始安装APK");
+                    ApkInstaller.INSTANCE.installApk(context, apkPath);
+                }
+            }
+
+
+            @Override
+            public void onFinish() {
 
             }
 
             @Override
-            public void onFinish() {
-                ApkInstaller.INSTANCE.installApk(context, apkPath);
-                LOG.i("下载完成，开始安装APK");
+            public void onError(@NonNull String msg) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         });
     }
