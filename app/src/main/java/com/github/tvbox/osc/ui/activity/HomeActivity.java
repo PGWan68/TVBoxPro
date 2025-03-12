@@ -61,6 +61,7 @@ import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.FileUtils;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
+import com.github.tvbox.osc.util.UpdateChecker;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
@@ -150,6 +151,8 @@ public class HomeActivity extends BaseActivity {
         ApiConfig.get().fetchRemoteSources();
 
         initData();
+
+        checkUpdate();
     }
 
     // takagen99: Added to allow read string
@@ -904,6 +907,18 @@ public class HomeActivity extends BaseActivity {
             });
             dialog.show();
         }
+    }
+
+
+    // TODO
+    private void checkUpdate() {
+        String currentVersion = "0.0.1";
+        UpdateChecker checker = new UpdateChecker(currentVersion);
+        checker.CheckUpdate((result) -> {
+
+            LOG.e("最新版本：" + result.tag_name + "/n 下载链接： " + (result.assets).get(0).browser_download_url);
+
+        });
     }
 
 

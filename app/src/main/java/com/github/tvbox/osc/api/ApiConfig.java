@@ -20,6 +20,7 @@ import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.activity.HomeActivity;
 import com.github.tvbox.osc.util.AES;
 import com.github.tvbox.osc.util.AdBlocker;
+import com.github.tvbox.osc.util.Config;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
@@ -33,7 +34,6 @@ import com.google.gson.JsonObject;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.callback.AbsCallback;
-import com.lzy.okgo.callback.Callback;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.orhanobut.hawk.Hawk;
@@ -846,7 +846,7 @@ public class ApiConfig {
      * 拉取远程配置
      */
     public void fetchRemoteSources() {
-        String remoteUrl = "https://gcore.jsdelivr.net/gh/PGWan68/tvbox-api/tv/1/collection.json";
+        String remoteUrl = Config.REMOTE_URL;
 
         OkGo.<String>get(remoteUrl)
                 .cacheKey(remoteUrl)
