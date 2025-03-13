@@ -194,14 +194,14 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
             }
         });
         
-        tvHistory.setOnLongClickListener(new View.OnLongClickListener() {
-        	@Override
-            public boolean onLongClick(View v) {
-                HomeActivity.homeRecf();
-                return HomeActivity.reHome(mContext);
-            }
-        });
-        
+//        tvHistory.setOnLongClickListener(new View.OnLongClickListener() {
+//        	@Override
+//            public boolean onLongClick(View v) {
+//                HomeActivity.homeRecf();
+//                return HomeActivity.reHome(mContext);
+//            }
+//        });
+//
         // Grid View
         tvHotListForGrid.setOnItemListener(new TvRecyclerView.OnItemListener() {
             @Override

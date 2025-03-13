@@ -47,6 +47,8 @@ public class JarLoader {
             File cacheDir = new File(App.getInstance().getCacheDir().getAbsolutePath() + "/catvod_csp");
             if (!cacheDir.exists()) cacheDir.mkdirs();
 
+            new File(jar).setReadOnly();
+
             DexClassLoader classLoader = new DexClassLoader(jar, cacheDir.getAbsolutePath(), null, App.getInstance().getClassLoader());
             // make force wait here, some device async dex load
             int count = 0;
@@ -146,7 +148,7 @@ public class JarLoader {
                 sp.homeContent(false); // 增加此行 应该可以解决部分写的有问题源的历史记录问题 但会增加这个源的首次加载时间 不需要可以已删掉
             }
             spiders.put(key, sp);
-            return new SpiderNull();
+            return sp;
         } catch (Throwable th) {
             LOG.e(th);
         }

@@ -275,10 +275,6 @@ public class ApiConfig {
 
                 File file = response.body();
                 if (file.exists()) {
-                    // 解决安卓14上报错：java.lang.SecurityException: Writable dex file '/data/user/0/com.github.tvbox.osc.pro/files/csp.jar' is not allowed.
-//                    boolean result = file.setReadOnly();
-//                    LOG.i("设置Jar包为只读权限：" + result);
-
                     if (jarLoader.load(file.getAbsolutePath())) {
                         callback.success();
                     } else {

@@ -122,7 +122,9 @@ public class SourceViewModel extends ViewModel {
                         @Override
                         public String call() throws Exception {
                             Spider sp = ApiConfig.get().getCSP(sourceBean);
-                            return sp.homeContent(true);
+                            String content = sp.homeContent(true);
+                            LOG.i("完成Tab数据解析：" + content);
+                            return content;
                         }
                     });
                     String sortJson = null;
@@ -380,7 +382,10 @@ public class SourceViewModel extends ViewModel {
                         @Override
                         public String call() throws Exception {
                             Spider sp = ApiConfig.get().getCSP(sourceBean);
-                            return sp.homeVideoContent();
+
+                            String homeContent = sp.homeVideoContent();
+                            LOG.i("成功加载首页TAB数据：" + homeContent);
+                            return homeContent;
                         }
                     });
                     String sortJson = null;
@@ -713,7 +718,10 @@ public class SourceViewModel extends ViewModel {
             if (type == 3) {
                 Spider sp = ApiConfig.get().getCSP(sourceBean);
                 String json = sp.playerContent(playFlag, url, ApiConfig.get().getVipParseFlags());
-                result = new JSONObject(json);
+
+                if (json!=null && !json.isEmpty()) {
+                    result = new JSONObject(json);
+                }
             } else if (type == 0 || type == 1) {
                 result = new JSONObject();
                 String playUrl = sourceBean.getPlayerUrl().trim();

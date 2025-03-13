@@ -53,7 +53,7 @@ public class UpdateChecker {
 
     public void checkThenUpgrade(Context context) {
         checkUpdate(latestReleases -> {
-            if (hasNewVersion(latestReleases)) {
+            if (latestReleases != null && hasNewVersion(latestReleases)) {
                 App.post(() -> {
                     LatestReleases.Assets assets = latestReleases.assets.get(0);
                     showUpdateDialog(context, assets);
