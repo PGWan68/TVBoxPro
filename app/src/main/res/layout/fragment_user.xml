@@ -32,6 +32,7 @@
             android:clickable="false"
             android:focusable="true"
             android:minWidth="@dimen/vs_150"
+            android:nextFocusUp="@id/mGridViewCategory"
             android:orientation="horizontal"
             android:padding="@dimen/vs_15">
 
@@ -71,6 +72,7 @@
             android:clickable="false"
             android:focusable="true"
             android:minWidth="@dimen/vs_150"
+            android:nextFocusUp="@id/mGridViewCategory"
             android:orientation="horizontal"
             android:padding="@dimen/vs_15">
 
@@ -149,6 +151,7 @@
             android:clickable="false"
             android:focusable="true"
             android:minWidth="@dimen/vs_150"
+            android:nextFocusUp="@id/mGridViewCategory"
             android:orientation="horizontal"
             android:padding="@dimen/vs_15">
 
@@ -188,6 +191,7 @@
             android:clickable="false"
             android:focusable="true"
             android:minWidth="@dimen/vs_150"
+            android:nextFocusUp="@id/mGridViewCategory"
             android:orientation="horizontal"
             android:padding="@dimen/vs_15">
 
@@ -226,6 +230,7 @@
             android:clickable="false"
             android:focusable="true"
             android:minWidth="@dimen/vs_150"
+            android:nextFocusUp="@id/mGridViewCategory"
             android:orientation="horizontal"
             android:padding="@dimen/vs_15">
 
@@ -264,8 +269,10 @@
             android:clickable="false"
             android:focusable="true"
             android:minWidth="@dimen/vs_150"
+            android:nextFocusUp="@id/mGridViewCategory"
             android:orientation="horizontal"
-            android:padding="@dimen/vs_15">
+            android:padding="@dimen/vs_15"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/hm_settings"

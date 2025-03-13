@@ -99,10 +99,7 @@ public class HomeActivity extends BaseActivity {
     private LinearLayout contentLayout;
     private TextView tvName;
     private ImageView tvWifi;
-    private ImageView tvFind;
-    private ImageView tvClear;
-    private ImageView tvDraw;
-    private ImageView tvMenu;
+    private ImageView tvSetting;
     private TextView tvDate;
     private TvRecyclerView mGridView;
     private NoScrollViewPager mViewPager;
@@ -133,7 +130,7 @@ public class HomeActivity extends BaseActivity {
         return R.layout.activity_home;
     }
 
-    boolean useCacheConfig = true;
+    boolean useCacheConfig = false;
 
     @Override
     protected void init() {
@@ -166,11 +163,12 @@ public class HomeActivity extends BaseActivity {
     private void initView() {
         this.topLayout = findViewById(R.id.topLayout);
         this.tvName = findViewById(R.id.tvName);
+
         this.tvWifi = findViewById(R.id.tvWifi);
-        this.tvFind = findViewById(R.id.tvFind);
-        this.tvClear = findViewById(R.id.tvClear);
-        this.tvDraw = findViewById(R.id.tvDrawer);
-        this.tvMenu = findViewById(R.id.tvMenu);
+//        this.tvFind = findViewById(R.id.tvFind);
+//        this.tvClear = findViewById(R.id.tvClear);
+//        this.tvDraw = findViewById(R.id.tvDrawer);
+        this.tvSetting = findViewById(R.id.tvSetting);
         this.tvDate = findViewById(R.id.tvDate);
         this.contentLayout = findViewById(R.id.contentLayout);
         this.mGridView = findViewById(R.id.mGridViewCategory);
@@ -273,39 +271,39 @@ public class HomeActivity extends BaseActivity {
             }
         });
         // Button : Search --------------------------------------------
-        tvFind.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                jumpActivity(SearchActivity.class);
-            }
-        });
+//        tvFind.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                jumpActivity(SearchActivity.class);
+//            }
+//        });
         // Button : Style --------------------------------------------
-        tvClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                File dir = getCacheDir();
-                FileUtils.recursiveDelete(dir);
-                dir = getExternalCacheDir();
-                FileUtils.recursiveDelete(dir);
-                Toast.makeText(HomeActivity.this, getString(R.string.hm_cache_del), Toast.LENGTH_SHORT).show();
-            }
-        });
+//        tvClear.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                File dir = getCacheDir();
+//                FileUtils.recursiveDelete(dir);
+//                dir = getExternalCacheDir();
+//                FileUtils.recursiveDelete(dir);
+//                Toast.makeText(HomeActivity.this, getString(R.string.hm_cache_del), Toast.LENGTH_SHORT).show();
+//            }
+//        });
         // Button : Drawer >> To go into App Drawer -------------------
-        tvDraw.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                jumpActivity(AppsActivity.class);
-            }
-        });
+//        tvDraw.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                jumpActivity(AppsActivity.class);
+//            }
+//        });
         // Button : Settings >> To go into Settings --------------------
-        tvMenu.setOnClickListener(new View.OnClickListener() {
+        tvSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 jumpActivity(SettingActivity.class);
             }
         });
         // Button : Settings >> To go into App Settings ----------------
-        tvMenu.setOnLongClickListener(new View.OnLongClickListener() {
+        tvSetting.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", getPackageName(), null)));
@@ -313,12 +311,12 @@ public class HomeActivity extends BaseActivity {
             }
         });
         // Button : Date >> Go into Android Date Settings --------------
-        tvDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(Settings.ACTION_DATE_SETTINGS));
-            }
-        });
+//        tvDate.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                startActivity(new Intent(Settings.ACTION_DATE_SETTINGS));
+//            }
+//        });
         setLoadSir(this.contentLayout);
         //mHandler.postDelayed(mFindFocus, 250);
     }
@@ -492,39 +490,24 @@ public class HomeActivity extends BaseActivity {
                             dialog = new TipDialog(HomeActivity.this, msg, getString(R.string.hm_retry), getString(R.string.hm_cancel), new TipDialog.OnListener() {
                                 @Override
                                 public void left() {
-                                    mHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            initData();
-                                            dialog.hide();
-                                        }
-                                    });
+                                    initData();
+                                    dialog.hide();
                                 }
 
                                 @Override
                                 public void right() {
                                     dataInitOk = true;
                                     jarInitOk = true;
-                                    mHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            initData();
-                                            dialog.hide();
-                                        }
-                                    });
+                                    initData();
+                                    dialog.hide();
                                 }
 
                                 @Override
                                 public void cancel() {
                                     dataInitOk = true;
                                     jarInitOk = true;
-                                    mHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            initData();
-                                            dialog.hide();
-                                        }
-                                    });
+                                    initData();
+                                    dialog.hide();
                                 }
                             });
                         if (!dialog.isShowing()) dialog.show();
@@ -535,7 +518,7 @@ public class HomeActivity extends BaseActivity {
     }
 
     private void initViewPager(AbsSortXml absXml) {
-        if (sortAdapter.getData().size() > 0) {
+        if (!sortAdapter.getData().isEmpty()) {
             for (MovieSort.SortData data : sortAdapter.getData()) {
                 if (data.id.equals("my0")) {
                     if (Hawk.get(HawkConfig.HOME_REC, 0) == 1 && absXml != null && absXml.videoList != null && absXml.videoList.size() > 0) {
@@ -559,7 +542,7 @@ public class HomeActivity extends BaseActivity {
             mViewPager.setPageTransformer(true, new DefaultTransformer());
             mViewPager.setAdapter(pageAdapter);
             mViewPager.setCurrentItem(currentSelected, false);
-            mGridView.setSelection(currentSelected);
+//            mGridView.setSelection(currentSelected);
         }
     }
 
@@ -628,16 +611,16 @@ public class HomeActivity extends BaseActivity {
         }
 
         // takagen99: Icon Placement
-        if (Hawk.get(HawkConfig.HOME_SEARCH_POSITION, true)) {
-            tvFind.setVisibility(View.VISIBLE);
-        } else {
-            tvFind.setVisibility(View.GONE);
-        }
-        if (Hawk.get(HawkConfig.HOME_MENU_POSITION, true)) {
-            tvMenu.setVisibility(View.VISIBLE);
-        } else {
-            tvMenu.setVisibility(View.GONE);
-        }
+//        if (Hawk.get(HawkConfig.HOME_SEARCH_POSITION, true)) {
+//            tvFind.setVisibility(View.VISIBLE);
+//        } else {
+//            tvFind.setVisibility(View.GONE);
+//        }
+//        if (Hawk.get(HawkConfig.HOME_MENU_POSITION, true)) {
+//            tvMenu.setVisibility(View.VISIBLE);
+//        } else {
+//            tvMenu.setVisibility(View.GONE);
+//        }
         mHandler.post(mRunnable);
     }
 
@@ -736,10 +719,12 @@ public class HomeActivity extends BaseActivity {
             animatorSet.start();
             tvName.setFocusable(false);
             tvWifi.setFocusable(false);
-            tvFind.setFocusable(false);
-            tvClear.setFocusable(false);
-            tvDraw.setFocusable(false);
-            tvMenu.setFocusable(false);
+            tvSetting.setFocusable(false);
+            tvDate.setFocusable(false);
+//            tvFind.setFocusable(false);
+//            tvClear.setFocusable(false);
+//            tvDraw.setFocusable(false);
+//            tvMenu.setFocusable(false);
             return;
         }
         // Show Top =======================================================
@@ -749,10 +734,12 @@ public class HomeActivity extends BaseActivity {
             animatorSet.start();
             tvName.setFocusable(true);
             tvWifi.setFocusable(true);
-            tvFind.setFocusable(true);
-            tvClear.setFocusable(true);
-            tvDraw.setFocusable(true);
-            tvMenu.setFocusable(true);
+            tvSetting.setFocusable(true);
+            tvDate.setFocusable(true);
+//            tvFind.setFocusable(true);
+//            tvClear.setFocusable(true);
+//            tvDraw.setFocusable(true);
+//            tvMenu.setFocusable(true);
         }
     }
 

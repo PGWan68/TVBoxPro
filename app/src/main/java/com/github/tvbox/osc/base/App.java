@@ -3,6 +3,7 @@ package com.github.tvbox.osc.base;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.webkit.MimeTypeMap;
 
 import androidx.core.os.HandlerCompat;
 import androidx.multidex.MultiDexApplication;
@@ -32,6 +33,7 @@ import com.yanzhenjie.andserver.AndServer;
 import com.yanzhenjie.andserver.Server;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.concurrent.TimeUnit;
 
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
@@ -86,16 +88,20 @@ public class App extends MultiDexApplication {
                 .setSupportSubunits(Subunits.MM);
         PlayerHelper.init();
 
+        // Add JS support
+        QuickJSLoader.init();
+
+        updateCacheFile();
+    }
+
+    private void updateCacheFile() {
+
         // Delete Cache
         /*File dir = getCacheDir();
         FileUtils.recursiveDelete(dir);
         dir = getExternalCacheDir();
         FileUtils.recursiveDelete(dir);*/
-
         FileUtils.cleanPlayerCache();
-
-        // Add JS support
-        QuickJSLoader.init();
 
         // add font support, my tv embed font not include emoji
         String extStorageDir = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -109,8 +115,8 @@ public class App extends MultiDexApplication {
                                     .build()))
                     .build();
         }
-
     }
+
 
     public static P2PClass getp2p() {
         try {
@@ -136,6 +142,8 @@ public class App extends MultiDexApplication {
         putDefault(HawkConfig.HOME_MENU_POSITION, false);     //按钮位置-设置: true=上方, false=下方
         putDefault(HawkConfig.HOME_REC, 0);                  //推荐: 0=豆瓣热播, 1=站点推荐, 2=观看历史
         putDefault(HawkConfig.HOME_NUM, 4);                  //历史条数: 0=20条, 1=40条, 2=60条, 3=80条, 4=100条
+        putDefault(HawkConfig.HOME_REC_STYLE, true);          // 默认竖列展示
+
         // 播放器选项
         putDefault(HawkConfig.SHOW_PREVIEW, true);           //窗口预览: true=开启, false=关闭
         putDefault(HawkConfig.PLAY_SCALE, 0);                //画面缩放: 0=默认, 1=16:9, 2=4:3, 3=填充, 4=原始, 5=裁剪

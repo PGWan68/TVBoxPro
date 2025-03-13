@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import androidx.core.content.FileProvider
+import com.github.tvbox.osc.BuildConfig
+import com.github.tvbox.osc.util.LOG
 import java.io.File
 
 object ApkInstaller {
@@ -22,7 +24,7 @@ object ApkInstaller {
 
             val uri =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) FileProvider.getUriForFile(
-                    context, context.packageName + ".FileProvider", cachedApkFile
+                    context, BuildConfig.APPLICATION_ID + ".fileProvider", cachedApkFile
                 )
                 else Uri.fromFile(cachedApkFile)
 

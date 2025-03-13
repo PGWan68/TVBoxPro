@@ -129,10 +129,10 @@ public class SourceViewModel extends ViewModel {
                     try {
                         sortJson = future.get(15, TimeUnit.SECONDS);
                     } catch (TimeoutException e) {
-                        e.printStackTrace();
+                        LOG.e(e);
                         future.cancel(true);
                     } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
+                        LOG.e(e);
                     } finally {
                         if (sortJson != null) {
                             AbsSortXml sortXml = sortJson(sortResult, sortJson);
@@ -159,7 +159,7 @@ public class SourceViewModel extends ViewModel {
                         try {
                             executor.shutdown();
                         } catch (Throwable th) {
-                            th.printStackTrace();
+                            LOG.e(th);
                         }
                     }
                 }

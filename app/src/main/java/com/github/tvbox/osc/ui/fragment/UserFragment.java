@@ -79,11 +79,11 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         } else {
             tvSearch.setVisibility(View.GONE);
         }
-        if (!Hawk.get(HawkConfig.HOME_MENU_POSITION, true)) {
-            tvSetting.setVisibility(View.VISIBLE);
-        } else {
-            tvSetting.setVisibility(View.GONE);
-        }
+//        if (!Hawk.get(HawkConfig.HOME_MENU_POSITION, true)) {
+//            tvSetting.setVisibility(View.VISIBLE);
+//        } else {
+//            tvSetting.setVisibility(View.GONE);
+//        }
 
         super.onFragmentResume();
         if (Hawk.get(HawkConfig.HOME_REC, 0) == 2) {

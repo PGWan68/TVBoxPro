@@ -3,6 +3,7 @@ package com.github.catvod.crawler;
 import android.content.Context;
 
 import com.github.tvbox.osc.base.App;
+import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.MD5;
 import com.lzy.okgo.OkGo;
 
@@ -44,8 +45,8 @@ public class JarLoader {
         boolean success = false;
         try {
             File cacheDir = new File(App.getInstance().getCacheDir().getAbsolutePath() + "/catvod_csp");
-            if (!cacheDir.exists())
-                cacheDir.mkdirs();
+            if (!cacheDir.exists()) cacheDir.mkdirs();
+
             DexClassLoader classLoader = new DexClassLoader(jar, cacheDir.getAbsolutePath(), null, App.getInstance().getClassLoader());
             // make force wait here, some device async dex load
             int count = 0;
@@ -55,20 +56,20 @@ public class JarLoader {
                     if (classInit != null) {
                         Method method = classInit.getMethod("init", Context.class);
                         method.invoke(null, App.getInstance());
-                        System.out.println("自定义爬虫代码加载成功!");
+                        LOG.i("自定义爬虫代码加载成功!");
                         success = true;
                         try {
                             Class proxy = classLoader.loadClass("com.github.catvod.spider.Proxy");
                             Method mth = proxy.getMethod("proxy", Map.class);
                             proxyMethods.put(key, mth);
                         } catch (Throwable th) {
-
+                            LOG.e(th);
                         }
                         break;
                     }
                     Thread.sleep(200);
                 } catch (Throwable th) {
-                    th.printStackTrace();
+                    LOG.e(th);
                 }
                 count++;
             } while (count < 5);
@@ -77,14 +78,13 @@ public class JarLoader {
                 classLoaders.put(key, classLoader);
             }
         } catch (Throwable th) {
-            th.printStackTrace();
+            LOG.e(th);
         }
         return success;
     }
 
     private DexClassLoader loadJarInternal(String jar, String md5, String key) {
-        if (classLoaders.contains(key))
-            return classLoaders.get(key);
+        if (classLoaders.contains(key)) return classLoaders.get(key);
         File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/" + key + ".jar");
         if (!md5.isEmpty()) {
             if (cache.exists() && MD5.getFileMd5(cache).equalsIgnoreCase(md5)) {
@@ -132,16 +132,13 @@ public class JarLoader {
             jarMd5 = urls.length > 1 ? urls[1].trim() : "";
         }
         recentJarKey = jarKey;
-        if (spiders.containsKey(key))
-            return spiders.get(key);
-        DexClassLoader classLoader = null;
-        if (jarKey.equals("main"))
-            classLoader = classLoaders.get("main");
+        if (spiders.containsKey(key)) return spiders.get(key);
+        DexClassLoader classLoader;
+        if (jarKey.equals("main")) classLoader = classLoaders.get("main");
         else {
             classLoader = loadJarInternal(jarUrl, jarMd5, jarKey);
         }
-        if (classLoader == null)
-            return new SpiderNull();
+        if (classLoader == null) return new SpiderNull();
         try {
             Spider sp = (Spider) classLoader.loadClass("com.github.catvod.spider." + clsKey).newInstance();
             sp.init(App.getInstance(), ext);
@@ -149,9 +146,9 @@ public class JarLoader {
                 sp.homeContent(false); // 增加此行 应该可以解决部分写的有问题源的历史记录问题 但会增加这个源的首次加载时间 不需要可以已删掉
             }
             spiders.put(key, sp);
-            return sp;
+            return new SpiderNull();
         } catch (Throwable th) {
-            th.printStackTrace();
+            LOG.e(th);
         }
         return new SpiderNull();
     }

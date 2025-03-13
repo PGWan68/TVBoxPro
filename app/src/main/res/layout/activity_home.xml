@@ -38,7 +38,7 @@
             android:focusable="true"
             android:focusableInTouchMode="false"
             android:gravity="left|center_vertical"
-            android:nextFocusRight="@id/tvWifi"
+            android:nextFocusRight="@id/tvSetting"
             android:nextFocusDown="@id/mGridViewCategory"
             android:singleLine="true"
             android:text="@string/app_name"
@@ -47,8 +47,9 @@
             android:textSize="@dimen/ts_30"
             android:textStyle="bold" />
 
+
         <ImageView
-            android:id="@+id/tvClear"
+            android:id="@+id/tvSetting"
             android:layout_width="@dimen/vs_50"
             android:layout_height="@dimen/vs_50"
             android:layout_marginStart="@dimen/vs_15"
@@ -58,8 +59,11 @@
             android:background="@drawable/button_dialog_vod"
             android:clickable="true"
             android:focusable="true"
+            android:nextFocusLeft="@id/tvName"
+            android:nextFocusRight="@id/tvWifi"
+            android:nextFocusDown="@id/mGridViewCategory"
             android:padding="@dimen/vs_5"
-            android:src="@drawable/icon_delete" />
+            android:src="@drawable/hm_settings" />
 
 
         <ImageView
@@ -73,54 +77,11 @@
             android:background="@drawable/button_dialog_vod"
             android:clickable="true"
             android:focusable="true"
-            android:nextFocusLeft="@id/tvName"
+            android:nextFocusLeft="@id/tvSetting"
+            android:nextFocusDown="@id/mGridViewCategory"
             android:padding="@dimen/vs_5"
             android:src="@drawable/hm_wifi_no" />
 
-        <ImageView
-            android:id="@+id/tvFind"
-            android:layout_width="@dimen/vs_50"
-            android:layout_height="@dimen/vs_50"
-            android:layout_marginStart="@dimen/vs_15"
-            android:layout_marginLeft="@dimen/vs_15"
-            android:layout_marginEnd="@dimen/vs_15"
-            android:layout_marginRight="@dimen/vs_15"
-            android:background="@drawable/button_dialog_vod"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="@dimen/vs_5"
-            android:src="@drawable/hm_search" />
-
-
-        <ImageView
-            android:id="@+id/tvDrawer"
-            android:layout_width="@dimen/vs_50"
-            android:layout_height="@dimen/vs_50"
-            android:layout_marginStart="@dimen/vs_15"
-            android:layout_marginLeft="@dimen/vs_15"
-            android:layout_marginEnd="@dimen/vs_15"
-            android:layout_marginRight="@dimen/vs_15"
-            android:background="@drawable/button_dialog_vod"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="@dimen/vs_5"
-            android:src="@drawable/hm_drawer"
-            android:visibility="gone" />
-
-        <ImageView
-            android:id="@+id/tvMenu"
-            android:layout_width="@dimen/vs_50"
-            android:layout_height="@dimen/vs_50"
-            android:layout_marginStart="@dimen/vs_15"
-            android:layout_marginLeft="@dimen/vs_15"
-            android:layout_marginEnd="@dimen/vs_15"
-            android:layout_marginRight="@dimen/vs_15"
-            android:background="@drawable/button_dialog_vod"
-            android:clickable="true"
-            android:focusable="true"
-            android:nextFocusDown="@id/tvDrive"
-            android:padding="@dimen/vs_5"
-            android:src="@drawable/hm_settings" />
 
         <TextView
             android:id="@+id/tvDate"

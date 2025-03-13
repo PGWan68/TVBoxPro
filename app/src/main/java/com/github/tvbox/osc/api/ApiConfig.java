@@ -142,7 +142,7 @@ public class ApiConfig {
         // Embedded Source : Update in Strings.xml if required
         String apiUrl = getCurrentApiUrl();
         if (apiUrl.isEmpty()) {
-            callback.error("源地址为空");
+            callback.error("源地址为空，请重试");
             return;
         }
 
@@ -176,64 +176,59 @@ public class ApiConfig {
         }
         System.out.println("API URL :" + configUrl);
         String configKey = TempKey;
-        OkGo.<String>get(configUrl)
-                .headers("User-Agent", userAgent)
-                .headers("Accept", requestAccept)
-                .execute(new AbsCallback<String>() {
-                    @Override
-                    public void onSuccess(Response<String> response) {
-                        try {
-                            String json = response.body();
-                            parseJson(apiUrl, json);
-                            try {
-                                File cacheDir = cache.getParentFile();
-                                if (!cacheDir.exists())
-                                    cacheDir.mkdirs();
-                                if (cache.exists())
-                                    cache.delete();
-                                FileOutputStream fos = new FileOutputStream(cache);
-                                fos.write(json.getBytes("UTF-8"));
-                                fos.flush();
-                                fos.close();
-                            } catch (Throwable th) {
-                                th.printStackTrace();
-                            }
-                            callback.success();
-                        } catch (Throwable th) {
-                            th.printStackTrace();
-                            callback.error("解析配置失败");
-                        }
+        OkGo.<String>get(configUrl).headers("User-Agent", userAgent).headers("Accept", requestAccept).execute(new AbsCallback<String>() {
+            @Override
+            public void onSuccess(Response<String> response) {
+                try {
+                    String json = response.body();
+                    parseJson(apiUrl, json);
+                    try {
+                        File cacheDir = cache.getParentFile();
+                        if (!cacheDir.exists()) cacheDir.mkdirs();
+                        if (cache.exists()) cache.delete();
+                        FileOutputStream fos = new FileOutputStream(cache);
+                        fos.write(json.getBytes("UTF-8"));
+                        fos.flush();
+                        fos.close();
+                    } catch (Throwable th) {
+                        th.printStackTrace();
                     }
+                    callback.success();
+                } catch (Throwable th) {
+                    th.printStackTrace();
+                    callback.error("解析配置失败");
+                }
+            }
 
-                    @Override
-                    public void onError(Response<String> response) {
-                        super.onError(response);
-                        if (cache.exists()) {
-                            try {
-                                parseJson(apiUrl, cache);
-                                callback.success();
-                                return;
-                            } catch (Throwable th) {
-                                th.printStackTrace();
-                            }
-                        }
-                        callback.error("拉取配置失败\n" + (response.getException() != null ? response.getException().getMessage() : ""));
+            @Override
+            public void onError(Response<String> response) {
+                super.onError(response);
+                if (cache.exists()) {
+                    try {
+                        parseJson(apiUrl, cache);
+                        callback.success();
+                        return;
+                    } catch (Throwable th) {
+                        th.printStackTrace();
                     }
+                }
+                callback.error("拉取配置失败\n" + (response.getException() != null ? response.getException().getMessage() : ""));
+            }
 
-                    public String convertResponse(okhttp3.Response response) throws Throwable {
-                        String result = "";
-                        if (response.body() == null) {
-                            result = "";
-                        } else {
-                            result = FindResult(response.body().string(), configKey);
-                        }
-                        if (apiUrl.startsWith("clan")) {
-                            result = clanContentFix(clanToAddress(apiUrl), result);
-                        }
-                        result = fixContentPath(apiUrl, result);
-                        return result;
-                    }
-                });
+            public String convertResponse(okhttp3.Response response) throws Throwable {
+                String result = "";
+                if (response.body() == null) {
+                    result = "";
+                } else {
+                    result = FindResult(response.body().string(), configKey);
+                }
+                if (apiUrl.startsWith("clan")) {
+                    result = clanContentFix(clanToAddress(apiUrl), result);
+                }
+                result = fixContentPath(apiUrl, result);
+                return result;
+            }
+        });
     }
 
     public void loadJar(boolean useCache, String spider, LoadConfigCallback callback) {
@@ -255,50 +250,51 @@ public class ApiConfig {
 
         boolean isJarInImg = jarUrl.startsWith("img+");
         jarUrl = jarUrl.replace("img+", "");
-        OkGo.<File>get(jarUrl)
-                .headers("User-Agent", userAgent)
-                .headers("Accept", requestAccept)
-                .execute(new AbsCallback<File>() {
+        OkGo.<File>get(jarUrl).headers("User-Agent", userAgent).headers("Accept", requestAccept).execute(new AbsCallback<File>() {
 
-                    @Override
-                    public File convertResponse(okhttp3.Response response) throws Throwable {
-                        File cacheDir = cache.getParentFile();
-                        if (!cacheDir.exists())
-                            cacheDir.mkdirs();
-                        if (cache.exists())
-                            cache.delete();
-                        FileOutputStream fos = new FileOutputStream(cache);
-                        if (isJarInImg) {
-                            String respData = response.body().string();
-                            byte[] imgJar = getImgJar(respData);
-                            fos.write(imgJar);
-                        } else {
-                            fos.write(response.body().bytes());
-                        }
-                        fos.flush();
-                        fos.close();
-                        return cache;
-                    }
+            @Override
+            public File convertResponse(okhttp3.Response response) throws Throwable {
+                File cacheDir = cache.getParentFile();
+                if (!cacheDir.exists()) cacheDir.mkdirs();
+                if (cache.exists()) cache.delete();
+                FileOutputStream fos = new FileOutputStream(cache);
+                if (isJarInImg) {
+                    String respData = response.body().string();
+                    byte[] imgJar = getImgJar(respData);
+                    fos.write(imgJar);
+                } else {
+                    fos.write(response.body().bytes());
+                }
+                fos.flush();
+                fos.close();
+                return cache;
+            }
 
-                    @Override
-                    public void onSuccess(Response<File> response) {
-                        if (response.body().exists()) {
-                            if (jarLoader.load(response.body().getAbsolutePath())) {
-                                callback.success();
-                            } else {
-                                callback.error("从网络上加载jar写入缓存后加载失败");
-                            }
-                        } else {
-                            callback.error("从网络上加载jar地址字节数据为空");
-                        }
-                    }
+            @Override
+            public void onSuccess(Response<File> response) {
 
-                    @Override
-                    public void onError(Response<File> response) {
-                        super.onError(response);
-                        callback.error("从网络上加载jar失败：" + response.getException().getMessage());
+                File file = response.body();
+                if (file.exists()) {
+                    // 解决安卓14上报错：java.lang.SecurityException: Writable dex file '/data/user/0/com.github.tvbox.osc.pro/files/csp.jar' is not allowed.
+//                    boolean result = file.setReadOnly();
+//                    LOG.i("设置Jar包为只读权限：" + result);
+
+                    if (jarLoader.load(file.getAbsolutePath())) {
+                        callback.success();
+                    } else {
+                        callback.error("从网络上加载jar写入缓存后加载失败");
                     }
-                });
+                } else {
+                    callback.error("从网络上加载jar地址字节数据为空");
+                }
+            }
+
+            @Override
+            public void onError(Response<File> response) {
+                super.onError(response);
+                callback.error("从网络上加载jar失败：" + response.getException().getMessage());
+            }
+        });
     }
 
     private void parseJson(String apiUrl, File f) throws Throwable {
@@ -347,17 +343,14 @@ public class ApiConfig {
             sb.setPlayerType(DefaultConfig.safeJsonInt(obj, "playerType", -1));
             sb.setCategories(DefaultConfig.safeJsonStringList(obj, "categories"));
             sb.setClickSelector(DefaultConfig.safeJsonString(obj, "click", ""));
-            if (firstSite == null && sb.getHide() == 0)
-                firstSite = sb;
+            if (firstSite == null && sb.getHide() == 0) firstSite = sb;
             sourceBeanList.put(siteKey, sb);
         }
         if (sourceBeanList != null && sourceBeanList.size() > 0) {
             String home = Hawk.get(HawkConfig.HOME_API, "");
             SourceBean sh = getSource(home);
-            if (sh == null || sh.getHide() == 1)
-                setSourceBean(firstSite);
-            else
-                setSourceBean(sh);
+            if (sh == null || sh.getHide() == 1) setSourceBean(firstSite);
+            else setSourceBean(sh);
         }
         // 需要使用vip解析的flag
         vipParseFlags = DefaultConfig.safeJsonStringList(infoJson, "flags");
@@ -379,13 +372,10 @@ public class ApiConfig {
         // 获取默认解析
         if (parseBeanList != null && parseBeanList.size() > 0) {
             String defaultParse = Hawk.get(HawkConfig.DEFAULT_PARSE, "");
-            if (!TextUtils.isEmpty(defaultParse))
-                for (ParseBean pb : parseBeanList) {
-                    if (pb.getName().equals(defaultParse))
-                        setDefaultParse(pb);
-                }
-            if (mDefaultParse == null)
-                setDefaultParse(parseBeanList.get(0));
+            if (!TextUtils.isEmpty(defaultParse)) for (ParseBean pb : parseBeanList) {
+                if (pb.getName().equals(defaultParse)) setDefaultParse(pb);
+            }
+            if (mDefaultParse == null) setDefaultParse(parseBeanList.get(0));
         }
 
         // takagen99: Check if Live URL is setup in Settings, if no, get from File Config
@@ -618,10 +608,8 @@ public class ApiConfig {
     private void putLiveHistory(String url) {
         if (!url.isEmpty()) {
             ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_HISTORY, new ArrayList<String>());
-            if (!liveHistory.contains(url))
-                liveHistory.add(0, url);
-            if (liveHistory.size() > 20)
-                liveHistory.remove(20);
+            if (!liveHistory.contains(url)) liveHistory.add(0, url);
+            if (liveHistory.size() > 20) liveHistory.remove(20);
             Hawk.put(HawkConfig.LIVE_HISTORY, liveHistory);
         }
     }
@@ -629,10 +617,8 @@ public class ApiConfig {
     public static void putEPGHistory(String url) {
         if (!url.isEmpty()) {
             ArrayList<String> epgHistory = Hawk.get(HawkConfig.EPG_HISTORY, new ArrayList<String>());
-            if (!epgHistory.contains(url))
-                epgHistory.add(0, url);
-            if (epgHistory.size() > 20)
-                epgHistory.remove(20);
+            if (!epgHistory.contains(url)) epgHistory.add(0, url);
+            if (epgHistory.size() > 20) epgHistory.remove(20);
             Hawk.put(HawkConfig.EPG_HISTORY, epgHistory);
         }
     }
@@ -649,10 +635,8 @@ public class ApiConfig {
             String groupName = ((JsonObject) groupElement).get("group").getAsString().trim();
             String[] splitGroupName = groupName.split("_", 2);
             liveChannelGroup.setGroupName(splitGroupName[0]);
-            if (splitGroupName.length > 1)
-                liveChannelGroup.setGroupPassword(splitGroupName[1]);
-            else
-                liveChannelGroup.setGroupPassword("");
+            if (splitGroupName.length > 1) liveChannelGroup.setGroupPassword(splitGroupName[1]);
+            else liveChannelGroup.setGroupPassword("");
             channelIndex = 0;
             for (JsonElement channelElement : ((JsonObject) groupElement).get("channels").getAsJsonArray()) {
                 JsonObject obj = (JsonObject) channelElement;
@@ -667,10 +651,8 @@ public class ApiConfig {
                 for (String url : urls) {
                     String[] splitText = url.split("\\$", 2);
                     sourceUrls.add(splitText[0]);
-                    if (splitText.length > 1)
-                        sourceNames.add(splitText[1]);
-                    else
-                        sourceNames.add("源" + sourceIndex);
+                    if (splitText.length > 1) sourceNames.add(splitText[1]);
+                    else sourceNames.add("源" + sourceIndex);
                     sourceIndex++;
                 }
                 liveChannelItem.setChannelSourceNames(sourceNames);
@@ -725,8 +707,7 @@ public class ApiConfig {
     }
 
     public SourceBean getSource(String key) {
-        if (!sourceBeanList.containsKey(key))
-            return null;
+        if (!sourceBeanList.containsKey(key)) return null;
         return sourceBeanList.get(key);
     }
 
@@ -736,8 +717,7 @@ public class ApiConfig {
     }
 
     public void setDefaultParse(ParseBean parseBean) {
-        if (this.mDefaultParse != null)
-            this.mDefaultParse.setDefault(false);
+        if (this.mDefaultParse != null) this.mDefaultParse.setDefault(false);
         this.mDefaultParse = parseBean;
         Hawk.put(HawkConfig.DEFAULT_PARSE, parseBean.getName());
         parseBean.setDefault(true);
@@ -782,8 +762,7 @@ public class ApiConfig {
 
     public IJKCode getIJKCodec(String name) {
         for (IJKCode code : ijkCodes) {
-            if (code.getName().equals(name))
-                return code;
+            if (code.getName().equals(name)) return code;
         }
         return ijkCodes.get(0);
     }
@@ -848,46 +827,43 @@ public class ApiConfig {
     public void fetchRemoteSources() {
         String remoteUrl = Config.REMOTE_URL;
 
-        OkGo.<String>get(remoteUrl)
-                .cacheKey(remoteUrl)
-                .cacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
-                .execute(new StringCallback() {
+        OkGo.<String>get(remoteUrl).cacheKey(remoteUrl).cacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST).execute(new StringCallback() {
 
-                    @Override
-                    public void onCacheSuccess(Response<String> response) {
-                        onSuccess(response);
-                    }
+            @Override
+            public void onCacheSuccess(Response<String> response) {
+                onSuccess(response);
+            }
 
-                    @Override
-                    public void onSuccess(Response<String> response) {
-                        try {
-                            if (response != null) {
-                                String result = response.body();
-                                if (result != null && !result.isEmpty()) {
+            @Override
+            public void onSuccess(Response<String> response) {
+                try {
+                    if (response != null) {
+                        String result = response.body();
+                        if (result != null && !result.isEmpty()) {
 
-                                    urlBeans.clear();
-                                    JsonObject json = new Gson().fromJson(result, JsonObject.class);
-                                    JsonArray urls = json.get("urls").getAsJsonArray();
-                                    for (JsonElement element : urls) {
-                                        JsonObject obj = (JsonObject) element;
-                                        String name = obj.get("name").getAsString();
-                                        String url = obj.get("url").getAsString();
+                            urlBeans.clear();
+                            JsonObject json = new Gson().fromJson(result, JsonObject.class);
+                            JsonArray urls = json.get("urls").getAsJsonArray();
+                            for (JsonElement element : urls) {
+                                JsonObject obj = (JsonObject) element;
+                                String name = obj.get("name").getAsString();
+                                String url = obj.get("url").getAsString();
 
-                                        // url单独处理
-                                        String regex = remoteUrl.split("collection")[0];
+                                // url单独处理
+                                String regex = remoteUrl.split("collection")[0];
 
-                                        url = regex + url.substring(2);
+                                url = regex + url.substring(2);
 
-                                        urlBeans.add(new UrlBean(name, url));
-                                    }
-                                }
+                                urlBeans.add(new UrlBean(name, url));
                             }
-                        } catch (Exception e) {
-                            LOG.e(e);
                         }
-
                     }
-                });
+                } catch (Exception e) {
+                    LOG.e(e);
+                }
+
+            }
+        });
     }
 
 }
