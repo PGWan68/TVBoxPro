@@ -150,7 +150,7 @@ public class HomeActivity extends BaseActivity {
         }
 
         // Fetch remote urls
-        ApiConfig.get().fetchRemoteSources();
+//        ApiConfig.get().fetchRemoteSources();
 
         initData();
     }

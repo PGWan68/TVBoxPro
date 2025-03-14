@@ -1,10 +1,12 @@
 package com.github.tvbox.osc.util;
 
 import static com.bumptech.glide.load.resource.bitmap.VideoDecoder.FRAME_OPTION;
+
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.text.TextUtils;
 import android.widget.ImageView;
+
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
@@ -24,6 +26,7 @@ import com.github.tvbox.osc.base.App;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -68,20 +71,20 @@ public class ImgUtil {
         } else {
             if (roundingRadius == 0) roundingRadius = 1;
             RequestOptions requestOptions = new RequestOptions()
-                .format(DecodeFormat.PREFER_RGB_565)
-                .diskCacheStrategy(getDiskCacheStrategy(4))
-                .dontAnimate()
-                .transform(
-            new CenterCrop(),
-            new RoundedCorners(roundingRadius));
+                    .format(DecodeFormat.PREFER_RGB_565)
+                    .diskCacheStrategy(getDiskCacheStrategy(4))
+                    .dontAnimate()
+                    .transform(
+                            new CenterCrop(),
+                            new RoundedCorners(roundingRadius));
             Glide.with(App.getInstance())
-                .asBitmap()
-                .load(getUrl(url))
-                .error(R.drawable.img_loading_placeholder)
-                .placeholder(R.drawable.img_loading_placeholder)
-                .listener(getListener(view, ImageView.ScaleType.FIT_XY))
-                .apply(requestOptions)
-                .into(view);
+                    .asBitmap()
+                    .load(getUrl(url))
+                    .error(R.drawable.img_loading_placeholder)
+                    .placeholder(R.drawable.img_loading_placeholder)
+                    .listener(getListener(view, ImageView.ScaleType.FIT_XY))
+                    .apply(requestOptions)
+                    .into(view);
         }
     }
 
@@ -93,20 +96,20 @@ public class ImgUtil {
      */
     public static void loadVideoScreenshot(String uri, ImageView imageView, long frameTimeMicros) {
         RequestOptions requestOptions = RequestOptions.frameOf(frameTimeMicros * 1000)
-            .set(FRAME_OPTION, MediaMetadataRetriever.OPTION_CLOSEST)
-            .transform(
-        new CenterCrop(),
-        new RoundedCorners(10));
+                .set(FRAME_OPTION, MediaMetadataRetriever.OPTION_CLOSEST)
+                .transform(
+                        new CenterCrop(),
+                        new RoundedCorners(10));
         Glide.with(App.getInstance())
-            .load(uri)
-            .skipMemoryCache(true)
-            .apply(requestOptions)
-            .into(imageView);
+                .load(uri)
+                .skipMemoryCache(true)
+                .apply(requestOptions)
+                .into(imageView);
     }
 
     public static String getDiskCacheStrategyName(int index) {
-        String[] names = new String[] {
-            "[NONE] 关闭", "[RESOURCE] 转换图片", "[DATA] 原始图片 ", "[ALL] 原始图片和转换图片", "[AUTOMATIC] 自动"
+        String[] names = new String[]{
+                "[NONE] 关闭", "[RESOURCE] 转换图片", "[DATA] 原始图片 ", "[ALL] 原始图片和转换图片", "[AUTOMATIC] 自动"
         };
         return names[index];
     }
@@ -152,7 +155,7 @@ public class ImgUtil {
         if (url.contains("@User-Agent=")) ua = url.split("@User-Agent=")[1].split("@")[0];
         if (url.contains("@Referer=")) referer = url.split("@Referer=")[1].split("@")[0];
         url = url.split("@")[0];
-        if(TextUtils.isEmpty(url)) return null;
+        if (TextUtils.isEmpty(url)) return null;
         /*   AuthInfo authInfo = new AuthInfo(url);
         url = authInfo.url; */
 
@@ -164,10 +167,10 @@ public class ImgUtil {
 
         if (!TextUtils.isEmpty(header)) {
             JsonObject jsonInfo = new Gson()
-                .fromJson(header, JsonObject.class);
-            for (String key: jsonInfo.keySet()) {
+                    .fromJson(header, JsonObject.class);
+            for (String key : jsonInfo.keySet()) {
                 String val = jsonInfo.get(key)
-                    .getAsString();
+                        .getAsString();
                 builder.addHeader(key, val);
             }
         } else {
@@ -188,22 +191,24 @@ public class ImgUtil {
             String host = imgUrl.getHost();
             builder.addHeader(HttpHeaders.HOST, host);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.e("解析图片链接异常：" + url);
         }
 
         return new GlideUrl(url, builder.build());
     }
 
-    private static RequestListener < Bitmap > getListener(ImageView view, ImageView.ScaleType scaleType) {
-        return new RequestListener < Bitmap > () {@Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target < Bitmap > target, boolean isFirstResource) {
+    private static RequestListener<Bitmap> getListener(ImageView view, ImageView.ScaleType scaleType) {
+        return new RequestListener<Bitmap>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                 view.setScaleType(scaleType);
                 view.setImageResource(R.drawable.img_loading_placeholder);
+                LOG.e("加载图片链接异常：" + e);
                 return true;
             }
 
             @Override
-            public boolean onResourceReady(Bitmap resource, Object model, Target < Bitmap > target, DataSource dataSource, boolean isFirstResource) {
+            public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
                 view.setScaleType(scaleType);
                 return false;
             }

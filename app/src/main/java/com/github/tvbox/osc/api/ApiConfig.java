@@ -83,11 +83,15 @@ public class ApiConfig {
 
     private final String requestAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
 
+    private final String proxy = "https://gh-proxy.com/";
+
     private ApiConfig() {
         sourceBeanList = new LinkedHashMap<>();
         liveChannelGroupList = new ArrayList<>();
         parseBeanList = new ArrayList<>();
         urlBeans = new ArrayList<>();
+        urlBeans.add(new UrlBean("饭太硬加强版", proxy + "https://raw.githubusercontent.com/qist/tvbox/master/0821.json"));
+//        urlBeans.add(new UrlBean("OK影视", proxy + "https://raw.githubusercontent.com/qist/tvbox/master/0825.json"));
     }
 
     public static ApiConfig get() {
@@ -294,7 +298,7 @@ public class ApiConfig {
     }
 
     private void parseJson(String apiUrl, File f) throws Throwable {
-        System.out.println("从本地缓存加载" + f.getAbsolutePath());
+        LOG.i("从本地缓存加载" + f.getAbsolutePath());
         BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
         StringBuilder sb = new StringBuilder();
         String s = "";
