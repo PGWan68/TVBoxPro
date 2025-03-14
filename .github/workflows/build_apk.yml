@@ -86,7 +86,7 @@ jobs:
           # 会使用一个临时的token来创建Release
           token: ${{ github.token }}
           # 自动生成一些变化列表之类的内容。
-          generateReleaseNotes: true
+#          generateReleaseNotes: true
 #          commit: asdfadfadsfa
           body: 我是更新内容
 
