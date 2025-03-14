@@ -88,5 +88,5 @@ jobs:
           # 自动生成一些变化列表之类的内容。
 #          generateReleaseNotes: true
 #          commit: asdfadfadsfa
-          body: 我是更新内容
+          body: 1、新增推荐TAB \n2、优化首页UI
 

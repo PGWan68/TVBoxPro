@@ -36,14 +36,15 @@ public class HomeHotVodAdapter extends BaseQuickAdapter<Movie.Video, BaseViewHol
             tvDel.setVisibility(View.GONE);
         }
 
-        // check if set as last watched
+//        item.year = 2025;
+//        item.note = "更新至第7集";
+
         TextView tvYear = helper.getView(R.id.tvYear);
-        if (Hawk.get(HawkConfig.HOME_REC, 0) == 2) {
-            tvYear.setVisibility(View.VISIBLE);
-            SourceBean source = ApiConfig.get().getSource(item.sourceKey);
-            tvYear.setText(source!=null?source.getName():"");
-        } else {
+        if (item.year <= 0) {
             tvYear.setVisibility(View.GONE);
+        } else {
+            tvYear.setText(String.valueOf(item.year));
+            tvYear.setVisibility(View.VISIBLE);
         }
 
         TextView tvRate = helper.getView(R.id.tvNote);

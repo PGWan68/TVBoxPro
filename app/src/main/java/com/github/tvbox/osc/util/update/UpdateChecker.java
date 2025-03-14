@@ -73,7 +73,7 @@ public class UpdateChecker {
     }
 
     private boolean hasNewVersion(LatestReleases latest) {
-        return VersionComparer.CompareVersion(latest.tag_name, this.CurrentVersion) > 0;
+        return latest.tag_name != null && CurrentVersion != null && VersionComparer.CompareVersion(latest.tag_name, this.CurrentVersion) > 0;
     }
 
 

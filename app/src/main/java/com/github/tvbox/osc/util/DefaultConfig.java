@@ -11,6 +11,8 @@ import android.text.TextUtils;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.App;
+import com.github.tvbox.osc.bean.AbsSortXml;
+import com.github.tvbox.osc.bean.Movie;
 import com.github.tvbox.osc.bean.MovieSort;
 import com.github.tvbox.osc.bean.SourceBean;
 import com.github.tvbox.osc.server.ControlManager;
@@ -36,31 +38,44 @@ import java.util.regex.Pattern;
  */
 public class DefaultConfig {
 
-    public static List<MovieSort.SortData> adjustSort(String sourceKey, List<MovieSort.SortData> list, boolean withMy) {
+    public static List<MovieSort.SortData> adjustSort(String sourceKey, AbsSortXml absXml) {
         List<MovieSort.SortData> data = new ArrayList<>();
-        if (sourceKey != null) {
-            SourceBean sb = ApiConfig.get().getSource(sourceKey);
-            ArrayList<String> categories = sb.getCategories();
-            if (!categories.isEmpty()) {
-                for (String cate : categories) {
-                    for (MovieSort.SortData sortData : list) {
-                        if (sortData.name.equals(cate)) {
-                            if (sortData.filters == null)
-                                sortData.filters = new ArrayList<>();
+
+        if (absXml != null && absXml.classes != null) {
+            List<MovieSort.SortData> sortList = absXml.classes.sortList;
+            if (sortList != null && !sortList.isEmpty()) {
+                if (sourceKey != null) {
+                    SourceBean sb = ApiConfig.get().getSource(sourceKey);
+                    ArrayList<String> categories = sb.getCategories();
+                    if (!categories.isEmpty()) {
+                        for (String cate : categories) {
+                            for (MovieSort.SortData sortData : sortList) {
+                                if (sortData.name.equals(cate)) {
+                                    if (sortData.filters == null)
+                                        sortData.filters = new ArrayList<>();
+                                    data.add(sortData);
+                                }
+                            }
+                        }
+                    } else {
+                        for (MovieSort.SortData sortData : sortList) {
+                            if (sortData.filters == null) sortData.filters = new ArrayList<>();
                             data.add(sortData);
                         }
                     }
                 }
-            } else {
-                for (MovieSort.SortData sortData : list) {
-                    if (sortData.filters == null)
-                        sortData.filters = new ArrayList<>();
-                    data.add(sortData);
-                }
             }
         }
-        if (withMy)
-            data.add(0, new MovieSort.SortData("my0", HomeActivity.getRes().getString(R.string.app_home)));
+
+
+        // 首页数据固定豆瓣热榜
+        data.add(0, new MovieSort.SortData("tvbox_home", HomeActivity.getRes().getString(R.string.app_home)));
+
+        // 如果站点有推荐数据，默认第二列展示
+        if (absXml != null && absXml.list != null && absXml.list.videoList != null && !absXml.list.videoList.isEmpty()) {
+            data.add(1, new MovieSort.SortData("tvbox_recommend", HomeActivity.getRes().getString(R.string.app_recommend), absXml.list));
+        }
+
         Collections.sort(data);
         return data;
     }
@@ -77,7 +92,7 @@ public class DefaultConfig {
         return -1;
     }
 
-    public static void resetApp(Context mContext){
+    public static void resetApp(Context mContext) {
         //使用
         clearPublic(mContext);
         clearPrivate(mContext);
@@ -119,7 +134,7 @@ public class DefaultConfig {
     /**
      * 清空私有目录
      */
-    public static  void clearPrivate(Context mContext) {
+    public static void clearPrivate(Context mContext) {
         //清空文件夹
         File dir = new File(Objects.requireNonNull(mContext.getFilesDir().getParent()));
         File[] files = dir.listFiles();
@@ -143,6 +158,7 @@ public class DefaultConfig {
         }
         return "";
     }
+
     public static String getAppVersionName(Context mContext) {
         //包管理操作管理类
         PackageManager pm = mContext.getPackageManager();
@@ -184,22 +200,8 @@ public class DefaultConfig {
     }
 
     // takagen99 : 增加对flv|avi|mkv|rm|wmv|mpg等几种视频格式的支持
-    private static final Pattern snifferMatch = Pattern.compile(
-            "http((?!http).){20,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg)\\?.*|" +
-                    "http((?!http).){20,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg)|" +
-                    "http((?!http).)*?video/tos*|" +
-                    "http((?!http).){20,}?/m3u8\\?pt=m3u8.*|" +
-                    "http((?!http).)*?default\\.ixigua\\.com/.*|" +
-                    "http((?!http).)*?dycdn-tos\\.pstatp[^\\?]*|" +
-                    "http.*?/player/m3u8play\\.php\\?url=.*|" +
-                    "http.*?/player/.*?[pP]lay\\.php\\?url=.*|" +
-                    "http.*?/playlist/m3u8/\\?vid=.*|" +
-                    "http.*?\\.php\\?type=m3u8&.*|" +
-                    "http.*?/download.aspx\\?.*|" +
-                    "http.*?/api/up_api.php\\?.*|" +
-                    "https.*?\\.66yk\\.cn.*|" +
-                    "http((?!http).)*?netease\\.com/file/.*"
-    );
+    private static final Pattern snifferMatch = Pattern.compile("http((?!http).){20,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg)\\?.*|" + "http((?!http).){20,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg)|" + "http((?!http).)*?video/tos*|" + "http((?!http).){20,}?/m3u8\\?pt=m3u8.*|" + "http((?!http).)*?default\\.ixigua\\.com/.*|" + "http((?!http).)*?dycdn-tos\\.pstatp[^\\?]*|" + "http.*?/player/m3u8play\\.php\\?url=.*|" + "http.*?/player/.*?[pP]lay\\.php\\?url=.*|" + "http.*?/playlist/m3u8/\\?vid=.*|" + "http.*?\\.php\\?type=m3u8&.*|" + "http.*?/download.aspx\\?.*|" + "http.*?/api/up_api.php\\?.*|" + "https.*?\\.66yk\\.cn.*|" + "http((?!http).)*?netease\\.com/file/.*");
+
     public static boolean isVideoFormat(String url) {
         if (url.contains("=http")) {
             return false;
@@ -213,10 +215,8 @@ public class DefaultConfig {
 
     public static String safeJsonString(JsonObject obj, String key, String defaultVal) {
         try {
-            if (obj.has(key))
-                return obj.getAsJsonPrimitive(key).getAsString().trim();
-            else
-                return defaultVal;
+            if (obj.has(key)) return obj.getAsJsonPrimitive(key).getAsString().trim();
+            else return defaultVal;
         } catch (Throwable th) {
         }
         return defaultVal;
@@ -224,10 +224,8 @@ public class DefaultConfig {
 
     public static int safeJsonInt(JsonObject obj, String key, int defaultVal) {
         try {
-            if (obj.has(key))
-                return obj.getAsJsonPrimitive(key).getAsInt();
-            else
-                return defaultVal;
+            if (obj.has(key)) return obj.getAsJsonPrimitive(key).getAsInt();
+            else return defaultVal;
         } catch (Throwable th) {
         }
         return defaultVal;
@@ -257,9 +255,7 @@ public class DefaultConfig {
     }
 
     public static String[] StoragePermissionGroup() {
-        return new String[] {
-                Permission.MANAGE_EXTERNAL_STORAGE                
-        };
+        return new String[]{Permission.MANAGE_EXTERNAL_STORAGE};
     }
 
 }

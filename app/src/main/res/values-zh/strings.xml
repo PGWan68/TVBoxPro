@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">影视仓</string>
     <string name="app_home">首页</string>
+    <string name="app_recommend">推荐</string>
     <string name="app_source"></string>
 
     // Home Page //

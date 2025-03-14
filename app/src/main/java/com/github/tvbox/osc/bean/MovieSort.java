@@ -34,12 +34,20 @@ public class MovieSort implements Serializable {
         public HashMap<String, String> filterSelect = new HashMap<>();
         public String flag; // 类型
 
+        public Movie movie;
+
         public SortData() {
         }
 
         public SortData(String id, String name) {
             this.id = id;
             this.name = name;
+        }
+
+        public SortData(String id, String name, Movie movie) {
+            this.id = id;
+            this.name = name;
+            this.movie = movie;
         }
 
         public int filterSelectCount() {

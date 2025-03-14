@@ -5,10 +5,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.blankj.utilcode.util.GsonUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.tvbox.osc.R;
@@ -79,7 +81,7 @@ public class GridFragment extends BaseLazyFragment {
     protected int getLayoutResID() {
         return R.layout.fragment_grid;
     }
-    
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,11 +96,11 @@ public class GridFragment extends BaseLazyFragment {
         initViewModel();
         initData();
     }
-    
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("sortDataJson", GsonUtils.toJson(sortData));        
+        outState.putString("sortDataJson", GsonUtils.toJson(sortData));
     }
 
     private void changeView(String id) {
@@ -108,17 +110,15 @@ public class GridFragment extends BaseLazyFragment {
         initData();
     }
 
-    public boolean isFolederMode() {
-        return (getUITag() == '1');
-    }
-
     // 获取当前页面UI的显示模式 ‘0’ 正常模式 '1' 文件夹模式 '2' 显示缩略图的文件夹模式
     public char getUITag() {
-        return (sortData.flag == null || sortData.flag.length() == 0) ? '0' : sortData.flag.charAt(0);
+        return (sortData.flag == null || sortData.flag.isEmpty()) ? '0' : sortData.flag.charAt(0);
     }
 
     // 是否允许聚合搜索 sortData.flag的第二个字符为‘1’时允许聚搜
-    public boolean enableFastSearch() {  return sortData.flag == null || sortData.flag.length() < 2 || (sortData.flag.charAt(1) == '1'); }
+    public boolean enableFastSearch() {
+        return sortData.flag == null || sortData.flag.length() < 2 || (sortData.flag.charAt(1) == '1');
+    }
     //public boolean enableFastSearch() {  return (sortData.flag == null || sortData.flag.length() < 2) ? true : (sortData.flag.charAt(1) == '1'); }
 
     // 保存当前页面
@@ -171,7 +171,7 @@ public class GridFragment extends BaseLazyFragment {
             mGridView.setVisibility(View.VISIBLE);
         }
         mGridView.setHasFixedSize(true);
-        gridAdapter = new GridAdapter(isFolederMode());
+        gridAdapter = new GridAdapter();
         this.page = 1;
         this.maxPage = 1;
         this.isLoad = false;
@@ -180,11 +180,8 @@ public class GridFragment extends BaseLazyFragment {
     private void initView() {
         this.createView();
         mGridView.setAdapter(gridAdapter);
-        if (isFolederMode()) {
-            mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, 1, false));
-        } else {
-            mGridView.setLayoutManager(new V7GridLayoutManager(this.mContext, isBaseOnWidth() ? 5 : 6));
-        }
+        mGridView.setLayoutManager(new V7GridLayoutManager(this.mContext, isBaseOnWidth() ? 5 : 6));
+
 
         gridAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
@@ -226,15 +223,15 @@ public class GridFragment extends BaseLazyFragment {
                     Bundle bundle = new Bundle();
                     bundle.putString("id", video.id);
                     bundle.putString("sourceKey", video.sourceKey);
-                    bundle.putString("title", video.name);                    
+                    bundle.putString("title", video.name);
                     if (("12".indexOf(getUITag()) != -1) && video.tag.equals("folder")) {
                         focusedView = view;
                         changeView(video.id);
                     } else {
                         if (video.id == null || video.id.isEmpty() || video.id.startsWith("msearch:")) {
-                            if(Hawk.get(HawkConfig.FAST_SEARCH_MODE, false) && enableFastSearch()){
+                            if (Hawk.get(HawkConfig.FAST_SEARCH_MODE, false) && enableFastSearch()) {
                                 jumpActivity(FastSearchActivity.class, bundle);
-                            }else {
+                            } else {
                                 jumpActivity(SearchActivity.class, bundle);
                             }
                         } else {
@@ -273,38 +270,41 @@ public class GridFragment extends BaseLazyFragment {
         sourceViewModel.listResult.observe(this, new Observer<AbsXml>() {
             @Override
             public void onChanged(AbsXml absXml) {
-//                if(mGridView != null) mGridView.requestFocus();
-                if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && absXml.movie.videoList.size() > 0) {
-                    if (page == 1) {
-                        showSuccess();
-                        isLoad = true;
-                        gridAdapter.setNewData(absXml.movie.videoList);
-                    } else {
-                        gridAdapter.addData(absXml.movie.videoList);
-                    }
-                    page++;
-                    maxPage = absXml.movie.pagecount;
-                    if (page > maxPage && maxPage!=0) {
-                        gridAdapter.loadMoreEnd();
-                        gridAdapter.setEnableLoadMore(false);
-                    } else {
-                        gridAdapter.loadMoreComplete();
-                        gridAdapter.setEnableLoadMore(true);
-                    }
-                } else {
-                    if (page == 1) {
-                        showEmpty();
-                    }
-                    if (page > maxPage && maxPage!=0) {
-                        Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_SHORT).show();
-                        gridAdapter.loadMoreEnd();
-                    } else {
-                        gridAdapter.loadMoreComplete();
-                    }
-                    gridAdapter.setEnableLoadMore(false);
-                }
+                onChangedUpdateUI(absXml);
             }
         });
+    }
+
+    private void onChangedUpdateUI(AbsXml absXml) {
+        if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && !absXml.movie.videoList.isEmpty()) {
+            if (page == 1) {
+                showSuccess();
+                isLoad = true;
+                gridAdapter.setNewData(absXml.movie.videoList);
+            } else {
+                gridAdapter.addData(absXml.movie.videoList);
+            }
+            page++;
+            maxPage = absXml.movie.pagecount;
+            if (page > maxPage && maxPage != 0) {
+                gridAdapter.loadMoreEnd();
+                gridAdapter.setEnableLoadMore(false);
+            } else {
+                gridAdapter.loadMoreComplete();
+                gridAdapter.setEnableLoadMore(true);
+            }
+        } else {
+            if (page == 1) {
+                showEmpty();
+            }
+            if (page > maxPage && maxPage != 0) {
+                Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_SHORT).show();
+                gridAdapter.loadMoreEnd();
+            } else {
+                gridAdapter.loadMoreComplete();
+            }
+            gridAdapter.setEnableLoadMore(false);
+        }
     }
 
     public boolean isLoad() {
@@ -312,7 +312,7 @@ public class GridFragment extends BaseLazyFragment {
     }
 
     private void initData() {
-    	if (ApiConfig.get().getHomeSourceBean().getApi()==null) {
+        if (ApiConfig.get().getHomeSourceBean().getApi() == null) {
             showEmpty();
             return;
         }
@@ -320,7 +320,15 @@ public class GridFragment extends BaseLazyFragment {
         isLoad = false;
         scrollTop();
         toggleFilterStatus();
-        sourceViewModel.getList(sortData, page);
+
+        if (sortData.id.equals("tvbox_recommend")) {
+            AbsXml absXml = new AbsXml();
+            absXml.movie = sortData.movie;
+            absXml.movie.pagecount = 1;
+            onChangedUpdateUI(absXml);
+        } else {
+            sourceViewModel.getList(sortData, page);
+        }
     }
 
     private void toggleFilterStatus() {
@@ -340,7 +348,7 @@ public class GridFragment extends BaseLazyFragment {
     }
 
     public void showFilter() {
-    	if (sortData!=null && !sortData.filters.isEmpty() && gridFilterDialog == null) {
+        if (sortData != null && !sortData.filters.isEmpty() && gridFilterDialog == null) {
             gridFilterDialog = new GridFilterDialog(mContext);
             gridFilterDialog.setData(sortData);
             gridFilterDialog.setOnDismiss(new GridFilterDialog.Callback() {
@@ -351,8 +359,7 @@ public class GridFragment extends BaseLazyFragment {
                 }
             });
         }
-        if (gridFilterDialog != null)
-            gridFilterDialog.show();
+        if (gridFilterDialog != null) gridFilterDialog.show();
     }
 
     public void forceRefresh() {
