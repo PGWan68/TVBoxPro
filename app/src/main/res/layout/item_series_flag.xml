@@ -27,7 +27,7 @@
         android:id="@+id/tvSeriesFlagSelect"
         android:layout_width="match_parent"
         android:layout_height="@dimen/vs_4"
-        android:layout_marginLeft="@dimen/vs_5"
-        android:layout_marginRight="@dimen/vs_5"
+        android:layout_marginLeft="@dimen/vs_4"
+        android:layout_marginRight="@dimen/vs_4"
         android:background="@drawable/shape_source_flag_line" />
 </LinearLayout>

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 /**
  * @author pj567
  * @date :2020/12/22
- * @description:
+ * @description:  [4.25GB] 电幻国度.The Electric State.2025.1080p中英字幕.mp4
  */
 public class SeriesAdapter extends BaseQuickAdapter<VodInfo.VodSeries, BaseViewHolder> {
     public SeriesAdapter() {

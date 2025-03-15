@@ -13,7 +13,7 @@ import java.util.ArrayList;
 /**
  * @author pj567
  * @date :2020/12/22
- * @description:
+ * @description: 夸父智，电影资源分类
  */
 public class SeriesFlagAdapter extends BaseQuickAdapter<VodInfo.VodSeriesFlag, BaseViewHolder> {
     public SeriesFlagAdapter() {
@@ -22,7 +22,6 @@ public class SeriesFlagAdapter extends BaseQuickAdapter<VodInfo.VodSeriesFlag, B
 
     @Override
     protected void convert(BaseViewHolder helper, VodInfo.VodSeriesFlag item) {
-        TextView tvSeries = helper.getView(R.id.tvSeriesFlag);
         View select = helper.getView(R.id.tvSeriesFlagSelect);
         if (item.selected) {
             select.setVisibility(View.VISIBLE);

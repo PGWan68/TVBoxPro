@@ -36,11 +36,6 @@ public class GridAdapter extends BaseQuickAdapter<Movie.Video, BaseViewHolder> {
             tvYear.setVisibility(View.VISIBLE);
         }
 
-        TextView tvLang = helper.getView(R.id.tvLang);
-        tvLang.setVisibility(View.GONE);
-
-        TextView tvArea = helper.getView(R.id.tvArea);
-        tvArea.setVisibility(View.GONE);
 
         if (TextUtils.isEmpty(item.note)) {
             helper.setVisible(R.id.tvNote, false);
@@ -49,7 +44,6 @@ public class GridAdapter extends BaseQuickAdapter<Movie.Video, BaseViewHolder> {
             helper.setText(R.id.tvNote, item.note);
         }
         helper.setText(R.id.tvName, item.name);
-        helper.setText(R.id.tvActor, item.actor);
         ImageView ivThumb = helper.getView(R.id.ivThumb);
         //由于部分电视机使用glide报错
         if (!TextUtils.isEmpty(item.pic)) {

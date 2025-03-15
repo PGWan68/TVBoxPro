@@ -10,6 +10,8 @@ import com.github.tvbox.osc.bean.VodSeriesGroup;
 
 import java.util.ArrayList;
 
+
+///  1-1， 电影集数分类
 public class SeriesGroupAdapter extends BaseQuickAdapter<VodSeriesGroup, BaseViewHolder> {
     public SeriesGroupAdapter() {
         super(R.layout.item_series_flag, new ArrayList<>());

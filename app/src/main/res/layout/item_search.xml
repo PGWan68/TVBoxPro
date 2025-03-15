@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fl_root_view"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -21,25 +22,25 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/vs_5"
-            android:layout_marginTop="@dimen/vs_5"
-            android:layout_marginRight="@dimen/vs_5"
+            android:layout_gravity="end"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tvSite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/vs_5"
-                android:layout_marginRight="@dimen/vs_5"
-                android:background="@drawable/shape_thumb_year"
+                android:background="?attr/color_theme"
                 android:ellipsize="end"
                 android:gravity="center"
-                android:paddingLeft="@dimen/vs_5"
-                android:paddingRight="@dimen/vs_5"
+                android:paddingLeft="@dimen/vs_8"
+                android:paddingTop="@dimen/vs_4"
+                android:paddingRight="@dimen/vs_8"
+                android:paddingBottom="@dimen/vs_4"
                 android:singleLine="true"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_20" />
+                android:textSize="@dimen/ts_18"
+                tools:text="2025" />
+
 
         </LinearLayout>
 
@@ -56,17 +57,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:layout_marginLeft="@dimen/vs_5"
-                android:layout_marginRight="@dimen/vs_5"
-                android:layout_marginBottom="@dimen/vs_5"
-                android:background="@drawable/shape_thumb_note"
-                android:ellipsize="end"
+                android:background="?attr/color_theme"
+                android:ellipsize="marquee"
                 android:gravity="center"
-                android:paddingLeft="@dimen/vs_5"
-                android:paddingRight="@dimen/vs_5"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:paddingLeft="@dimen/vs_8"
+                android:paddingTop="@dimen/vs_4"
+                android:paddingRight="@dimen/vs_8"
+                android:paddingBottom="@dimen/vs_4"
                 android:singleLine="true"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_20" />
+                android:textSize="@dimen/ts_20"
+                tools:text="4K" />
 
             <TextView
                 android:id="@+id/tvName"
@@ -74,11 +76,13 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/shape_thumb_bottom_name"
                 android:ellipsize="marquee"
+                android:gravity="center"
                 android:marqueeRepeatLimit="marquee_forever"
-                android:padding="@dimen/vs_5"
+                android:padding="@dimen/vs_6"
                 android:singleLine="true"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_22" />
+                android:textSize="@dimen/ts_22"
+                android:textStyle="bold" />
         </LinearLayout>
     </FrameLayout>
 </FrameLayout>

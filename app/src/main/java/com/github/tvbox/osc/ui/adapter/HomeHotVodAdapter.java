@@ -47,12 +47,12 @@ public class HomeHotVodAdapter extends BaseQuickAdapter<Movie.Video, BaseViewHol
             tvYear.setVisibility(View.VISIBLE);
         }
 
-        TextView tvRate = helper.getView(R.id.tvNote);
+        TextView tvNote = helper.getView(R.id.tvNote);
         if (item.note == null || item.note.isEmpty()) {
-            tvRate.setVisibility(View.GONE);
+            tvNote.setVisibility(View.GONE);
         } else {
-            tvRate.setText(item.note);
-            tvRate.setVisibility(View.VISIBLE);
+            tvNote.setText(item.note);
+            tvNote.setVisibility(View.VISIBLE);
         }
         helper.setText(R.id.tvName, item.name);
 
