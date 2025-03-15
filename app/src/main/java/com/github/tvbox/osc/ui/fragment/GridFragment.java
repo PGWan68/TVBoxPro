@@ -222,6 +222,10 @@ public class GridFragment extends BaseLazyFragment {
                 if (video != null) {
                     Bundle bundle = new Bundle();
                     bundle.putString("id", video.id);
+
+                    if (video.sourceKey == null && ApiConfig.get().getHomeSourceBean() != null) {
+                        video.sourceKey = ApiConfig.get().getHomeSourceBean().getKey();
+                    }
                     bundle.putString("sourceKey", video.sourceKey);
                     bundle.putString("title", video.name);
                     if (("12".indexOf(getUITag()) != -1) && video.tag.equals("folder")) {
