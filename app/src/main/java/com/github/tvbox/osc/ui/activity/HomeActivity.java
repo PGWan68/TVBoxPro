@@ -174,7 +174,7 @@ public class HomeActivity extends BaseActivity {
         this.mViewPager = findViewById(R.id.mViewPager);
         this.sortAdapter = new SortAdapter();
         this.mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, 0, false));
-        this.mGridView.setSpacingWithMargins(0, AutoSizeUtils.dp2px(this.mContext, 10.0f));
+        this.mGridView.setSpacingWithMargins(0, AutoSizeUtils.dp2px(this.mContext, 12.0f));
         this.mGridView.setAdapter(this.sortAdapter);
         this.mGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             public void onItemPreSelected(TvRecyclerView tvRecyclerView, View view, int position) {
