@@ -33,6 +33,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.cache.CacheMode;
+import com.lzy.okgo.cache.policy.CachePolicy;
 import com.lzy.okgo.callback.AbsCallback;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
@@ -53,6 +54,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import okhttp3.ResponseBody;
 
 /**
  * @author pj567
@@ -140,7 +143,7 @@ public class ApiConfig {
         return "".getBytes();
     }
 
-    public void loadConfig(boolean useCache, LoadConfigCallback callback, Activity activity) {
+    public void loadConfig(LoadConfigCallback callback) {
         // Embedded Source : Update in Strings.xml if required
         String apiUrl = getCurrentApiUrl();
         if (apiUrl.isEmpty()) {
@@ -148,16 +151,6 @@ public class ApiConfig {
             return;
         }
 
-        File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/" + MD5.encode(apiUrl));
-        if (useCache && cache.exists()) {
-            try {
-                parseJson(apiUrl, cache);
-                callback.success();
-                return;
-            } catch (Throwable th) {
-                th.printStackTrace();
-            }
-        }
         String TempKey = null, configUrl = "", pk = ";pk;";
         if (apiUrl.contains(pk)) {
             String[] a = apiUrl.split(pk);
@@ -178,74 +171,62 @@ public class ApiConfig {
         }
         System.out.println("API URL :" + configUrl);
         String configKey = TempKey;
-        OkGo.<String>get(configUrl).headers("User-Agent", userAgent).headers("Accept", requestAccept).execute(new AbsCallback<String>() {
-            @Override
-            public void onSuccess(Response<String> response) {
-                try {
-                    String json = response.body();
-                    parseJson(apiUrl, json);
-                    try {
-                        File cacheDir = cache.getParentFile();
-                        if (!cacheDir.exists()) cacheDir.mkdirs();
-                        if (cache.exists()) cache.delete();
-                        FileOutputStream fos = new FileOutputStream(cache);
-                        fos.write(json.getBytes("UTF-8"));
-                        fos.flush();
-                        fos.close();
-                    } catch (Throwable th) {
-                        th.printStackTrace();
-                    }
-                    callback.success();
-                } catch (Throwable th) {
-                    th.printStackTrace();
-                    callback.error("解析配置失败");
-                }
-            }
+        OkGo.<String>get(configUrl).headers("User-Agent", userAgent).headers("Accept", requestAccept).cacheKey(MD5.encode(apiUrl)).cacheMode(CacheMode.IF_NONE_CACHE_REQUEST).cacheTime(60 * 60 * 24)  // 24个小时有效期
+                .execute(new AbsCallback<>() {
 
-            @Override
-            public void onError(Response<String> response) {
-                super.onError(response);
-                if (cache.exists()) {
-                    try {
-                        parseJson(apiUrl, cache);
-                        callback.success();
-                        return;
-                    } catch (Throwable th) {
-                        th.printStackTrace();
+                    @Override
+                    public void onCacheSuccess(Response<String> response) {
+                        onSuccess(response);
                     }
-                }
-                callback.error("拉取配置失败\n" + (response.getException() != null ? response.getException().getMessage() : ""));
-            }
 
-            public String convertResponse(okhttp3.Response response) throws Throwable {
-                String result = "";
-                if (response.body() == null) {
-                    result = "";
-                } else {
-                    result = FindResult(response.body().string(), configKey);
-                }
-                if (apiUrl.startsWith("clan")) {
-                    result = clanContentFix(clanToAddress(apiUrl), result);
-                }
-                result = fixContentPath(apiUrl, result);
-                return result;
-            }
-        });
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        try {
+                            parseJson(apiUrl, response.body());
+                            callback.success();
+                        } catch (Throwable th) {
+                            th.printStackTrace();
+                            callback.error("解析配置失败");
+                        }
+                    }
+
+                    @Override
+                    public void onError(Response<String> response) {
+                        super.onError(response);
+                        callback.error("拉取配置失败\n" + (response.getException() != null ? response.getException().getMessage() : ""));
+                    }
+
+                    public String convertResponse(okhttp3.Response response) throws Throwable {
+                        String result = "";
+                        if (response.body() == null) {
+                            result = "";
+                        } else {
+                            result = FindResult(response.body().string(), configKey);
+                        }
+                        if (apiUrl.startsWith("clan")) {
+                            result = clanContentFix(clanToAddress(apiUrl), result);
+                        }
+                        result = fixContentPath(apiUrl, result);
+                        return result;
+                    }
+                });
     }
 
-    public void loadJar(boolean useCache, String spider, LoadConfigCallback callback) {
+    /**
+     * 加载Jar包，如果本地有Jar包缓存，并且本地缓存文件的Md5和服务端一致，则直接使用本地缓存，无需再从网络加载。
+     */
+    public void loadJar(String spider, LoadConfigCallback callback) {
         String[] urls = spider.split(";md5;");
         String jarUrl = urls[0];
         String md5 = urls.length > 1 ? urls[1].trim() : "";
         File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/csp.jar");
 
-        if (!md5.isEmpty() || useCache) {
-            if (cache.exists() && (useCache || MD5.getFileMd5(cache).equalsIgnoreCase(md5))) {
-                if (jarLoader.load(cache.getAbsolutePath())) {
-                    callback.success();
-                } else {
-                    callback.error("从缓存加载jar失败");
-                }
+
+        if (!md5.isEmpty() && cache.exists() && MD5.getFileMd5(cache).equalsIgnoreCase(md5)) {
+
+            // 缓冲中加载Jar成功直接返回，如果没有成功，继续从网络加载
+            if (jarLoader.load(cache.getAbsolutePath())) {
+                callback.success();
                 return;
             }
         }
@@ -257,15 +238,18 @@ public class ApiConfig {
             @Override
             public File convertResponse(okhttp3.Response response) throws Throwable {
                 File cacheDir = cache.getParentFile();
-                if (!cacheDir.exists()) cacheDir.mkdirs();
+                if (cacheDir != null && !cacheDir.exists()) cacheDir.mkdirs();
                 if (cache.exists()) cache.delete();
                 FileOutputStream fos = new FileOutputStream(cache);
-                if (isJarInImg) {
-                    String respData = response.body().string();
-                    byte[] imgJar = getImgJar(respData);
-                    fos.write(imgJar);
-                } else {
-                    fos.write(response.body().bytes());
+                ResponseBody body = response.body();
+                if (body != null) {
+                    if (isJarInImg) {
+                        String respData = body.string();
+                        byte[] imgJar = getImgJar(respData);
+                        fos.write(imgJar);
+                    } else {
+                        fos.write(body.bytes());
+                    }
                 }
                 fos.flush();
                 fos.close();

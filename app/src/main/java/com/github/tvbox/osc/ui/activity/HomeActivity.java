@@ -131,8 +131,6 @@ public class HomeActivity extends BaseActivity {
         return R.layout.activity_home;
     }
 
-    boolean useCacheConfig = false;
-
     @Override
     protected void init() {
         // takagen99: Added to allow read string
@@ -143,14 +141,6 @@ public class HomeActivity extends BaseActivity {
         App.startWebserver();
         initView();
         initViewModel();
-//        useCacheConfig = false;
-        Intent intent = getIntent();
-        if (intent != null && intent.getExtras() != null) {
-            Bundle bundle = intent.getExtras();
-            useCacheConfig = bundle.getBoolean("useCache", false);
-        }
-
-
         initData();
     }
 
@@ -255,7 +245,7 @@ public class HomeActivity extends BaseActivity {
         tvName.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                reloadHome(true);
+                reloadHome();
                 return true;
             }
         });
@@ -399,16 +389,13 @@ public class HomeActivity extends BaseActivity {
         showLoading();
         if (dataInitOk && !jarInitOk) {
             if (!ApiConfig.get().getSpider().isEmpty()) {
-                ApiConfig.get().loadJar(useCacheConfig, ApiConfig.get().getSpider(), new ApiConfig.LoadConfigCallback() {
+                ApiConfig.get().loadJar(ApiConfig.get().getSpider(), new ApiConfig.LoadConfigCallback() {
                     @Override
                     public void success() {
                         jarInitOk = true;
                         mHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                if (!useCacheConfig) {
-                                    Toast.makeText(HomeActivity.this, getString(R.string.hm_ok), Toast.LENGTH_SHORT).show();
-                                }
                                 initData();
                             }
                         }, 50);
@@ -437,7 +424,7 @@ public class HomeActivity extends BaseActivity {
             }
             return;
         }
-        ApiConfig.get().loadConfig(useCacheConfig, new ApiConfig.LoadConfigCallback() {
+        ApiConfig.get().loadConfig(new ApiConfig.LoadConfigCallback() {
             TipDialog dialog = null;
 
             @Override
@@ -484,31 +471,31 @@ public class HomeActivity extends BaseActivity {
                             dialog = new TipDialog(HomeActivity.this, msg, getString(R.string.hm_retry), getString(R.string.hm_cancel), new TipDialog.OnListener() {
                                 @Override
                                 public void left() {
-                                    initData();
                                     dialog.hide();
+                                    initData();
                                 }
 
                                 @Override
                                 public void right() {
+                                    dialog.hide();
                                     dataInitOk = true;
                                     jarInitOk = true;
                                     initData();
-                                    dialog.hide();
                                 }
 
                                 @Override
                                 public void cancel() {
+                                    dialog.hide();
                                     dataInitOk = true;
                                     jarInitOk = true;
                                     initData();
-                                    dialog.hide();
                                 }
                             });
                         if (!dialog.isShowing()) dialog.show();
                     }
                 });
             }
-        }, this);
+        });
     }
 
     private void initViewPager(AbsSortXml absXml) {
@@ -771,14 +758,14 @@ public class HomeActivity extends BaseActivity {
                 @Override
                 public void click(SourceBean value, int pos) {
                     ApiConfig.get().setSourceBean(value);
-                    reloadHome(true);
+                    reloadHome();
                 }
 
                 @Override
                 public String getDisplay(SourceBean val) {
                     return val.getName();
                 }
-            }, new DiffUtil.ItemCallback<SourceBean>() {
+            }, new DiffUtil.ItemCallback<>() {
                 @Override
                 public boolean areItemsTheSame(@NonNull @NotNull SourceBean oldItem, @NonNull @NotNull SourceBean newItem) {
                     return oldItem == newItem;
@@ -789,45 +776,22 @@ public class HomeActivity extends BaseActivity {
                     return oldItem.getKey().equals(newItem.getKey());
                 }
             }, sites, sites.indexOf(ApiConfig.get().getHomeSourceBean()));
-            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-//                    if (homeSourceKey != null && !homeSourceKey.equals(Hawk.get(HawkConfig.HOME_API, ""))) {
-//                        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-//                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                        Bundle bundle = new Bundle();
-//                        bundle.putBoolean("useCache", true);
-//                        intent.putExtras(bundle);
-//                        HomeActivity.this.startActivity(intent);
-//                    }
-                }
+            dialog.setOnDismissListener(dialog1 -> {
+
             });
             dialog.show();
         }
     }
 
 
-    void reloadHome(boolean useCache) {
+    void reloadHome() {
         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("useCache", useCache);
-        intent.putExtras(bundle);
         HomeActivity.this.startActivity(intent);
     }
 
 
-//    public void onClick(View v) {
-//        FastClickCheckUtil.check(v);
-//        if (v.getId() == R.id.tvFind) {
-//            jumpActivity(SearchActivity.class);
-//        } else if (v.getId() == R.id.tvMenu) {
-//            jumpActivity(SettingActivity.class);
-//        }
-//    }
-
-
-    // 点播线路选择
+    // 影视资源选择
     private void showUrlSelectDialog() {
         List<UrlBean> urlBeans = ApiConfig.get().getUrlBeans();
 
@@ -851,7 +815,7 @@ public class HomeActivity extends BaseActivity {
                 public void click(UrlBean value, int pos) {
                     Hawk.put(HawkConfig.API_URL, value.getUrl());
                     ApiConfig.get().clear();
-                    reloadHome(false);
+                    reloadHome();
                 }
 
                 @Override
@@ -882,11 +846,9 @@ public class HomeActivity extends BaseActivity {
     private void checkUpdate() {
 
         if (XXPermissions.isGranted(this, DefaultConfig.StoragePermissionGroup())) {
-            LOG.e("有文件写入权限");
             final UpdateChecker checker = new UpdateChecker(DefaultConfig.getAppVersionName(this));
             checker.checkThenUpgrade(this);
         } else {
-            LOG.e("没有文件写入权限，去申请");
             XXPermissions.with(this)
                     .permission(DefaultConfig.StoragePermissionGroup())
                     .request(new OnPermissionCallback() {

@@ -123,7 +123,6 @@ public class SourceViewModel extends ViewModel {
                         public String call() throws Exception {
                             Spider sp = ApiConfig.get().getCSP(sourceBean);
                             String content = sp.homeContent(true);
-                            LOG.i("完成Tab数据解析：" + content);
                             return content;
                         }
                     });
