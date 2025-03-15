@@ -82,13 +82,7 @@ public class UpdateChecker {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         builder.setTitle("新版本提示");
-        String msg;
-        if (assets.label != null && !assets.label.isEmpty()) {
-            msg = "更新内容：\n" + assets.label;
-        } else {
-            msg = "更新内容：" + assets.name;
-        }
-        builder.setMessage(msg);
+        builder.setMessage("更新内容：" + assets.name);
 
         builder.setNegativeButton("取消", (dialog, which) -> dialog.dismiss());
         builder.setPositiveButton("确认", (dialog, which) -> {
@@ -101,7 +95,7 @@ public class UpdateChecker {
 
     private void downloadApk(Context context, String url, String apkPath) {
 
-        Downloader.INSTANCE.downloadApk(url, apkPath, new Downloader.Callback() {
+        Downloader.INSTANCE.downloadApk(Config.GH_PROXY + url, apkPath, new Downloader.Callback() {
             @Override
             public void onStart() {
                 Toast.makeText(context, "后台下载中...，下载完自动安装", Toast.LENGTH_SHORT).show();

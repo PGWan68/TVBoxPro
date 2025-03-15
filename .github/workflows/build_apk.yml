@@ -4,8 +4,8 @@ name: Release Build
 on:
   push:
     # 根据branch或者tags来触发
-#    branches:
-#      - main
+    #    branches:
+    #      - main
 
     tags:
       - "v*"
@@ -86,7 +86,7 @@ jobs:
           # 会使用一个临时的token来创建Release
           token: ${{ github.token }}
           # 自动生成一些变化列表之类的内容。
-#          generateReleaseNotes: true
+          generateReleaseNotes: true
 #          commit: asdfadfadsfa
-          body: 1、新增推荐TAB \n2、优化首页UI
+#          body: 1、新增推荐TAB \n2、优化首页UI
 
