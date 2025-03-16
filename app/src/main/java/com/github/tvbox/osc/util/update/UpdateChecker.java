@@ -12,18 +12,13 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.*;
 
-import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.base.App;
-import com.github.tvbox.osc.ui.activity.HomeActivity;
-import com.github.tvbox.osc.util.Config;
-import com.github.tvbox.osc.util.DefaultConfig;
+import com.github.tvbox.osc.util.Constant;
 import com.github.tvbox.osc.util.FileUtils;
 import com.github.tvbox.osc.util.LOG;
-import com.github.tvbox.osc.util.ToastHelper;
 import com.google.gson.Gson;
 
 
@@ -64,7 +59,7 @@ public class UpdateChecker {
 
 
     private void checkUpdate(Consumer<LatestReleases> callback) {
-        this.WebClient.DownloadHtml(Config.GITHUB_URL, (html) -> {
+        this.WebClient.DownloadHtml(Constant.GITHUB_URL, (html) -> {
             LatestReleases latest = GetLatestReleases(html);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 callback.accept(latest);
@@ -95,7 +90,7 @@ public class UpdateChecker {
 
     private void downloadApk(Context context, String url, String apkPath) {
 
-        Downloader.INSTANCE.downloadApk(Config.GH_PROXY + url, apkPath, new Downloader.Callback() {
+        Downloader.INSTANCE.downloadApk(Constant.GH_PROXY + url, apkPath, new Downloader.Callback() {
             @Override
             public void onStart() {
                 Toast.makeText(context, "后台下载中...，下载完自动安装", Toast.LENGTH_SHORT).show();

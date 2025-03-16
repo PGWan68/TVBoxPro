@@ -1,6 +1,5 @@
 package com.github.tvbox.osc.api;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -20,7 +19,7 @@ import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.activity.HomeActivity;
 import com.github.tvbox.osc.util.AES;
 import com.github.tvbox.osc.util.AdBlocker;
-import com.github.tvbox.osc.util.Config;
+import com.github.tvbox.osc.util.Constant;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
@@ -33,7 +32,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.cache.CacheMode;
-import com.lzy.okgo.cache.policy.CachePolicy;
 import com.lzy.okgo.callback.AbsCallback;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
@@ -91,7 +89,7 @@ public class ApiConfig {
         liveChannelGroupList = new ArrayList<>();
         parseBeanList = new ArrayList<>();
         urlBeans = new ArrayList<>();
-        urlBeans.add(new UrlBean("饭太硬加强版", Config.GH_PROXY + "https://raw.githubusercontent.com/qist/tvbox/master/0821.json"));
+        urlBeans.add(new UrlBean("饭太硬加强版", Constant.REMOTE_URL));
 //        urlBeans.add(new UrlBean("OK影视", proxy + "https://raw.githubusercontent.com/qist/tvbox/master/0825.json"));
     }
 
@@ -169,7 +167,7 @@ public class ApiConfig {
         } else {
             configUrl = apiUrl;
         }
-        System.out.println("API URL :" + configUrl);
+        LOG.i("API URL :" + configUrl);
         String configKey = TempKey;
         OkGo.<String>get(configUrl).headers("User-Agent", userAgent).headers("Accept", requestAccept).cacheKey(MD5.encode(apiUrl)).cacheMode(CacheMode.IF_NONE_CACHE_REQUEST).cacheTime(60 * 60 * 24)  // 24个小时有效期
                 .execute(new AbsCallback<>() {
@@ -220,7 +218,6 @@ public class ApiConfig {
         String jarUrl = urls[0];
         String md5 = urls.length > 1 ? urls[1].trim() : "";
         File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/csp.jar");
-
 
         if (!md5.isEmpty() && cache.exists() && MD5.getFileMd5(cache).equalsIgnoreCase(md5)) {
 
@@ -361,13 +358,14 @@ public class ApiConfig {
         }
 
         // takagen99: Check if Live URL is setup in Settings, if no, get from File Config
-        liveChannelGroupList.clear();           //修复从后台切换重复加载频道列表
+        liveChannelGroupList.clear();           // 修复从后台切换重复加载频道列表
         String liveURL = Hawk.get(HawkConfig.LIVE_URL, "");
         String epgURL = Hawk.get(HawkConfig.EPG_URL, "");
 
         String liveURL_final = null;
         try {
             if (infoJson.has("lives") && infoJson.get("lives").getAsJsonArray() != null) {
+                // 这里只取了第一个用，需要改善
                 JsonObject livesOBJ = infoJson.get("lives").getAsJsonArray().get(0).getAsJsonObject();
                 String lives = livesOBJ.toString();
                 int index = lives.indexOf("proxy://");
@@ -390,7 +388,7 @@ public class ApiConfig {
                         }
 
                         // takagen99: Capture Live URL into Config
-                        System.out.println("Live URL :" + extUrlFix);
+                        LOG.i("Live URL :" + extUrlFix);
                         putLiveHistory(extUrlFix);
                         // Overwrite with Live URL from Settings
                         if (StringUtils.isBlank(liveURL)) {
@@ -410,7 +408,7 @@ public class ApiConfig {
                     // takagen99 : Getting EPG URL from File Config & put into Settings
                     if (livesOBJ.has("epg")) {
                         String epg = livesOBJ.get("epg").getAsString();
-                        System.out.println("EPG URL :" + epg);
+                        LOG.i("EPG URL :" + epg);
                         putEPGHistory(epg);
                         // Overwrite with EPG URL from Settings
                         if (StringUtils.isBlank(epgURL)) {
@@ -440,7 +438,7 @@ public class ApiConfig {
                             // takagen99 : Getting EPG URL from File Config & put into Settings
                             if (fengMiLives.has("epg")) {
                                 String epg = fengMiLives.get("epg").getAsString();
-                                System.out.println("EPG URL :" + epg);
+                                LOG.i("EPG URL :" + epg);
                                 putEPGHistory(epg);
                                 // Overwrite with EPG URL from Settings
                                 if (StringUtils.isBlank(epgURL)) {
@@ -452,7 +450,7 @@ public class ApiConfig {
 
                             if (url.startsWith("http")) {
                                 // takagen99: Capture Live URL into Settings
-                                System.out.println("Live URL :" + url);
+                                LOG.i("Live URL :" + url);
                                 putLiveHistory(url);
                                 // Overwrite with Live URL from Settings
                                 if (StringUtils.isBlank(liveURL)) {
@@ -807,7 +805,7 @@ public class ApiConfig {
      * 拉取远程配置
      */
     public void fetchRemoteSources() {
-        String remoteUrl = Config.REMOTE_URL;
+        String remoteUrl = Constant.REMOTE_URL;
 
         OkGo.<String>get(remoteUrl).cacheKey(remoteUrl).cacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST).execute(new StringCallback() {
 

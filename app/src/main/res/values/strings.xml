@@ -194,6 +194,10 @@
     <string name="sub_style">Style</string>
     <string name="sub_style_text">ABC.</string>
 
+    // Live Play
+    <string name="no_information">No Information</string>
+
+
     <string-array name="doh_name">
         <item>System</item>
         <item>Tencent</item>

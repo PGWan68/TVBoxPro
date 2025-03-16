@@ -194,6 +194,10 @@
     <string name="sub_style">样式</string>
     <string name="sub_style_text">字幕</string>
 
+    // 直播
+    <string name="no_information">暂无节目信息</string>
+
+
     <string-array name="media_title">
         <item>通用</item>
         <item>EXO</item>

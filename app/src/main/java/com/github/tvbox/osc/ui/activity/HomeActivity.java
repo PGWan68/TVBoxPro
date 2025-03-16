@@ -307,7 +307,18 @@ public class HomeActivity extends BaseActivity {
 //            }
 //        });
         setLoadSir(this.contentLayout);
-        //mHandler.postDelayed(mFindFocus, 250);
+
+        // takagen99: If network available, check connected Wifi or Lan
+        if (isNetworkAvailable()) {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+            if (cm.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI) {
+                tvWifi.setImageDrawable(res.getDrawable(R.drawable.hm_wifi));
+            } else if (cm.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_MOBILE) {
+                tvWifi.setImageDrawable(res.getDrawable(R.drawable.hm_mobile));
+            } else if (cm.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_ETHERNET) {
+                tvWifi.setImageDrawable(res.getDrawable(R.drawable.hm_lan));
+            }
+        }
     }
 
     public static boolean reHome(Context appContext) {
@@ -362,18 +373,6 @@ public class HomeActivity extends BaseActivity {
         if (HomeShow) {
             if (home != null && home.getName() != null && !home.getName().isEmpty())
                 tvName.setText(home.getName());
-        }
-
-        // takagen99: If network available, check connected Wifi or Lan
-        if (isNetworkAvailable()) {
-            ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-            if (cm.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI) {
-                tvWifi.setImageDrawable(res.getDrawable(R.drawable.hm_wifi));
-            } else if (cm.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_MOBILE) {
-                tvWifi.setImageDrawable(res.getDrawable(R.drawable.hm_mobile));
-            } else if (cm.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_ETHERNET) {
-                tvWifi.setImageDrawable(res.getDrawable(R.drawable.hm_lan));
-            }
         }
 
         mGridView.requestFocus();

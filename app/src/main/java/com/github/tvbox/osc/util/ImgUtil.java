@@ -88,6 +88,24 @@ public class ImgUtil {
         }
     }
 
+
+    public static void loadEpgLogo(String url, ImageView view) {
+        if (TextUtils.isEmpty(url)) {
+            view.setImageResource(R.drawable.img_logo_placeholder);
+        } else {
+            RequestOptions requestOptions = new RequestOptions()
+                    .diskCacheStrategy(getDiskCacheStrategy(4));
+
+            Glide.with(App.getInstance())
+                    .asBitmap()
+                    .load(getUrl(url))
+                    .error(R.drawable.img_logo_placeholder)
+                    .placeholder(R.drawable.img_logo_placeholder)
+                    .apply(requestOptions)
+                    .into(view);
+        }
+    }
+
     /*
      * 使用Glide方式获取视频某一帧
      * @param uri 视频地址

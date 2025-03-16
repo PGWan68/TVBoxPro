@@ -53,7 +53,7 @@ public class JsLoader {
                 try {
                     classInit = classLoader.loadClass("com.github.catvod.js.Method");
                     if (classInit != null) {
-                        System.out.println("自定义jsapi加载成功!");
+                        LOG.i("自定义jsapi加载成功!");
                         success = true;
                         break;
                     }

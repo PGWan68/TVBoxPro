@@ -39,40 +39,12 @@ public class HistoryAdapter extends BaseQuickAdapter<VodInfo, BaseViewHolder> {
 
         TextView tvYear = helper.getView(R.id.tvYear);
         tvYear.setText(ApiConfig.get().getSource(item.sourceKey).getName());
-        /*if (item.year <= 0) {
-            tvYear.setVisibility(View.GONE);
-        } else {
-            tvYear.setText(String.valueOf(item.year));
-            tvYear.setVisibility(View.VISIBLE);
-        }*/
-        /*TextView tvLang = helper.getView(R.id.tvLang);
-        if (TextUtils.isEmpty(item.lang)) {
-            tvLang.setVisibility(View.GONE);
-        } else {
-            tvLang.setText(item.lang);
-            tvLang.setVisibility(View.VISIBLE);
-        }
-        TextView tvArea = helper.getView(R.id.tvArea);
-        if (TextUtils.isEmpty(item.area)) {
-            tvArea.setVisibility(View.GONE);
-        } else {
-            tvArea.setText(item.area);
-            tvArea.setVisibility(View.VISIBLE);
-        }
-        TextView tvNote = helper.getView(R.id.tvNote);
-        if (TextUtils.isEmpty(item.note)) {
-            tvNote.setVisibility(View.GONE);
-        } else {
-            tvNote.setText(item.note);
-            tvNote.setVisibility(View.VISIBLE);
-        }*/
 
-        helper.setVisible(R.id.tvLang, false);
-        helper.setVisible(R.id.tvArea, false);
         if (item.note == null || item.note.isEmpty()) {
             helper.setVisible(R.id.tvNote, false);
         } else {
             helper.setText(R.id.tvNote, item.note);
+            helper.setVisible(R.id.tvNote, true);
         }
         helper.setText(R.id.tvName, item.name);
         // helper.setText(R.id.tvActor, item.actor);
@@ -80,7 +52,7 @@ public class HistoryAdapter extends BaseQuickAdapter<VodInfo, BaseViewHolder> {
         //由于部分电视机使用glide报错
         if (!TextUtils.isEmpty(item.pic)) {
             // takagen99 : Use Glide instead
-            ImgUtil.load(item.pic, ivThumb,  (int) App.getInstance().getResources().getDimension(R.dimen.vs_5));
+            ImgUtil.load(item.pic, ivThumb, (int) App.getInstance().getResources().getDimension(R.dimen.vs_5));
         } else {
             ivThumb.setImageResource(R.drawable.img_loading_placeholder);
         }
