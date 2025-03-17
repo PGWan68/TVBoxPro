@@ -4,6 +4,7 @@ import static xyz.doikki.videoplayer.util.PlayerUtils.stringForTimeVod;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,9 +25,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
@@ -41,8 +39,6 @@ import com.github.tvbox.osc.bean.LiveSettingGroup;
 import com.github.tvbox.osc.bean.LiveSettingItem;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.player.controller.LiveController;
-import com.github.tvbox.osc.subtitle.runtime.AppTaskExecutor;
-import com.github.tvbox.osc.subtitle.runtime.TaskExecutor;
 import com.github.tvbox.osc.ui.adapter.ApiHistoryDialogAdapter;
 import com.github.tvbox.osc.ui.adapter.LiveChannelGroupAdapter;
 import com.github.tvbox.osc.ui.adapter.LiveChannelItemAdapter;
@@ -65,7 +61,6 @@ import com.github.tvbox.osc.util.MD5;
 import com.github.tvbox.osc.util.live.TxtSubscribe;
 import com.google.gson.JsonArray;
 import com.lzy.okgo.OkGo;
-import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.callback.AbsCallback;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
@@ -73,26 +68,22 @@ import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
 
-import org.apache.commons.lang3.StringUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -189,6 +180,7 @@ public class LivePlayActivity extends BaseActivity {
     private static String shiyi_time;//时移时间
 
     private Map<String, List<Epginfo>> epgMaps;
+    private XmlPullParser xmlParser;
 
     private HashMap<String, String> setPlayHeaders(String url) {
         HashMap<String, String> header = new HashMap();
@@ -308,7 +300,7 @@ public class LivePlayActivity extends BaseActivity {
         initSettingItemView();
         initLiveChannelList();
         initLiveSettingGroupList();
-        // initEpgData();
+
 
         // takagen99 : Add SeekBar for VOD
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -364,35 +356,6 @@ public class LivePlayActivity extends BaseActivity {
         });
     }
 
-    private void initEpgData() {
-
-        // 如果有数据就不去解析了
-        if (!epgMaps.isEmpty()) {
-            return;
-        }
-
-        String cacheKey = MD5.encode(epgStringAddress);
-        String result = FileUtils.getCache(cacheKey);
-        if (result != null && !result.isEmpty()) {
-            parseEpgData(result);
-        } else {
-            OkGo.<String>get(epgStringAddress).execute(new StringCallback() {
-
-                public void onSuccess(Response<String> response) {
-                    String result = response.body();
-                    parseEpgData(result);
-                    FileUtils.setCache((int) getExpireTime(), cacheKey, result);
-                }
-
-                @Override
-                public void onError(Response<String> response) {
-                    LOG.e(response.getException());
-                }
-
-            });
-        }
-
-    }
 
     boolean PiPON = Hawk.get(HawkConfig.BACKGROUND_PLAY_TYPE, 0) == 2;
 
@@ -733,47 +696,36 @@ public class LivePlayActivity extends BaseActivity {
         }
     }
 
-    //显示侧边EPG
-    private void showEpg(Date date, List<Epginfo> arrayList) {
-        if (arrayList != null && !arrayList.isEmpty()) {
-            epgdata = arrayList;
-            epgListAdapter.CanBack(currentLiveChannelItem.getinclude_back());
-            epgListAdapter.setNewData(epgdata);
-
-            int i = -1;
-            int size = epgdata.size() - 1;
+    // 显示侧边EPG
+    private void showEpg(Date date) {
+        List<Epginfo> epginfos = epgMaps.get(channel_Name.getChannelName());
+        if (epginfos != null && !epginfos.isEmpty()) {
+            int i;
+            int size = epginfos.size() - 1;
             while (size >= 0) {
-                if (new Date().compareTo(epgdata.get(size).startdateTime) >= 0) {
+                if (date.compareTo(epginfos.get(size).startdateTime) >= 0) {
                     break;
                 }
                 size--;
             }
             i = size;
-            if (i >= 0 && new Date().compareTo(epgdata.get(i).enddateTime) <= 0) {
+            if (i >= 0 && date.compareTo(epginfos.get(i).enddateTime) <= 0) {
+                epgListAdapter.CanBack(currentLiveChannelItem.getinclude_back());
+                epgListAdapter.setNewData(epginfos);
+
                 mEpgInfoGridView.setSelectedPosition(i);
                 mEpgInfoGridView.setSelection(i);
                 epgListAdapter.setSelectedEpgIndex(i);
-                int finalI = i;
-                mEpgInfoGridView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mEpgInfoGridView.smoothScrollToPosition(finalI);
-                    }
-                });
+                int lastI = i;
+                mEpgInfoGridView.post(() -> mEpgInfoGridView.smoothScrollToPosition(lastI));
+                return;
             }
-        } else {
-
-            Epginfo epgbcinfo = new Epginfo(date, "暂无节目信息", date, "00:00", "23:59", 0);
-            if (arrayList == null) {
-                arrayList = new ArrayList<>();
-            }
-            arrayList.add(epgbcinfo);
-            epgdata = arrayList;
-
-            epgListAdapter.setNewData(epgdata);
-
-            //  mEpgInfoGridView.setAdapter(epgListAdapter);
         }
+        Epginfo epginfo = new Epginfo(date, "暂无节目信息", date, "00:00", "23:59", 0);
+        epginfos = new ArrayList<>();
+        epginfos.add(epginfo);
+        epgListAdapter.CanBack(false);
+        epgListAdapter.setNewData(epginfos);
     }
 
     private final Runnable tv_sys_timeRunnable = new Runnable() {
@@ -793,28 +745,29 @@ public class LivePlayActivity extends BaseActivity {
         }
     };
 
+
     //显示底部EPG
+    @SuppressLint("SetTextI18n")
     private void showBottomEpg() {
         if (isSHIYI) return;
-        if (channel_Name.getChannelName() != null) {
+        String channelName = channel_Name.getChannelName();
+        if (channelName != null) {
             showChannelInfo();
-//            String savedEpgKey = channel_Name.getChannelName() + "_" + epgDateAdapter.getItem(epgDateAdapter.getSelectedIndex()).getDatePresented();
-            if (epgMaps.containsKey(channel_Name)) {
-                String[] epgInfo = EpgUtil.getEpgInfo(channel_Name.getChannelName());
+            if (epgMaps.containsKey(channelName)) {
+                String[] epgInfo = EpgUtil.getEpgInfo(channelName);
                 ImgUtil.loadEpgLogo(epgInfo == null ? null : epgInfo[0], tv_logo);
 
-                ArrayList arrayList = (ArrayList) epgMaps.get(channel_Name);
-                if (arrayList != null && arrayList.size() > 0) {
+                List<Epginfo> epginfos = epgMaps.get(channelName);
+                if (epginfos != null && !epginfos.isEmpty()) {
                     Date date = new Date();
-                    int size = arrayList.size() - 1;
+                    int size = epginfos.size() - 1;
                     while (size >= 0) {
-                        if (date.after(((Epginfo) arrayList.get(size)).startdateTime) & date.before(((Epginfo) arrayList.get(size)).enddateTime)) {
-//                            if (new Date().compareTo(((Epginfo) arrayList.get(size)).startdateTime) >= 0) {
-                            tv_curr_time.setText(((Epginfo) arrayList.get(size)).start + " - " + ((Epginfo) arrayList.get(size)).end);
-                            tv_curr_name.setText(((Epginfo) arrayList.get(size)).title);
-                            if (size != arrayList.size() - 1) {
-                                tv_next_time.setText(((Epginfo) arrayList.get(size + 1)).start + " - " + ((Epginfo) arrayList.get(size + 1)).end);
-                                tv_next_name.setText(((Epginfo) arrayList.get(size + 1)).title);
+                        if (date.after((epginfos.get(size)).startdateTime) & date.before((epginfos.get(size)).enddateTime)) {
+                            tv_curr_time.setText((epginfos.get(size)).start + " - " + (epginfos.get(size)).end);
+                            tv_curr_name.setText((epginfos.get(size)).title);
+                            if (size != epginfos.size() - 1) {
+                                tv_next_time.setText((epginfos.get(size + 1)).start + " - " + (epginfos.get(size + 1)).end);
+                                tv_next_name.setText((epginfos.get(size + 1)).title);
                             } else {
                                 tv_next_time.setText("00:00 - 23:59");
                                 tv_next_name.setText(getResources().getString(R.string.no_information));
@@ -826,104 +779,103 @@ public class LivePlayActivity extends BaseActivity {
                     }
                 }
                 epgListAdapter.CanBack(currentLiveChannelItem.getinclude_back());
-                epgListAdapter.setNewData(arrayList);
+                epgListAdapter.setNewData(epginfos);
             } else {
-//                int selectedIndex = epgDateAdapter.getSelectedIndex();
-//                if (selectedIndex < 0) getEpg(new Date());
-//                else getEpg(epgDateAdapter.getData().get(selectedIndex).getDateParamVal());
-
-
+                tv_curr_time.setText("00:00 - 23:59");
+                tv_curr_name.setText(getResources().getString(R.string.no_information));
+                tv_next_time.setText("00:00 - 23:59");
+                tv_next_name.setText(getResources().getString(R.string.no_information));
             }
         }
     }
 
-    // 获取EPG并存储 // 百川epg
-    private List<Epginfo> epgdata = new ArrayList<>();
 
-    public void getEpg(Date date) {
+    private String epgXmlData;
 
+    public void getEpg(Date date, boolean isShowBottomEpg) {
         String channelName = channel_Name.getChannelName();
-        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd");
-        timeFormat.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
         String[] epgInfo = EpgUtil.getEpgInfo(channelName);
-//        String epgTagName = channelName;
-//
-//        if (epgInfo != null && !epgInfo[1].isEmpty()) {
-//            epgTagName = epgInfo[1];
-//        }
-
-//        if (epgStringAddress.contains("{name}") && epgStringAddress.contains("{date}")) {
-//            epgUrl = epgStringAddress.replace("{name}", URLEncoder.encode(epgTagName)).replace("{date}", timeFormat.format(date));
-//        } else {
-//            epgUrl = epgStringAddress + "?ch=" + URLEncoder.encode(epgTagName) + "&date=" + timeFormat.format(date);
-//        }
-
 
         epgListAdapter.CanBack(currentLiveChannelItem.getinclude_back());
         ImgUtil.loadEpgLogo(epgInfo == null ? null : epgInfo[0], tv_logo);
-        showEpg(date, epgMaps.get(channelName));
-        showBottomEpg();
-    }
 
-    private void parseEpgData(String result) {
-        AppTaskExecutor.getInstance().executeOnDeskIO(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    XmlPullParser xmlParser = Xml.newPullParser();
-                    xmlParser.setInput(new ByteArrayInputStream(result.getBytes()), "utf-8");
-                    int eventType = xmlParser.getEventType();
+        ///  解析数据
+        ///  已经有数据不去解析
+        if (epgMaps.containsKey(channelName)) {
+            showEpg(date);
+            if (isShowBottomEpg) showBottomEpg();
+            return;
+        }
 
-                    Date date = new Date();
+        ///  xml数据内存缓存
+        if (epgXmlData != null) {
+            parserEpgData(isShowBottomEpg, date, epgXmlData);
+            return;
+        }
+        String cacheKey = MD5.encode(epgStringAddress);
+        String result = FileUtils.getCache(cacheKey);
+        if (result != null && !result.isEmpty()) {
+            parserEpgData(isShowBottomEpg, date, result);
+        } else {
+            OkGo.<String>get(epgStringAddress).execute(new StringCallback() {
 
-                    while (eventType != XmlPullParser.END_DOCUMENT) {
-                        if (eventType == XmlPullParser.START_TAG) {
-
-                            if (xmlParser.getName().equals("channel")) {
-                                String id = xmlParser.getAttributeValue(null, "id");
-                                xmlParser.nextTag();
-                                epgMaps.put(id, new ArrayList<>());
-
-                            } else if (xmlParser.getName().equals("programme")) {
-                                String channelId = xmlParser.getAttributeValue(null, "channel");
-                                String startTime = xmlParser.getAttributeValue(null, "start");
-                                String stopTime = xmlParser.getAttributeValue(null, "stop");
-                                xmlParser.nextTag();
-                                String title = xmlParser.nextText();
-
-                                if (epgMaps.containsKey(channelId)) {
-                                    List<Epginfo> epgInfo = epgMaps.get(channelId);
-                                    epgInfo.add(new Epginfo(date, title, date, parseTime(startTime), parseTime(stopTime), epgInfo.size() + 1));
-
-//                            epgMaps.put();
-                                }
-                            }
-                        }
-                        eventType = xmlParser.next();
-                    }
-                } catch (XmlPullParserException | IOException e) {
-                    LOG.e(e);
+                public void onSuccess(Response<String> response) {
+                    String result = response.body();
+                    parserEpgData(isShowBottomEpg, date, result);
+                    FileUtils.setCache((int) getExpireTime(), cacheKey, result);
                 }
 
+                @Override
+                public void onError(Response<String> response) {
+                    LOG.e(response.getException());
+                }
+            });
+        }
+    }
+
+    ///  这里只初始化解析器
+    private void parserEpgData(boolean isShowBottomEpg, Date date, String result) {
+        if (epgXmlData == null) epgXmlData = result;
+        try {
+            if (xmlParser == null) {
+                xmlParser = Xml.newPullParser();
             }
-        });
+            xmlParser.setInput(new ByteArrayInputStream(result.getBytes()), "utf-8");
 
+            int eventType = xmlParser.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                if (eventType == XmlPullParser.START_TAG) {
 
-//        try {
-//            if (paramString.contains("epg_data")) {
-//                final JSONArray jSONArray = new JSONObject(paramString).optJSONArray("epg_data");
-//                if (jSONArray != null) for (int b = 0; b < jSONArray.length(); b++) {
-//                    JSONObject jSONObject = jSONArray.getJSONObject(b);
-//                    Epginfo epgbcinfo = new Epginfo(date, jSONObject.optString("title"), date, jSONObject.optString("start"), jSONObject.optString("end"), b);
-//                    arrayList.add(epgbcinfo);
-//                }
-//            }
-//
-//        } catch (JSONException jSONException) {
-//            jSONException.printStackTrace();
-//        }
+                    if (xmlParser.getName().equals("channel")) {
+                        String id = xmlParser.getAttributeValue(null, "id");
+                        xmlParser.nextTag();
+                        if (channel_Name.getChannelName().equals(id)) {
+                            epgMaps.put(id, new ArrayList<>());
+                        }
 
+                    } else if (xmlParser.getName().equals("programme")) {
+                        String channelId = xmlParser.getAttributeValue(null, "channel");
+                        String startTime = xmlParser.getAttributeValue(null, "start");
+                        String stopTime = xmlParser.getAttributeValue(null, "stop");
+                        xmlParser.nextTag();
+                        String title = xmlParser.nextText();
 
+                        if (epgMaps.containsKey(channelId)) {
+                            List<Epginfo> epgList = epgMaps.get(channelId);
+                            if (epgList != null) {
+                                epgList.add(new Epginfo(date, title, date, parseTime(startTime), parseTime(stopTime), epgList.size()));
+                            }
+                        }
+                    }
+                }
+                eventType = xmlParser.next();
+            }
+        } catch (XmlPullParserException | IOException e) {
+            LOG.e(e);
+        } finally {
+            showEpg(date);
+            if (isShowBottomEpg) showBottomEpg();
+        }
     }
 
     private String parseTime(String time) {
@@ -967,7 +919,7 @@ public class LivePlayActivity extends BaseActivity {
             tv_source.setText("线路 " + (channel_Name.getSourceIndex() + 1) + "/" + channel_Name.getSourceNum());
         }
 
-        getEpg(new Date());
+        getEpg(new Date(), true);
         mVideoView.setUrl(currentLiveChannelItem.getUrl(), setPlayHeaders(currentLiveChannelItem.getUrl()));
         showChannelInfo();
         mVideoView.start();
@@ -1005,7 +957,7 @@ public class LivePlayActivity extends BaseActivity {
             tv_source.setText("线路 " + (channel_Name.getSourceIndex() + 1) + "/" + channel_Name.getSourceNum());
         }
 
-        getEpg(new Date());
+        getEpg(new Date(), true);
         mVideoView.setUrl(currentLiveChannelItem.getUrl(), setPlayHeaders(currentLiveChannelItem.getUrl()));
         showChannelInfo();
         mVideoView.start();
@@ -1381,7 +1333,7 @@ public class LivePlayActivity extends BaseActivity {
                 mHandler.removeCallbacks(mHideChannelListRun);
                 mHandler.postDelayed(mHideChannelListRun, 6000);
                 epgDateAdapter.setSelectedIndex(position);
-                getEpg(epgDateAdapter.getData().get(position).getDateParamVal());
+                getEpg(epgDateAdapter.getData().get(position).getDateParamVal(), false);
             }
         });
 
@@ -1393,7 +1345,7 @@ public class LivePlayActivity extends BaseActivity {
                 mHandler.removeCallbacks(mHideChannelListRun);
                 mHandler.postDelayed(mHideChannelListRun, 6000);
                 epgDateAdapter.setSelectedIndex(position);
-                getEpg(epgDateAdapter.getData().get(position).getDateParamVal());
+                getEpg(epgDateAdapter.getData().get(position).getDateParamVal(), false);
             }
         });
         epgDateAdapter.setSelectedIndex(1);

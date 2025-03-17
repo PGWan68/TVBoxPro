@@ -170,8 +170,7 @@ public class DetailActivity extends BaseActivity {
 
     public static int getNum(String str) {
         try {
-            Matcher matcher = Pattern.compile("\\d+")
-                    .matcher(str);
+            Matcher matcher = Pattern.compile("\\d+").matcher(str);
             if (!matcher.find()) {
                 return 0;
             }
@@ -257,7 +256,7 @@ public class DetailActivity extends BaseActivity {
         mEmptyPlayList = findViewById(R.id.mEmptyPlaylist);
         mGridView = findViewById(R.id.mGridView);
         mGridView.setHasFixedSize(false);
-        mGridViewLayoutMgr = new V7GridLayoutManager(this.mContext, 6);
+        mGridViewLayoutMgr = new V7GridLayoutManager(this, 6);
         mGridView.setLayoutManager(mGridViewLayoutMgr);
 //        mGridView.setLayoutManager(new V7GridLayoutManager(this.mContext, isBaseOnWidth() ? 6 : 7));
         seriesAdapter = new SeriesAdapter();
@@ -642,7 +641,7 @@ public class DetailActivity extends BaseActivity {
             int offset = screenWidth / w;
             if (offset <= 2) offset = 2;
             if (offset > 6) offset = 6;
-            mGridViewLayoutMgr.setSpanCount(offset);
+            if (mGridViewLayoutMgr != null) mGridViewLayoutMgr.setSpanCount(offset);
 
             List<VodSeriesGroup> seriesGroupList = getSeriesGroupList();
             seriesGroupList.get(vodInfo.playGroup).selected = true;
@@ -722,8 +721,7 @@ public class DetailActivity extends BaseActivity {
     }
 
     private String removeHtmlTag(String info) {
-        if (info == null)
-            return "";
+        if (info == null) return "";
         return info.replaceAll("\\<.*?\\>", "").replaceAll("\\s", "");
     }
 
@@ -804,8 +802,7 @@ public class DetailActivity extends BaseActivity {
                             if (flag.name.equals(vodInfo.playFlag)) {
                                 flagScrollTo = j;
                                 flag.selected = true;
-                            } else
-                                flag.selected = false;
+                            } else flag.selected = false;
                         }
 
                         seriesFlagAdapter.setNewData(vodInfo.seriesFlags);
@@ -934,37 +931,32 @@ public class DetailActivity extends BaseActivity {
             if (event.obj != null) {
                 List<String> data = (List<String>) event.obj;
                 OkGo.getInstance().cancelTag("pushVod");
-                OkGo.<String>post("http://" + data.get(0) + ":" + data.get(1) + "/action")
-                        .tag("pushVod")
-                        .params("id", vodId)
-                        .params("sourceKey", sourceKey)
-                        .params("do", "mirror")
-                        .execute(new AbsCallback<String>() {
-                            @Override
-                            public String convertResponse(okhttp3.Response response) throws Throwable {
-                                if (response.body() != null) {
-                                    return response.body().string();
-                                } else {
-                                    Toast.makeText(DetailActivity.this, "推送失败，填的地址可能不对", Toast.LENGTH_SHORT).show();
-                                    throw new IllegalStateException("网络请求错误");
-                                }
-                            }
+                OkGo.<String>post("http://" + data.get(0) + ":" + data.get(1) + "/action").tag("pushVod").params("id", vodId).params("sourceKey", sourceKey).params("do", "mirror").execute(new AbsCallback<String>() {
+                    @Override
+                    public String convertResponse(okhttp3.Response response) throws Throwable {
+                        if (response.body() != null) {
+                            return response.body().string();
+                        } else {
+                            Toast.makeText(DetailActivity.this, "推送失败，填的地址可能不对", Toast.LENGTH_SHORT).show();
+                            throw new IllegalStateException("网络请求错误");
+                        }
+                    }
 
-                            @Override
-                            public void onSuccess(Response<String> response) {
-                                String r = response.body();
-                                if ("mirrored".equals(r))
-                                    Toast.makeText(DetailActivity.this, "推送成功", Toast.LENGTH_SHORT).show();
-                                else
-                                    Toast.makeText(DetailActivity.this, "推送失败，远端tvbox版本不支持", Toast.LENGTH_SHORT).show();
-                            }
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        String r = response.body();
+                        if ("mirrored".equals(r))
+                            Toast.makeText(DetailActivity.this, "推送成功", Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(DetailActivity.this, "推送失败，远端tvbox版本不支持", Toast.LENGTH_SHORT).show();
+                    }
 
-                            @Override
-                            public void onError(Response<String> response) {
-                                super.onError(response);
-                                Toast.makeText(DetailActivity.this, "推送失败，填的地址可能不对", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                    @Override
+                    public void onError(Response<String> response) {
+                        super.onError(response);
+                        Toast.makeText(DetailActivity.this, "推送失败，填的地址可能不对", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }
     }
@@ -982,8 +974,7 @@ public class DetailActivity extends BaseActivity {
 
     private void startQuickSearch() {
         initCheckedSourcesForSearch();
-        if (hadQuickStart)
-            return;
+        if (hadQuickStart) return;
         hadQuickStart = true;
         OkGo.getInstance().cancelTag("quick_search");
         quickSearchWord.clear();
@@ -991,41 +982,39 @@ public class DetailActivity extends BaseActivity {
         quickSearchData.clear();
         quickSearchWord.add(searchTitle);
         // 分词
-        OkGo.<String>get("https://api.yesapi.cn/?service=App.Scws.GetWords&text=" + searchTitle + "&app_key=CEE4B8A091578B252AC4C92FB4E893C3&sign=CB7602F3AC922808AF5D475D8DA33302")
-                .tag("fenci")
-                .execute(new AbsCallback<String>() {
-                    @Override
-                    public String convertResponse(okhttp3.Response response) throws Throwable {
-                        if (response.body() != null) {
-                            return response.body().string();
-                        } else {
-                            throw new IllegalStateException("网络请求错误");
-                        }
-                    }
+        OkGo.<String>get("https://api.yesapi.cn/?service=App.Scws.GetWords&text=" + searchTitle + "&app_key=CEE4B8A091578B252AC4C92FB4E893C3&sign=CB7602F3AC922808AF5D475D8DA33302").tag("fenci").execute(new AbsCallback<String>() {
+            @Override
+            public String convertResponse(okhttp3.Response response) throws Throwable {
+                if (response.body() != null) {
+                    return response.body().string();
+                } else {
+                    throw new IllegalStateException("网络请求错误");
+                }
+            }
 
-                    @Override
-                    public void onSuccess(Response<String> response) {
-                        String json = response.body();
-                        quickSearchWord.clear();
-                        try {
-                            JsonObject resJson = JsonParser.parseString(json).getAsJsonObject();
-                            JsonElement wordsJson = resJson.get("data").getAsJsonObject().get("words");
+            @Override
+            public void onSuccess(Response<String> response) {
+                String json = response.body();
+                quickSearchWord.clear();
+                try {
+                    JsonObject resJson = JsonParser.parseString(json).getAsJsonObject();
+                    JsonElement wordsJson = resJson.get("data").getAsJsonObject().get("words");
 
-                            for (JsonElement je : wordsJson.getAsJsonArray()) {
-                                quickSearchWord.add(je.getAsJsonObject().get("word").getAsString());
-                            }
-                        } catch (Throwable th) {
-                            th.printStackTrace();
-                        }
-                        quickSearchWord.add(searchTitle);
-                        EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_QUICK_SEARCH_WORD, quickSearchWord));
+                    for (JsonElement je : wordsJson.getAsJsonArray()) {
+                        quickSearchWord.add(je.getAsJsonObject().get("word").getAsString());
                     }
+                } catch (Throwable th) {
+                    th.printStackTrace();
+                }
+                quickSearchWord.add(searchTitle);
+                EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_QUICK_SEARCH_WORD, quickSearchWord));
+            }
 
-                    @Override
-                    public void onError(Response<String> response) {
-                        super.onError(response);
-                    }
-                });
+            @Override
+            public void onError(Response<String> response) {
+                super.onError(response);
+            }
+        });
 
         searchResult();
     }
@@ -1071,8 +1060,7 @@ public class DetailActivity extends BaseActivity {
             List<Movie.Video> data = new ArrayList<>();
             for (Movie.Video video : absXml.movie.videoList) {
                 // 去除当前相同的影片
-                if (video.sourceKey.equals(sourceKey) && video.id.equals(vodId))
-                    continue;
+                if (video.sourceKey.equals(sourceKey) && video.id.equals(vodId)) continue;
                 data.add(video);
             }
             quickSearchData.addAll(data);
@@ -1144,9 +1132,7 @@ public class DetailActivity extends BaseActivity {
             actions.add(generateRemoteAction(android.R.drawable.ic_media_previous, BROADCAST_ACTION_PREV, "Prev", "Play Previous"));
             actions.add(generateRemoteAction(android.R.drawable.ic_media_play, BROADCAST_ACTION_PLAYPAUSE, "Play", "Play/Pause"));
             actions.add(generateRemoteAction(android.R.drawable.ic_media_next, BROADCAST_ACTION_NEXT, "Next", "Play Next"));
-            PictureInPictureParams params = new PictureInPictureParams.Builder()
-                    .setAspectRatio(ratio)
-                    .setActions(actions).build();
+            PictureInPictureParams params = new PictureInPictureParams.Builder().setAspectRatio(ratio).setActions(actions).build();
             if (!fullWindows) {
                 toggleFullPreview();
             }
@@ -1162,12 +1148,7 @@ public class DetailActivity extends BaseActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private RemoteAction generateRemoteAction(int iconResId, int actionCode, String title, String desc) {
-        final PendingIntent intent =
-                PendingIntent.getBroadcast(
-                        DetailActivity.this,
-                        actionCode,
-                        new Intent(BROADCAST_ACTION).putExtra("action", actionCode),
-                        0);
+        final PendingIntent intent = PendingIntent.getBroadcast(DetailActivity.this, actionCode, new Intent(BROADCAST_ACTION).putExtra("action", actionCode), 0);
         final Icon icon = Icon.createWithResource(DetailActivity.this, iconResId);
         return (new RemoteAction(icon, title, desc, intent));
     }
@@ -1236,8 +1217,7 @@ public class DetailActivity extends BaseActivity {
     public void onBackPressed() {
         boolean showPreview = Hawk.get(HawkConfig.SHOW_PREVIEW, true);
         if (fullWindows) {
-            if (playFragment.onBackPressed())
-                return;
+            if (playFragment.onBackPressed()) return;
             playFragment.getVodController().mProgressTop.setVisibility(View.INVISIBLE);
             toggleFullPreview();
             mGridView.requestFocus();

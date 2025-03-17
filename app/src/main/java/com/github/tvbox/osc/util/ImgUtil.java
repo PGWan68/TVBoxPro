@@ -98,7 +98,7 @@ public class ImgUtil {
 
             Glide.with(App.getInstance())
                     .asBitmap()
-                    .load(getUrl(url))
+                    .load(url)
                     .error(R.drawable.img_logo_placeholder)
                     .placeholder(R.drawable.img_logo_placeholder)
                     .apply(requestOptions)
