@@ -158,6 +158,8 @@ public class App extends MultiDexApplication {
         putDefault(HawkConfig.BACKGROUND_PLAY_TYPE, 0);      //后台：0=关闭, 1=开启, 2=画中画
         putDefault(HawkConfig.PLAY_TYPE, 1);                 //播放器: 0=系统, 1=IJK, 2=Exo, 3=MX, 4=Reex, 5=Kodi
         putDefault(HawkConfig.IJK_CODEC, "硬解码");           //IJK解码: 软解码, 硬解码
+        putDefault(HawkConfig.PLAY_RENDER, 1);               //渲染控件: 0: TextureView, 1: SurfaceView, // 小米电视上使用TextureView会有一些高码视频解码失败
+
         // 系统选项
         putDefault(HawkConfig.HOME_LOCALE, 0);               //语言: 0=中文, 1=英文
         putDefault(HawkConfig.THEME_SELECT, 2);              //主题: 0=奈飞, 1=哆啦, 2=百事, 3=鸣人, 4=小黄, 5=八神, 6=樱花
