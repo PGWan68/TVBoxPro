@@ -100,6 +100,7 @@ public class SelectDialogAdapter<T> extends ListAdapter<T, SelectDialogAdapter.S
             public void onClick(View v) {
                 if (!muteCheck && position == select)
                     return;
+                notifyItemChanged(select);
                 select = position;
                 notifyItemChanged(select);
                 dialogInterface.click(value, position);
