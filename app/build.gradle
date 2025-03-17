@@ -222,4 +222,6 @@ dependencies {
             exclude group: 'xpp3', module: 'xpp3'
         }
     }
+
+    implementation 'com.tencent.bugly:crashreport:latest.release'
 }

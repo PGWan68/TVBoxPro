@@ -1,5 +1,6 @@
 package com.github.tvbox.osc.base;
 
+import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,6 +29,7 @@ import com.hjq.permissions.XXPermissions;
 import com.kingja.loadsir.core.LoadSir;
 import com.orhanobut.hawk.Hawk;
 import com.p2p.P2PClass;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.whl.quickjs.android.QuickJSLoader;
 import com.yanzhenjie.andserver.AndServer;
 import com.yanzhenjie.andserver.Server;
@@ -92,6 +94,12 @@ public class App extends MultiDexApplication {
         QuickJSLoader.init();
 
         updateCacheFile();
+
+        initBugly();
+    }
+
+    private void initBugly() {
+        CrashReport.initCrashReport(getApplicationContext(), "1efbca1553", false);
     }
 
     private void updateCacheFile() {
