@@ -104,13 +104,15 @@
                         android:textSize="@dimen/ts_24" />
                 </LinearLayout>
 
+<!--                TODO -->
+<!--                显示API的地址，暂时隐藏-->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/vs_50"
                     android:layout_marginBottom="@dimen/vs_10"
                     android:focusable="false"
                     android:orientation="horizontal"
-                    android:visibility="visible">
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:id="@+id/llApi"

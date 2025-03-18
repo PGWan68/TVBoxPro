@@ -259,6 +259,13 @@ public class HomeActivity extends BaseActivity {
                 }
             }
         });
+
+        findViewById(R.id.tvRefresh).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reloadHome();
+            }
+        });
         // Button : Search --------------------------------------------
 //        tvFind.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -319,24 +326,6 @@ public class HomeActivity extends BaseActivity {
                 tvWifi.setImageDrawable(res.getDrawable(R.drawable.hm_lan));
             }
         }
-    }
-
-    public static boolean reHome(Context appContext) {
-        Intent intent = new Intent(appContext, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("useCache", true);
-        intent.putExtras(bundle);
-        appContext.startActivity(intent);
-        return true;
-    }
-
-    public static void homeRecf() { //站点切换
-        int homeRec = Hawk.get(HawkConfig.HOME_REC, -1);
-        int limit = 2;
-        if (homeRec == limit) homeRec = -1;
-        homeRec++;
-        Hawk.put(HawkConfig.HOME_REC, homeRec);
     }
 
     private void initViewModel() {
