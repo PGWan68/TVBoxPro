@@ -23,7 +23,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
             android:text="@string/dia_reset"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/color_white"
             android:textSize="24sp"
             android:textStyle="bold"
             tools:text="@string/dia_reset" />
@@ -49,7 +49,7 @@
             android:shadowDy="0"
             android:shadowRadius="5"
             android:text="确定"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/color_white"
             android:textColorHint="@color/color_FFFFFF_50"
             android:textSize="@dimen/ts_20" />
 
@@ -70,7 +70,7 @@
             android:shadowDy="0"
             android:shadowRadius="5"
             android:text="取消"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/color_white"
             android:textColorHint="@color/color_FFFFFF_50"
             android:textSize="@dimen/ts_20" />
 

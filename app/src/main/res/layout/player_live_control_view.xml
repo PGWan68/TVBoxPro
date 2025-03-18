@@ -128,7 +128,7 @@
                     android:shadowRadius="3"
                     android:tag="play_speed_top_hide"
                     android:text="Speed"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_22"
                     android:textStyle="bold" />
 
@@ -145,7 +145,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="3"
                     android:text="Mbps"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_16"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -254,7 +254,7 @@
                         android:shadowRadius="3"
                         android:tag="play_speed_top"
                         android:text="Speed"
-                        android:textColor="@color/color_FFFFFF"
+                        android:textColor="@color/color_white"
                         android:textSize="@dimen/ts_22"
                         android:textStyle="bold" />
 
@@ -271,7 +271,7 @@
                         android:shadowDy="0"
                         android:shadowRadius="3"
                         android:text="Mbps"
-                        android:textColor="@color/color_FFFFFF"
+                        android:textColor="@color/color_white"
                         android:textSize="@dimen/ts_16"
                         android:textStyle="bold" />
                 </LinearLayout>

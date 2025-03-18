@@ -63,7 +63,7 @@
             android:background="@drawable/shape_setting_model_focus"
             android:gravity="center"
             android:text="回看"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/color_white"
             android:textSize="@dimen/vs_15" />
 
         <com.github.tvbox.osc.ui.tv.widget.AudioWaveView

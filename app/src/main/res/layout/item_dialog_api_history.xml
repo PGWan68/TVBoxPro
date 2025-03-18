@@ -20,7 +20,7 @@
         android:padding="@dimen/vs_10"
         android:singleLine="true"
         android:text="@{name}"
-        android:textColor="@color/color_FFFFFF"
+        android:textColor="@color/color_white"
         android:textSize="@dimen/ts_26"
         tools:text="11111111111111" />
 

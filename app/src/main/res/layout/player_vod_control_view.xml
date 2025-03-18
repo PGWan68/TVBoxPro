@@ -85,7 +85,7 @@
                     android:shadowRadius="3"
                     android:tag="play_speed_top"
                     android:text="Speed"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_22"
                     android:textStyle="bold" />
 
@@ -102,7 +102,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="3"
                     android:text="Mbps"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_16"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -293,7 +293,7 @@
                     android:shadowRadius="3"
                     android:tag="play_speed_top_hide"
                     android:text="Speed"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_22"
                     android:textStyle="bold" />
 
@@ -310,7 +310,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="3"
                     android:text="Mbps"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_16"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -618,7 +618,7 @@
         android:paddingRight="@dimen/vs_20"
         android:paddingBottom="@dimen/vs_15"
         android:text=""
-        android:textColor="@color/color_FFFFFF"
+        android:textColor="@color/color_white"
         android:textSize="16sp"
         android:textStyle="bold" />
 
@@ -748,7 +748,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="3"
                 android:text="00:00:00"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/ts_20" />
 
             <TextView
@@ -791,7 +791,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="3"
                 android:text="00:00:00"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/ts_20" />
         </LinearLayout>
 
@@ -912,7 +912,7 @@
 	                android:focusableInTouchMode="false"
 	                android:gravity="center"
 	                android:text="x0.25"
-	                android:textColor="@color/color_FFFFFF"
+	                android:textColor="@color/color_white"
 	                android:textSize="@dimen/ts_12"
 	                android:textStyle="bold" />
 	
@@ -971,7 +971,7 @@
 	                android:focusableInTouchMode="false"
 	                android:gravity="center"
 	                android:text="16:9"
-	                android:textColor="@color/color_FFFFFF"
+	                android:textColor="@color/color_white"
 	                android:textSize="@dimen/ts_12"
 	                android:textStyle="bold" />
 	
@@ -1005,7 +1005,7 @@
 	                    android:focusableInTouchMode="false"
 	                    android:gravity="center"
 	                    android:text="系统"
-	                    android:textColor="@color/color_FFFFFF"
+	                    android:textColor="@color/color_white"
 	                    android:textSize="@dimen/ts_14"
 	                    android:visibility="gone" />
 	            </LinearLayout>
@@ -1123,7 +1123,7 @@
 	                android:background="@color/color_FFFFFF_50"
 	                android:gravity="center"
 	                android:padding="@dimen/vs_10"
-	                android:textColor="@color/color_FFFFFF"
+	                android:textColor="@color/color_white"
 	                android:textSize="@dimen/ts_22" />
 	                
 	            <TextView
@@ -1140,7 +1140,7 @@
 					android:focusable="true"
 	                android:gravity="center"
 	                android:padding="@dimen/vs_10"
-	                android:textColor="@color/color_FFFFFF"
+	                android:textColor="@color/color_white"
 	                android:textSize="@dimen/ts_22" />    
 	
 	            <TextView
@@ -1246,7 +1246,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="3"
                 android:text="解析"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/ts_20"
                 android:textStyle="bold" />
 
@@ -1274,7 +1274,7 @@
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="1"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/ts_20"
                 android:textStyle="bold" />
         </LinearLayout>

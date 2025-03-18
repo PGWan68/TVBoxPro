@@ -36,7 +36,7 @@
                 android:shadowDx="0"
                 android:shadowDy="0"
                 android:shadowRadius="5"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/ts_24"
                 android:textStyle="bold"
                 tools:text="1111111111111111111111111111111111111111111111111111" />
@@ -78,7 +78,7 @@
                             android:shadowDx="0"
                             android:shadowDy="0"
                             android:shadowRadius="3"
-                            android:textColor="@color/color_FFFFFF"
+                            android:textColor="@color/color_white"
                             android:textColorHint="@color/color_FFFFFF_50"
                             android:textSize="@dimen/ts_22" />
 
@@ -128,7 +128,7 @@
                             android:shadowDx="0"
                             android:shadowDy="0"
                             android:shadowRadius="3"
-                            android:textColor="@color/color_FFFFFF"
+                            android:textColor="@color/color_white"
                             android:textColorHint="@color/color_FFFFFF_50"
                             android:textSize="@dimen/ts_22" />
 
@@ -178,7 +178,7 @@
                             android:shadowDx="0"
                             android:shadowDy="0"
                             android:shadowRadius="3"
-                            android:textColor="@color/color_FFFFFF"
+                            android:textColor="@color/color_white"
                             android:textColorHint="@color/color_FFFFFF_50"
                             android:textSize="@dimen/ts_22" />
 
@@ -228,7 +228,7 @@
                             android:shadowDx="0"
                             android:shadowDy="0"
                             android:shadowRadius="3"
-                            android:textColor="@color/color_FFFFFF"
+                            android:textColor="@color/color_white"
                             android:textColorHint="@color/color_FFFFFF_50"
                             android:textSize="@dimen/ts_22" />
                     </LinearLayout>
@@ -255,7 +255,7 @@
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
                     android:text="存储权限"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_22" />
 
                 <TextView
@@ -269,7 +269,7 @@
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
                     android:text="确定"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_22" />
             </LinearLayout>
 

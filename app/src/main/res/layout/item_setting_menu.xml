@@ -1,19 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_gravity="center"
     android:layout_marginBottom="@dimen/vs_10"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:background="@drawable/shape_setting_sort_focus"
     android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/vs_5">
+
+    <ImageView
+        android:id="@+id/tvIcon"
+        android:layout_width="@dimen/vs_24"
+        android:layout_height="@dimen/vs_24"
+        android:layout_marginStart="@dimen/vs_12"
+        android:src="@drawable/ic_refresh_24dp" />
 
     <TextView
         android:id="@+id/tvName"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/vs_12"
         android:gravity="center"
-        android:padding="@dimen/vs_5"
-        android:singleLine="true"
-        android:textColor="@color/color_FFFFFF_80"
-        android:textSize="@dimen/ts_24" />
-</FrameLayout>
+        android:textColor="@drawable/color_selector"
+        android:textSize="@dimen/ts_24"
+        tools:text="关于" />
+</LinearLayout>

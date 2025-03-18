@@ -29,7 +29,7 @@
             android:shadowRadius="5"
             android:singleLine="true"
             android:text="@string/dia_hm_icon"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/color_white"
             android:textSize="@dimen/ts_26"
             android:textStyle="bold"
             tools:text="@string/dia_hm_icon" />

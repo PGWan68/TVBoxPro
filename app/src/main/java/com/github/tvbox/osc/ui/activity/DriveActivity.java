@@ -103,7 +103,7 @@ public class DriveActivity extends BaseActivity {
         this.btnSort = findViewById(R.id.btnSort);
         footLoading = getLayoutInflater().inflate(R.layout.item_search_lite, null);
         footLoading.findViewById(R.id.tvName).setVisibility(View.GONE);
-        this.btnRemoveServer.setColorFilter(ContextCompat.getColor(mContext, R.color.color_FFFFFF));
+        this.btnRemoveServer.setColorFilter(ContextCompat.getColor(mContext, R.color.color_white));
         this.btnRemoveServer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -393,7 +393,7 @@ public class DriveActivity extends BaseActivity {
 //            this.btnRemoveServer.setColorFilter(ContextCompat.getColor(mContext, R.color.color_theme));
             this.btnRemoveServer.setColorFilter(getThemeColor());
         } else {
-            this.btnRemoveServer.setColorFilter(ContextCompat.getColor(mContext, R.color.color_FFFFFF));
+            this.btnRemoveServer.setColorFilter(ContextCompat.getColor(mContext, R.color.color_white));
         }
         adapter.toggleDelMode(delMode);
     }

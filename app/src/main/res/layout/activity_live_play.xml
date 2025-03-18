@@ -79,7 +79,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="3"
                 android:text="更 多"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/ts_18"
                 android:textStyle="bold" />
 
@@ -104,7 +104,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="3"
                 android:text="节 目"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/ts_18"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -159,7 +159,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="3"
                 android:text="节 目"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/ts_18"
                 android:textStyle="bold" />
 
@@ -184,7 +184,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="3"
                 android:text="信 息"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/ts_18"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -212,7 +212,7 @@
                 android:paddingLeft="@dimen/vs_5"
                 android:paddingTop="@dimen/vs_5"
                 android:paddingBottom="@dimen/vs_5"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 app:tv_selectedItemIsCentered="true"
                 app:tv_verticalSpacingWithMargins="10mm" />
 
@@ -235,7 +235,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="暂无节目信息…"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:visibility="gone" />
 
         </LinearLayout>
@@ -348,7 +348,7 @@
                     android:shadowRadius="3"
                     android:singleLine="true"
                     android:text="00:00 - 23:59"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_36"
                     android:textStyle="normal"
                     android:visibility="visible" />
@@ -369,7 +369,7 @@
                     android:shadowRadius="3"
                     android:singleLine="true"
                     android:text="@string/no_information"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_36"
                     android:textStyle="bold" />
 
@@ -423,7 +423,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="5"
                     android:text="1"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_15"
                     android:textStyle="bold"
                     android:visibility="visible" />
@@ -450,7 +450,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="5"
                     android:text="Channel 1"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_15"
                     android:textStyle="bold" />
 
@@ -474,7 +474,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="2"
                     android:text="1920 x 1080"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_15"
                     android:textStyle="bold" />
 
@@ -496,7 +496,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="2"
                     android:text="源 1/1"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_15"
                     android:textStyle="bold" />
 
@@ -526,7 +526,7 @@
                     android:shadowRadius="3"
                     android:singleLine="true"
                     android:text="00:00 - 23:59"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_20"
                     android:textStyle="normal"
                     android:visibility="visible" />
@@ -549,7 +549,7 @@
                     android:shadowRadius="3"
                     android:singleLine="true"
                     android:text="@string/no_information"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_20"
                     android:textStyle="normal" />
             </LinearLayout>
@@ -576,7 +576,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="3"
                     android:text="00:00:00"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_18" />
 
                 <TextView
@@ -620,7 +620,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="3"
                     android:text="00:00:00"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_18" />
             </LinearLayout>
 
@@ -643,7 +643,7 @@
         android:shadowDy="0"
         android:shadowRadius="2"
         android:text="00:00 PM"
-        android:textColor="@color/color_FFFFFF"
+        android:textColor="@color/color_white"
         android:textSize="@dimen/ts_22"
         android:textStyle="bold"
         android:visibility="gone" />
@@ -662,7 +662,7 @@
         android:shadowDy="0"
         android:shadowRadius="2"
         android:text="0.00 MB/s"
-        android:textColor="@color/color_FFFFFF"
+        android:textColor="@color/color_white"
         android:textSize="@dimen/ts_22"
         android:textStyle="bold"
         android:visibility="gone" />

@@ -48,24 +48,24 @@ public class LiveEpgAdapter extends BaseQuickAdapter<Epginfo, BaseViewHolder> {
             textview.setTextColor(((BaseActivity) mContext).getThemeColor());
             timeview.setTextColor(((BaseActivity) mContext).getThemeColor());
         } else {
-            textview.setTextColor(mContext.getResources().getColor(R.color.color_FFFFFF));
-            timeview.setTextColor(mContext.getResources().getColor(R.color.color_FFFFFF));
+            textview.setTextColor(mContext.getResources().getColor(R.color.color_white));
+            timeview.setTextColor(mContext.getResources().getColor(R.color.color_white));
         }
 
         if (now.compareTo(value.startdateTime) >= 0 && now.compareTo(value.enddateTime) <= 0) {
             shiyi.setVisibility(View.VISIBLE);
             shiyi.setBackgroundColor(mContext.getResources().getColor(R.color.color_32364E));
-            shiyi.setTextColor(mContext.getResources().getColor(R.color.color_FFFFFF));
+            shiyi.setTextColor(mContext.getResources().getColor(R.color.color_white));
             shiyi.setText("直播");
         } else if (now.compareTo(value.enddateTime) > 0 && source_include_back) {
             shiyi.setVisibility(View.VISIBLE);
             shiyi.setBackgroundColor(mContext.getResources().getColor(R.color.color_32364E_40));
-            shiyi.setTextColor(mContext.getResources().getColor(R.color.color_FFFFFF));
+            shiyi.setTextColor(mContext.getResources().getColor(R.color.color_white));
             shiyi.setText("回看");
         } else if (now.compareTo(value.startdateTime) < 0 && source_include_back) {
             shiyi.setVisibility(View.VISIBLE);
             shiyi.setBackgroundColor(mContext.getResources().getColor(R.color.color_3D3D3D));
-            shiyi.setTextColor(mContext.getResources().getColor(R.color.color_FFFFFF));
+            shiyi.setTextColor(mContext.getResources().getColor(R.color.color_white));
             shiyi.setText("预约");
         } else {
             shiyi.setVisibility(View.GONE);
@@ -73,8 +73,8 @@ public class LiveEpgAdapter extends BaseQuickAdapter<Epginfo, BaseViewHolder> {
 
         textview.setText(value.title);
         timeview.setText(value.start + " - " + value.end);
-        textview.setTextColor(mContext.getResources().getColor(R.color.color_FFFFFF));
-        timeview.setTextColor(mContext.getResources().getColor(R.color.color_FFFFFF));
+        textview.setTextColor(mContext.getResources().getColor(R.color.color_white));
+        timeview.setTextColor(mContext.getResources().getColor(R.color.color_white));
         if (ShiyiSelection == false) {
             if (now.compareTo(value.startdateTime) >= 0 && now.compareTo(value.enddateTime) <= 0) {
                 wqddg_AudioWaveView.setVisibility(View.VISIBLE);

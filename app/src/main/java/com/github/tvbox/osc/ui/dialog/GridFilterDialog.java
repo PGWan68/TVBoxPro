@@ -75,7 +75,7 @@ public class GridFilterDialog extends BaseDialog {
                         if (pre != null) {
                             TextView val = pre.findViewById(R.id.filterValue);
                             val.getPaint().setFakeBoldText(false);
-                            val.setTextColor(getContext().getResources().getColor(R.color.color_FFFFFF));
+                            val.setTextColor(getContext().getResources().getColor(R.color.color_white));
                         }
                         TextView val = view.findViewById(R.id.filterValue);
                         val.getPaint().setFakeBoldText(true);
@@ -89,7 +89,7 @@ public class GridFilterDialog extends BaseDialog {
                         sortData.filterSelect.remove(key);
                         TextView val = pre.findViewById(R.id.filterValue);
                         val.getPaint().setFakeBoldText(false);
-                        val.setTextColor(getContext().getResources().getColor(R.color.color_FFFFFF));
+                        val.setTextColor(getContext().getResources().getColor(R.color.color_white));
                         pre = null;
                     }
                 }

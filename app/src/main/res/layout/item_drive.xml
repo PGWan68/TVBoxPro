@@ -51,7 +51,7 @@
                     android:maxWidth="@dimen/vs_60"
                     android:padding="@dimen/vs_1"
                     android:singleLine="true"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_10"
                     tools:visibility="gone" />
             </FrameLayout>
@@ -69,7 +69,7 @@
                 android:paddingLeft="@dimen/vs_15"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/ts_22" />
         </LinearLayout>
 
