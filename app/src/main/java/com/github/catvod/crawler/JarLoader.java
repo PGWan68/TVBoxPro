@@ -141,13 +141,18 @@ public class JarLoader {
         }
         if (classLoader == null) return new SpiderNull();
         try {
-            Spider sp = (Spider) classLoader.loadClass("com.github.catvod.spider." + clsKey).newInstance();
-            sp.init(App.getInstance(), ext);
-            if (!jar.isEmpty()) {
-                sp.homeContent(false); // 增加此行 应该可以解决部分写的有问题源的历史记录问题 但会增加这个源的首次加载时间 不需要可以已删掉
+
+            Class<?> clazz = classLoader.loadClass("com.github.catvod.spider." + clsKey);
+            if (clazz != null) {
+                Spider sp = (Spider) clazz.newInstance();
+                sp.init(App.getInstance(), ext);
+                if (!jar.isEmpty()) {
+                    sp.homeContent(false); // 增加此行 应该可以解决部分写的有问题源的历史记录问题 但会增加这个源的首次加载时间 不需要可以已删掉
+                }
+                spiders.put(key, sp);
+                return sp;
             }
-            spiders.put(key, sp);
-            return sp;
+            return new SpiderNull();
         } catch (Throwable th) {
             LOG.e(th);
         }

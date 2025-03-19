@@ -139,7 +139,7 @@ public class SourceViewModel extends ViewModel {
                 });
                 String sortJson = null;
                 try {
-                    sortJson = future.get(10, TimeUnit.SECONDS);
+                    sortJson = future.get(15, TimeUnit.SECONDS);
                 } catch (TimeoutException e) {
                     LOG.e(e);
                     future.cancel(true);
@@ -382,7 +382,7 @@ public class SourceViewModel extends ViewModel {
                     });
                     String sortJson = null;
                     try {
-                        sortJson = future.get(10, TimeUnit.SECONDS);
+                        sortJson = future.get(15, TimeUnit.SECONDS);
                     } catch (TimeoutException e) {
                         e.printStackTrace();
                         future.cancel(true);
@@ -712,7 +712,7 @@ public class SourceViewModel extends ViewModel {
         threadPoolGetPlay.execute(() -> {
             Future<JSONObject> future = threadPoolGetPlay.submit(callable);
             try {
-                JSONObject jsonObject = future.get(10, TimeUnit.SECONDS);
+                JSONObject jsonObject = future.get(15, TimeUnit.SECONDS);
                 playResult.postValue(jsonObject);
             } catch (Throwable e) {
                 e.printStackTrace();

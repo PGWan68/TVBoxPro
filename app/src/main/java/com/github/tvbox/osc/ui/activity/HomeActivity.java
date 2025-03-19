@@ -125,7 +125,10 @@ public class HomeActivity extends BaseActivity {
         // takagen99: Added to allow read string
         res = getResources();
 
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+
         ControlManager.get().startServer();
         App.startWebserver();
         initView();

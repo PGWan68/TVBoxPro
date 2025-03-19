@@ -1,6 +1,7 @@
 package com.github.tvbox.osc.ui.activity;
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
@@ -18,6 +19,7 @@ import com.github.tvbox.osc.base.BaseLazyFragment;
 import com.github.tvbox.osc.ui.adapter.SettingMenuAdapter;
 import com.github.tvbox.osc.ui.adapter.SettingPageAdapter;
 import com.github.tvbox.osc.ui.fragment.ModelSettingFragment;
+import com.github.tvbox.osc.ui.fragment.UserFragment;
 import com.github.tvbox.osc.util.AppManager;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.orhanobut.hawk.Hawk;
@@ -47,6 +49,8 @@ public class SettingActivity extends BaseActivity {
     private String currentLive;
     private int homeRec;
     private int dnsOpt;
+
+    private List<SettingMenu> sortList = new ArrayList<>();
 
     @Override
     protected int getLayoutResID() {
@@ -84,24 +88,25 @@ public class SettingActivity extends BaseActivity {
             @Override
             public void onItemPreSelected(TvRecyclerView parent, View itemView, int position) {
                 if (itemView != null) {
-                    TextView tvName = itemView.findViewById(R.id.tvName);
-                    tvName.setTextColor(getResources().getColor(R.color.color_FFFFFF_70));
+//                    TextView tvName = itemView.findViewById(R.id.tvName);
+//                    tvName.setTextColor(getResources().getColor(R.color.color_FFFFFF_70));
                 }
             }
 
             @Override
             public void onItemSelected(TvRecyclerView parent, View itemView, int position) {
-                if (itemView != null) {
-                    sortChange = true;
-                    sortFocused = position;
-                    TextView tvName = itemView.findViewById(R.id.tvName);
-                    tvName.setTextColor(Color.WHITE);
-                }
+//                if (itemView != null) {
+//                    sortChange = true;
+//                    sortFocused = position;
+//                    TextView tvName = itemView.findViewById(R.id.tvName);
+//                    tvName.setTextColor(Color.WHITE);
+//                }
+                mViewPager.setCurrentItem(position, false);
             }
 
             @Override
             public void onItemClick(TvRecyclerView parent, View itemView, int position) {
-
+                mViewPager.setCurrentItem(position, false);
             }
         });
     }
@@ -112,19 +117,30 @@ public class SettingActivity extends BaseActivity {
         homeSourceKey = ApiConfig.get().getHomeSourceBean().getKey();
         homeRec = Hawk.get(HawkConfig.HOME_REC, 0);
         dnsOpt = Hawk.get(HawkConfig.DOH_URL, 0);
-        List<String> sortList = new ArrayList<>();
-        sortList.add("应用");
-        sortList.add("点播源");
-        sortList.add("直播源");
-        sortList.add("播放器");
-        sortList.add("系统");
-        sortList.add("关于");
+
+        sortList.add(new SettingMenu("应用", getDrawable(R.drawable.hm_settings)));
+        sortList.add(new SettingMenu("点播源", getDrawable(R.drawable.hm_wifi)));
+        sortList.add(new SettingMenu("直播源", getDrawable(R.drawable.hm_history)));
+        sortList.add(new SettingMenu("播放器", getDrawable(R.drawable.hm_live)));
+        sortList.add(new SettingMenu("系统", getDrawable(R.drawable.set_hm)));
+        sortList.add(new SettingMenu("关于", getDrawable(R.drawable.hm_drawer)));
         sortAdapter.setNewData(sortList);
         initViewPager();
     }
 
     private void initViewPager() {
-        fragments.add(ModelSettingFragment.newInstance());
+
+        for (SettingMenu menu : sortList) {
+            if (menu.name.equals("应用")) {
+                fragments.add(ModelSettingFragment.newInstance());
+            } else if (menu.name.equals("点播源")) {
+                fragments.add(ModelSettingFragment.newInstance());
+            }else {
+                fragments.add(UserFragment.newInstance());
+            }
+        }
+
+//        fragments.add(ModelSettingFragment.newInstance());
         pageAdapter = new SettingPageAdapter(getSupportFragmentManager(), fragments);
         mViewPager.setAdapter(pageAdapter);
         mViewPager.setCurrentItem(0);
@@ -184,10 +200,7 @@ public class SettingActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if ((homeSourceKey != null && !homeSourceKey.equals(Hawk.get(HawkConfig.HOME_API, ""))) ||
-                !currentApi.equals(Hawk.get(HawkConfig.API_URL, "")) || !currentLive.equals(Hawk.get(HawkConfig.LIVE_URL, "")) ||
-                homeRec != Hawk.get(HawkConfig.HOME_REC, 0) ||
-                dnsOpt != Hawk.get(HawkConfig.DOH_URL, 0)) {
+        if ((homeSourceKey != null && !homeSourceKey.equals(Hawk.get(HawkConfig.HOME_API, ""))) || !currentApi.equals(Hawk.get(HawkConfig.API_URL, "")) || !currentLive.equals(Hawk.get(HawkConfig.LIVE_URL, "")) || homeRec != Hawk.get(HawkConfig.HOME_REC, 0) || dnsOpt != Hawk.get(HawkConfig.DOH_URL, 0)) {
             AppManager.getInstance().finishAllActivity();
             if (currentApi.equals(Hawk.get(HawkConfig.API_URL, "")) & (currentLive.equals(Hawk.get(HawkConfig.LIVE_URL, "")))) {
                 Bundle bundle = new Bundle();
@@ -199,5 +212,16 @@ public class SettingActivity extends BaseActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    public class SettingMenu {
+        public String name;
+        public Drawable drawable;
+
+        public SettingMenu(String name, Drawable drawable) {
+            this.drawable = drawable;
+            this.name = name;
+        }
+
     }
 }

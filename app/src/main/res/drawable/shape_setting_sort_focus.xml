@@ -2,13 +2,14 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_focused="true">
         <shape>
-            <corners android:radius="5mm" />
-            <solid android:color="@color/color_white" />
+            <corners android:radius="@dimen/ts_10"/>
+            <solid android:color="@color/color_FFFFFF_80"/>
         </shape>
     </item>
     <item android:state_focused="false">
         <shape>
-            <solid android:color="@android:color/transparent" />
+            <corners android:radius="@dimen/ts_36"/>
+            <solid android:color="@android:color/transparent"/>
         </shape>
     </item>
 </selector>
