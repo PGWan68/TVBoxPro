@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.function.*;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.util.Constant;
 import com.github.tvbox.osc.util.FileUtils;
@@ -54,6 +55,8 @@ public class UpdateChecker {
                     LatestReleases.Assets assets = latestReleases.assets.get(0);
                     showUpdateDialog(context, assets);
                 }, 800);
+            } else {
+                ToastUtils.showShort("当前已是最新版本");
             }
         });
     }
