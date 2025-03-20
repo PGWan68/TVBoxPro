@@ -1,13 +1,11 @@
 package com.github.tvbox.osc.ui.activity;
 
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.viewpager.widget.ViewPager;
 
@@ -118,29 +116,29 @@ public class SettingActivity extends BaseActivity {
         homeRec = Hawk.get(HawkConfig.HOME_REC, 0);
         dnsOpt = Hawk.get(HawkConfig.DOH_URL, 0);
 
-        sortList.add(new SettingMenu("应用", getDrawable(R.drawable.hm_settings)));
-        sortList.add(new SettingMenu("点播源", getDrawable(R.drawable.hm_wifi)));
-        sortList.add(new SettingMenu("直播源", getDrawable(R.drawable.hm_history)));
-        sortList.add(new SettingMenu("播放器", getDrawable(R.drawable.hm_live)));
-        sortList.add(new SettingMenu("系统", getDrawable(R.drawable.set_hm)));
-        sortList.add(new SettingMenu("关于", getDrawable(R.drawable.hm_drawer)));
+
+        sortList.add(new SettingMenu("应用", getDrawable(R.drawable.hm_drawer)));
+        sortList.add(new SettingMenu("数据源", getDrawable(R.drawable.ic_data_24dp)));
+        sortList.add(new SettingMenu("播放器", getDrawable(R.drawable.set_play)));
+        sortList.add(new SettingMenu("系统", getDrawable(R.drawable.hm_settings)));
+        sortList.add(new SettingMenu("关于", getDrawable(R.drawable.ic_info_24dp)));
         sortAdapter.setNewData(sortList);
         initViewPager();
     }
 
     private void initViewPager() {
 
-        for (SettingMenu menu : sortList) {
-            if (menu.name.equals("应用")) {
-                fragments.add(ModelSettingFragment.newInstance());
-            } else if (menu.name.equals("点播源")) {
-                fragments.add(ModelSettingFragment.newInstance());
-            }else {
-                fragments.add(UserFragment.newInstance());
-            }
+        /*
+         * 0：应用设置
+         * 1: 数据源设置
+         * 2: 播放器设置
+         * 3：系统设置
+         * 4:关于
+         */
+        for (int i = 0; i < sortList.size(); i++) {
+            fragments.add(ModelSettingFragment.newInstance(i));
         }
 
-//        fragments.add(ModelSettingFragment.newInstance());
         pageAdapter = new SettingPageAdapter(getSupportFragmentManager(), fragments);
         mViewPager.setAdapter(pageAdapter);
         mViewPager.setCurrentItem(0);
@@ -153,7 +151,7 @@ public class SettingActivity extends BaseActivity {
                 sortChange = false;
                 if (sortFocused != defaultSelected) {
                     defaultSelected = sortFocused;
-                    mViewPager.setCurrentItem(sortFocused, false);
+//                    mViewPager.setCurrentItem(sortFocused, false);
                 }
             }
         }

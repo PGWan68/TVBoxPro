@@ -327,9 +327,7 @@ public class HomeActivity extends BaseActivity {
             public void onChanged(AbsSortXml absXml) {
                 showSuccess();
                 initViewPager(absXml);
-
-                // 检查更新
-                checkUpdate();
+                checkPermissions();
             }
         });
     }
@@ -770,7 +768,6 @@ public class HomeActivity extends BaseActivity {
         HomeActivity.this.startActivity(intent);
     }
 
-
     // 影视资源选择
     private void showUrlSelectDialog() {
         List<UrlBean> urlBeans = ApiConfig.get().getUrlBeans();
@@ -819,39 +816,30 @@ public class HomeActivity extends BaseActivity {
         }
     }
 
-
     /**
-     * 调用Github的接口去检查更新
+     * 检查存储权限
      */
-    private void checkUpdate() {
+    private void checkPermissions() {
 
-        if (XXPermissions.isGranted(this, DefaultConfig.StoragePermissionGroup())) {
-            final UpdateChecker checker = new UpdateChecker(DefaultConfig.getAppVersionName(this));
-            checker.checkThenUpgrade(this);
-        } else {
-            XXPermissions.with(this)
-                    .permission(DefaultConfig.StoragePermissionGroup())
-                    .request(new OnPermissionCallback() {
-                        @Override
-                        public void onGranted(List<String> permissions, boolean all) {
-                            if (all) {
-                                Toast.makeText(HomeActivity.this, "已获得存储权限", Toast.LENGTH_SHORT).show();
-                                final UpdateChecker checker = new UpdateChecker(DefaultConfig.getAppVersionName(HomeActivity.this));
-                                checker.checkThenUpgrade(HomeActivity.this);
-                            }
-                        }
+        if (!XXPermissions.isGranted(this, DefaultConfig.StoragePermissionGroup())) {
+            XXPermissions.with(this).permission(DefaultConfig.StoragePermissionGroup()).request(new OnPermissionCallback() {
+                @Override
+                public void onGranted(List<String> permissions, boolean all) {
+                    if (all) {
+                        Toast.makeText(HomeActivity.this, "已获得存储权限", Toast.LENGTH_SHORT).show();
+                    }
+                }
 
-                        @Override
-                        public void onDenied(List<String> permissions, boolean never) {
-                            if (never) {
-                                Toast.makeText(HomeActivity.this, "获取存储权限失败,请在系统设置中开启", Toast.LENGTH_SHORT).show();
-                                XXPermissions.startPermissionActivity(HomeActivity.this, permissions);
-                            } else {
-                                Toast.makeText(HomeActivity.this, "获取存储权限失败", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-
+                @Override
+                public void onDenied(List<String> permissions, boolean never) {
+                    if (never) {
+                        Toast.makeText(HomeActivity.this, "获取存储权限失败,请在系统设置中开启", Toast.LENGTH_SHORT).show();
+                        XXPermissions.startPermissionActivity(HomeActivity.this, permissions);
+                    } else {
+                        Toast.makeText(HomeActivity.this, "获取存储权限失败", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 }

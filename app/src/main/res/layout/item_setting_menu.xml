@@ -27,11 +27,10 @@
         android:id="@+id/tvName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/vs_12"
+        android:layout_marginStart="@dimen/vs_20"
         android:focusable="false"
         android:gravity="center"
         android:textColor="@color/color_selector"
         android:textSize="@dimen/ts_24"
-        android:textStyle="bold"
         tools:text="关于" />
 </LinearLayout>

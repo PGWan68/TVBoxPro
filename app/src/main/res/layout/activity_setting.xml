@@ -5,14 +5,14 @@
     android:orientation="horizontal">
 
     <LinearLayout
-        android:layout_width="@dimen/vs_240"
+        android:layout_width="@dimen/vs_300"
         android:layout_height="match_parent">
 
         <com.owen.tvrecyclerview.widget.TvRecyclerView
             android:id="@+id/mGridView"
-            android:padding="@dimen/vs_30"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:padding="@dimen/vs_40" />
     </LinearLayout>
 
     <com.github.tvbox.osc.ui.tv.widget.NoScrollViewPager
