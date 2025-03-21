@@ -309,7 +309,7 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
         return themeColor;
     }
 
-    protected static BitmapDrawable globalWp = null;
+    public static BitmapDrawable globalWp = null;
 
     public void changeWallpaper(boolean force) {
         if (!force && globalWp != null) {

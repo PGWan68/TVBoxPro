@@ -38,7 +38,7 @@ import com.github.tvbox.osc.base.BaseLazyFragment;
 import com.github.tvbox.osc.bean.AbsSortXml;
 import com.github.tvbox.osc.bean.MovieSort;
 import com.github.tvbox.osc.bean.SourceBean;
-import com.github.tvbox.osc.bean.UrlBean;
+import com.github.tvbox.osc.bean.DataSourceBean;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.adapter.HomePageAdapter;
@@ -56,7 +56,6 @@ import com.github.tvbox.osc.util.AppManager;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
-import com.github.tvbox.osc.util.update.UpdateChecker;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.XXPermissions;
@@ -770,46 +769,46 @@ public class HomeActivity extends BaseActivity {
 
     // 影视资源选择
     private void showUrlSelectDialog() {
-        List<UrlBean> urlBeans = ApiConfig.get().getUrlBeans();
+        List<DataSourceBean> urlList = Hawk.get(HawkConfig.API_LIST);
 
-        if (!urlBeans.isEmpty()) {
-            SelectDialog<UrlBean> dialog = new SelectDialog<>(HomeActivity.this);
+        if (!urlList.isEmpty()) {
+            SelectDialog<DataSourceBean> dialog = new SelectDialog<>(HomeActivity.this);
 
             TvRecyclerView tvRecyclerView = dialog.findViewById(R.id.list);
             tvRecyclerView.setLayoutManager(new V7GridLayoutManager(dialog.getContext(), 2));
 
             String url = ApiConfig.get().getCurrentApiUrl();
             int position = 0;
-            for (UrlBean vodLine : urlBeans) {
+            for (DataSourceBean vodLine : urlList) {
                 if (Objects.equals(vodLine.getUrl(), url)) {
-                    position = urlBeans.indexOf(vodLine);
+                    position = urlList.indexOf(vodLine);
                 }
             }
 
             dialog.setTip(getString(R.string.dia_lines));
-            dialog.setAdapter(tvRecyclerView, new SelectDialogAdapter.SelectDialogInterface<UrlBean>() {
+            dialog.setAdapter(tvRecyclerView, new SelectDialogAdapter.SelectDialogInterface<DataSourceBean>() {
                 @Override
-                public void click(UrlBean value, int pos) {
+                public void click(DataSourceBean value, int pos) {
                     Hawk.put(HawkConfig.API_URL, value.getUrl());
                     ApiConfig.get().clear();
                     reloadHome();
                 }
 
                 @Override
-                public String getDisplay(UrlBean val) {
+                public String getDisplay(DataSourceBean val) {
                     return val.getName();
                 }
             }, new DiffUtil.ItemCallback<>() {
                 @Override
-                public boolean areItemsTheSame(@NonNull @NotNull UrlBean oldItem, @NonNull @NotNull UrlBean newItem) {
+                public boolean areItemsTheSame(@NonNull @NotNull DataSourceBean oldItem, @NonNull @NotNull DataSourceBean newItem) {
                     return oldItem == newItem;
                 }
 
                 @Override
-                public boolean areContentsTheSame(@NonNull @NotNull UrlBean oldItem, @NonNull @NotNull UrlBean newItem) {
+                public boolean areContentsTheSame(@NonNull @NotNull DataSourceBean oldItem, @NonNull @NotNull DataSourceBean newItem) {
                     return oldItem.getUrl().equals(newItem.getUrl());
                 }
-            }, urlBeans, position);
+            }, urlList, position);
             dialog.setOnDismissListener(dialog1 -> {
             });
             dialog.show();

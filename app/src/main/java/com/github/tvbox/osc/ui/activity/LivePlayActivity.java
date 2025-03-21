@@ -158,7 +158,7 @@ public class LivePlayActivity extends BaseActivity {
     private LiveEpgAdapter epgListAdapter;
 
     // Misc Variables
-    public final String epgStringAddress = Constant.EPG_XML_URL;
+    public final String epgStringAddress = Constant.DEFAULT_EPG_URL;
     SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final Handler mHandler = new Handler();
     private static LiveChannelItem channel_Name = null;

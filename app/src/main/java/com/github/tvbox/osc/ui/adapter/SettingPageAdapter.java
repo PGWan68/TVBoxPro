@@ -19,10 +19,6 @@ public class SettingPageAdapter extends FragmentPagerAdapter {
     public FragmentManager fragmentManager;
     public List<BaseLazyFragment> list;
 
-    public SettingPageAdapter(FragmentManager fm) {
-        super(fm);
-    }
-
     public SettingPageAdapter(FragmentManager fm, List<BaseLazyFragment> list) {
         super(fm);
         this.fragmentManager = fm;

@@ -13,7 +13,7 @@ public class HawkConfig {
     // URL Configurations
     public static final String API_URL = "api_url";
 
-    public static final String API_HISTORY = "api_history";
+    public static final String API_LIST = "api_list";
     public static final String LIVE_URL = "live_url";
     public static final String LIVE_HISTORY = "live_history";
     public static final String EPG_URL = "epg_url";

@@ -34,6 +34,7 @@ public class PushActivity extends BaseActivity {
         ivQRCode = findViewById(R.id.ivQRCode);
         tvAddress = findViewById(R.id.tvAddress);
         refreshQRCode();
+        findViewById(R.id.pushLocal).setVisibility(View.VISIBLE);
         findViewById(R.id.pushLocal).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

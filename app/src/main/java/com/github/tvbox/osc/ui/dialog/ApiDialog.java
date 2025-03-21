@@ -92,12 +92,12 @@ public class ApiDialog extends BaseDialog {
                     newApi = newApi.replace("./", "clan://localhost/");
                 }
                 if (!newApi.isEmpty()) {
-                    ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
+                    ArrayList<String> history = Hawk.get(HawkConfig.API_LIST, new ArrayList<String>());
                     if (!history.contains(newApi))
                         history.add(0, newApi);
                     if (history.size() > 20)
                         history.remove(20);
-                    Hawk.put(HawkConfig.API_HISTORY, history);
+                    Hawk.put(HawkConfig.API_LIST, history);
                     listener.onchange(newApi);
                     dismiss();
                 }
@@ -128,7 +128,7 @@ public class ApiDialog extends BaseDialog {
         findViewById(R.id.apiHistory).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
+                ArrayList<String> history = Hawk.get(HawkConfig.API_LIST, new ArrayList<String>());
                 if (history.isEmpty())
                     return;
                 String current = Hawk.get(HawkConfig.API_URL, "");
@@ -147,7 +147,7 @@ public class ApiDialog extends BaseDialog {
 
                     @Override
                     public void del(String value, ArrayList<String> data) {
-                        Hawk.put(HawkConfig.API_HISTORY, data);
+                        Hawk.put(HawkConfig.API_LIST, data);
                     }
                 }, history, idx);
                 dialog.show();

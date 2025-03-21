@@ -14,7 +14,7 @@ import com.github.tvbox.osc.bean.LiveChannelGroup;
 import com.github.tvbox.osc.bean.LiveChannelItem;
 import com.github.tvbox.osc.bean.ParseBean;
 import com.github.tvbox.osc.bean.SourceBean;
-import com.github.tvbox.osc.bean.UrlBean;
+import com.github.tvbox.osc.bean.DataSourceBean;
 import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.activity.HomeActivity;
 import com.github.tvbox.osc.util.AES;
@@ -61,14 +61,11 @@ import okhttp3.ResponseBody;
  * @description:
  */
 public class ApiConfig {
-    private static ApiConfig instance;
     private final LinkedHashMap<String, SourceBean> sourceBeanList;
     private SourceBean mHomeSource;
     private ParseBean mDefaultParse;
     private final List<LiveChannelGroup> liveChannelGroupList;
     private final List<ParseBean> parseBeanList;
-
-    private final List<UrlBean> urlBeans;
 
     private List<String> vipParseFlags;
     private List<IJKCode> ijkCodes;
@@ -88,20 +85,22 @@ public class ApiConfig {
         sourceBeanList = new LinkedHashMap<>();
         liveChannelGroupList = new ArrayList<>();
         parseBeanList = new ArrayList<>();
-        urlBeans = new ArrayList<>();
-        urlBeans.add(new UrlBean("饭太硬加强版", Constant.REMOTE_URL));
-//        urlBeans.add(new UrlBean("OK影视", proxy + "https://raw.githubusercontent.com/qist/tvbox/master/0825.json"));
+
+        List<DataSourceBean> apiList = Hawk.get(HawkConfig.API_LIST);
+        if (apiList == null || apiList.isEmpty()) {
+            List<DataSourceBean> data = new ArrayList<>();
+            data.add(new DataSourceBean("饭太硬加强版", Constant.DEFAULT_VOD_URL, true));
+            Hawk.put(HawkConfig.API_LIST, data);
+            Hawk.put(HawkConfig.API_URL, data.get(0).getUrl());
+        }
+    }
+
+    private static final class InstanceHolder {
+        private static final ApiConfig instance = new ApiConfig();
     }
 
     public static ApiConfig get() {
-        if (instance == null) {
-            synchronized (ApiConfig.class) {
-                if (instance == null) {
-                    instance = new ApiConfig();
-                }
-            }
-        }
-        return instance;
+        return InstanceHolder.instance;
     }
 
     public static String FindResult(String json, String configKey) {
@@ -359,8 +358,8 @@ public class ApiConfig {
 
         // takagen99: Check if Live URL is setup in Settings, if no, get from File Config
         liveChannelGroupList.clear();           // 修复从后台切换重复加载频道列表
-        String liveURL = Hawk.get(HawkConfig.LIVE_URL, "");
-        String epgURL = Hawk.get(HawkConfig.EPG_URL, "");
+        String liveURL = Hawk.get(HawkConfig.LIVE_URL, Constant.DEFAULT_LIVE_URL);
+        String epgURL = Hawk.get(HawkConfig.EPG_URL, Constant.DEFAULT_EPG_URL);
 
         String liveURL_final = null;
         try {
@@ -369,6 +368,7 @@ public class ApiConfig {
                 JsonObject livesOBJ = infoJson.get("lives").getAsJsonArray().get(0).getAsJsonObject();
                 String lives = livesOBJ.toString();
                 int index = lives.indexOf("proxy://");
+                // 使用了代理
                 if (index != -1) {
                     int endIndex = lives.lastIndexOf("\"");
                     String url = lives.substring(index, endIndex);
@@ -727,10 +727,6 @@ public class ApiConfig {
         return liveChannelGroupList;
     }
 
-    public List<UrlBean> getUrlBeans() {
-        return urlBeans;
-    }
-
     public List<IJKCode> getIjkCodes() {
         return ijkCodes;
     }
@@ -791,13 +787,7 @@ public class ApiConfig {
     }
 
     public String getCurrentApiUrl() {
-        String apiUrl = Hawk.get(HawkConfig.API_URL, HomeActivity.getRes().getString(R.string.app_source));
-        if (apiUrl.isEmpty() && !urlBeans.isEmpty()) {
-            apiUrl = urlBeans.get(0).getUrl();
-            Hawk.put(HawkConfig.API_URL, apiUrl);
-            return apiUrl;
-        }
-        return apiUrl;
+        return Hawk.get(HawkConfig.API_URL, Constant.DEFAULT_VOD_URL);
     }
 
 
@@ -805,7 +795,7 @@ public class ApiConfig {
      * 拉取远程配置
      */
     public void fetchRemoteSources() {
-        String remoteUrl = Constant.REMOTE_URL;
+        String remoteUrl = Constant.DEFAULT_VOD_URL;
 
         OkGo.<String>get(remoteUrl).cacheKey(remoteUrl).cacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST).execute(new StringCallback() {
 
@@ -821,7 +811,6 @@ public class ApiConfig {
                         String result = response.body();
                         if (result != null && !result.isEmpty()) {
 
-                            urlBeans.clear();
                             JsonObject json = new Gson().fromJson(result, JsonObject.class);
                             JsonArray urls = json.get("urls").getAsJsonArray();
                             for (JsonElement element : urls) {
@@ -834,7 +823,7 @@ public class ApiConfig {
 
                                 url = regex + url.substring(2);
 
-                                urlBeans.add(new UrlBean(name, url));
+                                // dataSourceBeans.add(new DataSourceBean(name, url));
                             }
                         }
                     }

@@ -3,10 +3,10 @@ package com.github.tvbox.osc.ui.activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -17,7 +17,6 @@ import com.github.tvbox.osc.base.BaseLazyFragment;
 import com.github.tvbox.osc.ui.adapter.SettingMenuAdapter;
 import com.github.tvbox.osc.ui.adapter.SettingPageAdapter;
 import com.github.tvbox.osc.ui.fragment.ModelSettingFragment;
-import com.github.tvbox.osc.ui.fragment.UserFragment;
 import com.github.tvbox.osc.util.AppManager;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.orhanobut.hawk.Hawk;
@@ -48,7 +47,9 @@ public class SettingActivity extends BaseActivity {
     private int homeRec;
     private int dnsOpt;
 
-    private List<SettingMenu> sortList = new ArrayList<>();
+    private FragmentManager fragmentManager;
+
+    private final List<SettingMenu> sortList = new ArrayList<>();
 
     @Override
     protected int getLayoutResID() {
@@ -62,6 +63,9 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void initView() {
+
+        fragmentManager = getSupportFragmentManager();
+
         mGridView = findViewById(R.id.mGridView);
         mViewPager = findViewById(R.id.mViewPager);
         sortAdapter = new SettingMenuAdapter();
@@ -85,20 +89,11 @@ public class SettingActivity extends BaseActivity {
         mGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             @Override
             public void onItemPreSelected(TvRecyclerView parent, View itemView, int position) {
-                if (itemView != null) {
-//                    TextView tvName = itemView.findViewById(R.id.tvName);
-//                    tvName.setTextColor(getResources().getColor(R.color.color_FFFFFF_70));
-                }
+
             }
 
             @Override
             public void onItemSelected(TvRecyclerView parent, View itemView, int position) {
-//                if (itemView != null) {
-//                    sortChange = true;
-//                    sortFocused = position;
-//                    TextView tvName = itemView.findViewById(R.id.tvName);
-//                    tvName.setTextColor(Color.WHITE);
-//                }
                 mViewPager.setCurrentItem(position, false);
             }
 
@@ -139,65 +134,45 @@ public class SettingActivity extends BaseActivity {
             fragments.add(ModelSettingFragment.newInstance(i));
         }
 
-        pageAdapter = new SettingPageAdapter(getSupportFragmentManager(), fragments);
+        pageAdapter = new SettingPageAdapter(fragmentManager, fragments);
         mViewPager.setAdapter(pageAdapter);
         mViewPager.setCurrentItem(0);
     }
 
-    private final Runnable mDataRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (sortChange) {
-                sortChange = false;
-                if (sortFocused != defaultSelected) {
-                    defaultSelected = sortFocused;
-//                    mViewPager.setCurrentItem(sortFocused, false);
-                }
-            }
-        }
-    };
-
-    private final Runnable mDevModeRun = new Runnable() {
-        @Override
-        public void run() {
-            devMode = "";
-        }
-    };
-
-
-    public interface DevModeCallback {
-        void onChange();
-    }
-
-    public static DevModeCallback callback = null;
+//    public interface DevModeCallback {
+//        void onChange();
+//    }
+//
+//    public static DevModeCallback callback = null;
 
     String devMode = "";
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            mHandler.removeCallbacks(mDataRunnable);
-            int keyCode = event.getKeyCode();
-            switch (keyCode) {
-                case KeyEvent.KEYCODE_0:
-                    mHandler.removeCallbacks(mDevModeRun);
-                    devMode += "0";
-                    mHandler.postDelayed(mDevModeRun, 200);
-                    if (devMode.length() >= 4) {
-                        if (callback != null) {
-                            callback.onChange();
-                        }
-                    }
-                    break;
-            }
-        } else if (event.getAction() == KeyEvent.ACTION_UP) {
-            mHandler.postDelayed(mDataRunnable, 200);
-        }
-        return super.dispatchKeyEvent(event);
-    }
+//    @Override
+//    public boolean dispatchKeyEvent(KeyEvent event) {
+//        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+//            mHandler.removeCallbacks(mDataRunnable);
+//            int keyCode = event.getKeyCode();
+//            switch (keyCode) {
+//                case KeyEvent.KEYCODE_0:
+//                    mHandler.removeCallbacks(mDevModeRun);
+//                    devMode += "0";
+//                    mHandler.postDelayed(mDevModeRun, 200);
+//                    if (devMode.length() >= 4) {
+//                        if (callback != null) {
+//                            callback.onChange();
+//                        }
+//                    }
+//                    break;
+//            }
+//        } else if (event.getAction() == KeyEvent.ACTION_UP) {
+//            mHandler.postDelayed(mDataRunnable, 200);
+//        }
+//        return super.dispatchKeyEvent(event);
+//    }
 
     @Override
     public void onBackPressed() {
+
         if ((homeSourceKey != null && !homeSourceKey.equals(Hawk.get(HawkConfig.HOME_API, ""))) || !currentApi.equals(Hawk.get(HawkConfig.API_URL, "")) || !currentLive.equals(Hawk.get(HawkConfig.LIVE_URL, "")) || homeRec != Hawk.get(HawkConfig.HOME_REC, 0) || dnsOpt != Hawk.get(HawkConfig.DOH_URL, 0)) {
             AppManager.getInstance().finishAllActivity();
             if (currentApi.equals(Hawk.get(HawkConfig.API_URL, "")) & (currentLive.equals(Hawk.get(HawkConfig.LIVE_URL, "")))) {
@@ -212,7 +187,7 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
-    public class SettingMenu {
+    public static class SettingMenu {
         public String name;
         public Drawable drawable;
 
@@ -220,6 +195,5 @@ public class SettingActivity extends BaseActivity {
             this.drawable = drawable;
             this.name = name;
         }
-
     }
 }

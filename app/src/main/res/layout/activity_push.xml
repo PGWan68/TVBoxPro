@@ -39,6 +39,7 @@
             android:background="@drawable/shape_user_focus"
             android:focusable="true"
             android:gravity="center"
+            android:visibility="gone"
             android:padding="@dimen/vs_10"
             android:text="推送剪贴板内容"
             android:textColor="@color/color_white"

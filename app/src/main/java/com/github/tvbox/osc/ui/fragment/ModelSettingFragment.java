@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
@@ -22,7 +23,9 @@ import com.github.tvbox.osc.bean.SourceBean;
 import com.github.tvbox.osc.player.thirdparty.Kodi;
 import com.github.tvbox.osc.player.thirdparty.MXPlayer;
 import com.github.tvbox.osc.player.thirdparty.ReexPlayer;
+import com.github.tvbox.osc.ui.activity.DataSourceActivity;
 import com.github.tvbox.osc.ui.activity.HomeActivity;
+import com.github.tvbox.osc.ui.activity.SettingActivity;
 import com.github.tvbox.osc.ui.adapter.SelectDialogAdapter;
 import com.github.tvbox.osc.ui.dialog.AboutDialog;
 import com.github.tvbox.osc.ui.dialog.BackupDialog;
@@ -283,22 +286,9 @@ public class ModelSettingFragment extends BaseLazyFragment {
 
     private void initDataSourceSettingView() {
         findViewById(R.id.tvDataSourceSetting).setVisibility(View.VISIBLE);
-
-        findViewById(R.id.llVodSource).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ToastUtils.showShort("点播源");
-            }
-        });
-
-
-        findViewById(R.id.llLiveSource).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ToastUtils.showShort("直播源");
-            }
-        });
-
+        findViewById(R.id.llVodSource).setOnClickListener(v -> DataSourceActivity.launchActivity(0));
+        findViewById(R.id.llLiveSource).setOnClickListener(v -> DataSourceActivity.launchActivity(1));
+        findViewById(R.id.llEpgSource).setOnClickListener(v -> DataSourceActivity.launchActivity(2));
     }
 
 
