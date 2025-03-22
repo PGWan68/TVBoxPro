@@ -120,27 +120,28 @@ public class JarLoader {
     }
 
     public Spider getSpider(String key, String cls, String ext, String jar) {
-        String clsKey = cls.replace("csp_", "");
-        String jarUrl = "";
-        String jarMd5 = "";
-        String jarKey = "";
-        if (jar.isEmpty()) {
-            jarKey = "main";
-        } else {
-            String[] urls = jar.split(";md5;");
-            jarUrl = urls[0];
-            jarKey = MD5.string2MD5(jarUrl);
-            jarMd5 = urls.length > 1 ? urls[1].trim() : "";
-        }
-        recentJarKey = jarKey;
-        if (spiders.containsKey(key)) return spiders.get(key);
-        DexClassLoader classLoader;
-        if (jarKey.equals("main")) classLoader = classLoaders.get("main");
-        else {
-            classLoader = loadJarInternal(jarUrl, jarMd5, jarKey);
-        }
-        if (classLoader == null) return new SpiderNull();
+
         try {
+            String clsKey = cls.replace("csp_", "");
+            String jarUrl = "";
+            String jarMd5 = "";
+            String jarKey = "";
+            if (jar.isEmpty()) {
+                jarKey = "main";
+            } else {
+                String[] urls = jar.split(";md5;");
+                jarUrl = urls[0];
+                jarKey = MD5.string2MD5(jarUrl);
+                jarMd5 = urls.length > 1 ? urls[1].trim() : "";
+            }
+            recentJarKey = jarKey;
+            if (spiders.containsKey(key)) return spiders.get(key);
+            DexClassLoader classLoader;
+            if (jarKey.equals("main")) classLoader = classLoaders.get("main");
+            else {
+                classLoader = loadJarInternal(jarUrl, jarMd5, jarKey);
+            }
+            if (classLoader == null) return new SpiderNull();
 
             Class<?> clazz = classLoader.loadClass("com.github.catvod.spider." + clsKey);
             if (clazz != null) {
@@ -153,8 +154,8 @@ public class JarLoader {
                 return sp;
             }
             return new SpiderNull();
-        } catch (Throwable th) {
-            LOG.e(th);
+        } catch (Exception e) {
+            LOG.e(e);
         }
         return new SpiderNull();
     }

@@ -60,7 +60,7 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            debuggable false
+//            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
 
@@ -70,14 +70,14 @@ android {
         }
 
         debug {
-            minifyEnabled false
-            shrinkResources false
-            debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            minifyEnabled false
+//            shrinkResources false
+////            debuggable true
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-            ndk {
-                abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
-            }
+//            ndk {
+//                abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
+//            }
         }
 
     }
