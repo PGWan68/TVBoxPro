@@ -13,10 +13,12 @@ import com.github.catvod.crawler.JarLoader;
 import com.github.catvod.crawler.JsLoader;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
+import com.github.tvbox.osc.bean.DataSourceBean;
 import com.github.tvbox.osc.callback.EmptyCallback;
 import com.github.tvbox.osc.callback.LoadingCallback;
 import com.github.tvbox.osc.data.AppDataManager;
 import com.github.tvbox.osc.server.ControlManager;
+import com.github.tvbox.osc.util.Constant;
 import com.github.tvbox.osc.util.EpgUtil;
 import com.github.tvbox.osc.util.FileUtils;
 import com.github.tvbox.osc.util.HawkConfig;
@@ -36,6 +38,8 @@ import com.yanzhenjie.andserver.Server;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
@@ -167,6 +171,37 @@ public class App extends MultiDexApplication {
         putDefault(HawkConfig.PARSE_WEBVIEW, true);          //嗅探Webview: true=系统自带, false=XWalkView
         putDefault(HawkConfig.DOH_URL, 0);                   //安全DNS: 0=关闭, 1=腾讯, 2=阿里, 3=360, 4=Google, 5=AdGuard, 6=Quad9
 
+
+        // 数据源
+        // 点播源
+        List<DataSourceBean> apiList = Hawk.get(HawkConfig.API_LIST);
+        if (apiList == null || apiList.isEmpty()) {
+            apiList = new ArrayList<>();
+            apiList.add(new DataSourceBean("饭太硬加强版", Constant.DEFAULT_VOD_URL, true, true));
+            apiList.add(new DataSourceBean("菜妮丝", Constant.DEFAULT_VOD_URL2, false, true));
+            apiList.add(new DataSourceBean("老刘备", Constant.DEFAULT_VOD_URL3, false, true));
+            Hawk.put(HawkConfig.API_LIST, apiList);
+            Hawk.put(HawkConfig.API_URL, apiList.get(0).getUrl());
+        }
+
+
+        // 直播源
+        List<DataSourceBean> liveList = Hawk.get(HawkConfig.LIVE_LIST);
+        if (liveList == null || liveList.isEmpty()) {
+            liveList = new ArrayList<>();
+            liveList.add(new DataSourceBean("IPTV加强版直播源", Constant.DEFAULT_LIVE_URL, true, true));
+            Hawk.put(HawkConfig.LIVE_LIST, liveList);
+            Hawk.put(HawkConfig.LIVE_URL, liveList.get(0).getUrl());
+        }
+
+        // EPG源
+        List<DataSourceBean> epgList = Hawk.get(HawkConfig.EPG_LIST);
+        if (epgList == null || epgList.isEmpty()) {
+            epgList = new ArrayList<>();
+            epgList.add(new DataSourceBean("范明明电子节目单", Constant.DEFAULT_EPG_URL, true, true));
+            Hawk.put(HawkConfig.EPG_LIST, epgList);
+            Hawk.put(HawkConfig.EPG_URL, epgList.get(0).getUrl());
+        }
     }
 
     private void initLocale() {

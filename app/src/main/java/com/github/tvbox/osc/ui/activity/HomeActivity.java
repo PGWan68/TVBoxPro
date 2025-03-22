@@ -799,26 +799,29 @@ public class HomeActivity extends BaseActivity {
      * 检查存储权限
      */
     private void checkPermissions() {
-
-        if (!XXPermissions.isGranted(this, DefaultConfig.StoragePermissionGroup())) {
-            XXPermissions.with(this).permission(DefaultConfig.StoragePermissionGroup()).request(new OnPermissionCallback() {
-                @Override
-                public void onGranted(List<String> permissions, boolean all) {
-                    if (all) {
-                        Toast.makeText(HomeActivity.this, "已获得存储权限", Toast.LENGTH_SHORT).show();
+        App.post(() -> {
+            if (!XXPermissions.isGranted(HomeActivity.this, DefaultConfig.StoragePermissionGroup())) {
+                XXPermissions.with(HomeActivity.this).permission(DefaultConfig.StoragePermissionGroup()).request(new OnPermissionCallback() {
+                    @Override
+                    public void onGranted(List<String> permissions, boolean all) {
+                        if (all) {
+                            Toast.makeText(HomeActivity.this, "已获得存储权限", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
 
-                @Override
-                public void onDenied(List<String> permissions, boolean never) {
-                    if (never) {
-                        Toast.makeText(HomeActivity.this, "获取存储权限失败,请在系统设置中开启", Toast.LENGTH_SHORT).show();
-                        XXPermissions.startPermissionActivity(HomeActivity.this, permissions);
-                    } else {
-                        Toast.makeText(HomeActivity.this, "获取存储权限失败", Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onDenied(List<String> permissions, boolean never) {
+                        if (never) {
+                            Toast.makeText(HomeActivity.this, "获取存储权限失败,请在系统设置中开启", Toast.LENGTH_SHORT).show();
+                            XXPermissions.startPermissionActivity(HomeActivity.this, permissions);
+                        } else {
+                            Toast.makeText(HomeActivity.this, "获取存储权限失败", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
+        }, 1200);
+
+
     }
 }

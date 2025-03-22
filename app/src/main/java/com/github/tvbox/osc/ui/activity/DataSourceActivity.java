@@ -83,11 +83,11 @@ public class DataSourceActivity extends BaseActivity {
         });
 
         adapter.setOnItemClickListener((adapter, view, position) -> {
-            showSelectDialog(position, view);
+            showSelectDialog(position);
         });
     }
 
-    private void showSelectDialog(int position, View view) {
+    private void showSelectDialog(int position) {
         DataSourceBean bean = adapter.getItem(position);
 
         if (bean != null) {
@@ -105,11 +105,9 @@ public class DataSourceActivity extends BaseActivity {
                     }
 
                     adapter.notifyDataSetChanged();
-
-                    Hawk.put(HawkConfig.API_URL, bean.getUrl());
-                    Hawk.put(HawkConfig.API_LIST, adapter.getData());
-
                     recyclerView.setSelection(position);
+
+                    saveDataSource(bean.getUrl(), adapter.getData());
                 }
 
                 @Override
@@ -163,18 +161,14 @@ public class DataSourceActivity extends BaseActivity {
     }
 
     private List<DataSourceBean> getDataFromLocal() {
-        List<DataSourceBean> data = new ArrayList<>();
-
         TextView tvTitle = findViewById(R.id.tvTitle);
 
         if (type == 1) { // 直播
             tvTitle.setText("直播源");
-            data.add(new DataSourceBean("IPTV加强版直播源", Constant.DEFAULT_LIVE_URL));
-            return data;
+            return Hawk.get(HawkConfig.LIVE_LIST);
         } else if (type == 2) { // 节目单
             tvTitle.setText("电子节目单");
-            data.add(new DataSourceBean("范明明电子节目单", Constant.DEFAULT_EPG_URL));
-            return data;
+            return Hawk.get(HawkConfig.EPG_LIST);
         } else { // 点播
             tvTitle.setText("点播源");
             return Hawk.get(HawkConfig.API_LIST);
@@ -185,5 +179,20 @@ public class DataSourceActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+    private void saveDataSource(String url, List<DataSourceBean> list) {
+        if (type == 1) { // 直播
+            Hawk.put(HawkConfig.LIVE_URL, url);
+            Hawk.put(HawkConfig.LIVE_LIST, list);
+        } else if (type == 2) { // 节目单
+            Hawk.put(HawkConfig.EPG_URL, url);
+            Hawk.put(HawkConfig.EPG_LIST, list);
+        } else {
+            Hawk.put(HawkConfig.API_URL, url);
+            Hawk.put(HawkConfig.API_LIST, list);
+        }
+
+
     }
 }

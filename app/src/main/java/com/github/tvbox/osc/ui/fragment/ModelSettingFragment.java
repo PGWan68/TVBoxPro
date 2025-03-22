@@ -286,7 +286,6 @@ public class ModelSettingFragment extends BaseLazyFragment {
 
     private void initDataSourceSettingView() {
         findViewById(R.id.tvDataSourceSetting).setVisibility(View.VISIBLE);
-
         findViewById(R.id.llVodSource).setOnClickListener(v -> DataSourceActivity.launchActivity(0));
         findViewById(R.id.llLiveSource).setOnClickListener(v -> DataSourceActivity.launchActivity(1));
         findViewById(R.id.llEpgSource).setOnClickListener(v -> DataSourceActivity.launchActivity(2));

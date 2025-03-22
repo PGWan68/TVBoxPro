@@ -104,22 +104,22 @@ public class ApiDialog extends BaseDialog {
                 // Capture Live input into Settings & Live History (max 20)
                 Hawk.put(HawkConfig.LIVE_URL, newLive);
                 if (!newLive.isEmpty()) {
-                    ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_HISTORY, new ArrayList<String>());
+                    ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_LIST, new ArrayList<String>());
                     if (!liveHistory.contains(newLive))
                         liveHistory.add(0, newLive);
                     if (liveHistory.size() > 20)
                         liveHistory.remove(20);
-                    Hawk.put(HawkConfig.LIVE_HISTORY, liveHistory);
+                    Hawk.put(HawkConfig.LIVE_LIST, liveHistory);
                 }
                 // Capture EPG input into Settings
                 Hawk.put(HawkConfig.EPG_URL, newEPG);
                 if (!newEPG.isEmpty()) {
-                    ArrayList<String> EPGHistory = Hawk.get(HawkConfig.EPG_HISTORY, new ArrayList<String>());
+                    ArrayList<String> EPGHistory = Hawk.get(HawkConfig.EPG_LIST, new ArrayList<String>());
                     if (!EPGHistory.contains(newEPG))
                         EPGHistory.add(0, newEPG);
                     if (EPGHistory.size() > 20)
                         EPGHistory.remove(20);
-                    Hawk.put(HawkConfig.EPG_HISTORY, EPGHistory);
+                    Hawk.put(HawkConfig.EPG_LIST, EPGHistory);
                 }
                 // Capture oroxy server input into Settings
                 Hawk.put(HawkConfig.PROXY_SERVER, newProxyServer);
@@ -156,7 +156,7 @@ public class ApiDialog extends BaseDialog {
         findViewById(R.id.liveHistory).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_HISTORY, new ArrayList<String>());
+                ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_LIST, new ArrayList<String>());
                 if (liveHistory.isEmpty())
                     return;
                 String current = Hawk.get(HawkConfig.LIVE_URL, "");
@@ -175,7 +175,7 @@ public class ApiDialog extends BaseDialog {
 
                     @Override
                     public void del(String value, ArrayList<String> data) {
-                        Hawk.put(HawkConfig.LIVE_HISTORY, data);
+                        Hawk.put(HawkConfig.LIVE_LIST, data);
                     }
                 }, liveHistory, idx);
                 dialog.show();
@@ -184,7 +184,7 @@ public class ApiDialog extends BaseDialog {
         findViewById(R.id.EPGHistory).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> EPGHistory = Hawk.get(HawkConfig.EPG_HISTORY, new ArrayList<String>());
+                ArrayList<String> EPGHistory = Hawk.get(HawkConfig.EPG_LIST, new ArrayList<String>());
                 if (EPGHistory.isEmpty())
                     return;
                 String current = Hawk.get(HawkConfig.EPG_URL, "");
@@ -203,7 +203,7 @@ public class ApiDialog extends BaseDialog {
 
                     @Override
                     public void del(String value, ArrayList<String> data) {
-                        Hawk.put(HawkConfig.EPG_HISTORY, data);
+                        Hawk.put(HawkConfig.EPG_LIST, data);
                     }
                 }, EPGHistory, idx);
                 dialog.show();

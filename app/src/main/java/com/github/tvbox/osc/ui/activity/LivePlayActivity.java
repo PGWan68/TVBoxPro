@@ -1679,7 +1679,7 @@ public class LivePlayActivity extends BaseActivity {
                 switch (position) {
                     case 0:
                         // takagen99 : Added Live History list selection - 直播列表
-                        ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_HISTORY, new ArrayList<String>());
+                        ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_LIST, new ArrayList<String>());
                         if (liveHistory.isEmpty()) return;
                         String current = Hawk.get(HawkConfig.LIVE_URL, "");
                         int idx = 0;
@@ -1703,7 +1703,7 @@ public class LivePlayActivity extends BaseActivity {
 
                             @Override
                             public void del(String value, ArrayList<String> data) {
-                                Hawk.put(HawkConfig.LIVE_HISTORY, data);
+                                Hawk.put(HawkConfig.LIVE_LIST, data);
                             }
                         }, liveHistory, idx);
                         dialog.show();

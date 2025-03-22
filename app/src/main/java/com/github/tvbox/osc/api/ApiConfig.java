@@ -1,13 +1,13 @@
 package com.github.tvbox.osc.api;
 
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Base64;
 
 import com.github.catvod.crawler.JarLoader;
 import com.github.catvod.crawler.JsLoader;
 import com.github.catvod.crawler.Spider;
-import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.bean.IJKCode;
 import com.github.tvbox.osc.bean.LiveChannelGroup;
@@ -16,7 +16,6 @@ import com.github.tvbox.osc.bean.ParseBean;
 import com.github.tvbox.osc.bean.SourceBean;
 import com.github.tvbox.osc.bean.DataSourceBean;
 import com.github.tvbox.osc.server.ControlManager;
-import com.github.tvbox.osc.ui.activity.HomeActivity;
 import com.github.tvbox.osc.util.AES;
 import com.github.tvbox.osc.util.AdBlocker;
 import com.github.tvbox.osc.util.Constant;
@@ -50,6 +49,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,16 +86,6 @@ public class ApiConfig {
         sourceBeanList = new LinkedHashMap<>();
         liveChannelGroupList = new ArrayList<>();
         parseBeanList = new ArrayList<>();
-
-        List<DataSourceBean> apiList = Hawk.get(HawkConfig.API_LIST);
-        if (apiList == null || apiList.isEmpty()) {
-            List<DataSourceBean> data = new ArrayList<>();
-            data.add(new DataSourceBean("饭太硬加强版", Constant.DEFAULT_VOD_URL, true, true));
-            data.add(new DataSourceBean("菜妮丝", Constant.DEFAULT_VOD_URL2, false, true));
-            data.add(new DataSourceBean("老刘备", Constant.DEFAULT_VOD_URL3, false, true));
-            Hawk.put(HawkConfig.API_LIST, data);
-            Hawk.put(HawkConfig.API_URL, data.get(0).getUrl());
-        }
     }
 
     private static final class InstanceHolder {
@@ -360,127 +351,82 @@ public class ApiConfig {
 
         // takagen99: Check if Live URL is setup in Settings, if no, get from File Config
         liveChannelGroupList.clear();           // 修复从后台切换重复加载频道列表
-        String liveURL = Hawk.get(HawkConfig.LIVE_URL, Constant.DEFAULT_LIVE_URL);
-        String epgURL = Hawk.get(HawkConfig.EPG_URL, Constant.DEFAULT_EPG_URL);
 
-        String liveURL_final = null;
         try {
             if (infoJson.has("lives") && infoJson.get("lives").getAsJsonArray() != null) {
-                // 这里只取了第一个用，需要改善
-                JsonObject livesOBJ = infoJson.get("lives").getAsJsonArray().get(0).getAsJsonObject();
-                String lives = livesOBJ.toString();
-                int index = lives.indexOf("proxy://");
-                // 使用了代理
-                if (index != -1) {
-                    int endIndex = lives.lastIndexOf("\"");
-                    String url = lives.substring(index, endIndex);
-                    url = DefaultConfig.checkReplaceProxy(url);
+                for (JsonElement item : infoJson.get("lives").getAsJsonArray()) {
+                    JsonObject livesOBJ = item.getAsJsonObject();
+                    String lives = livesOBJ.toString();
+                    int index = lives.indexOf("proxy://");
+                    // 使用了代理
 
-                    //clan
-                    String extUrl = Uri.parse(url).getQueryParameter("ext");
-                    if (extUrl != null && !extUrl.isEmpty()) {
-                        String extUrlFix;
-                        if (extUrl.startsWith("http") || extUrl.startsWith("clan://")) {
-                            extUrlFix = extUrl;
-                        } else {
-                            extUrlFix = new String(Base64.decode(extUrl, Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP), "UTF-8");
-                        }
-                        if (extUrlFix.startsWith("clan://")) {
-                            extUrlFix = clanContentFix(clanToAddress(apiUrl), extUrlFix);
-                        }
+                    // 使用了代理
+                    if (index != -1) {
+                        int endIndex = lives.lastIndexOf("\"");
+                        String url = lives.substring(index, endIndex);
+                        url = DefaultConfig.checkReplaceProxy(url);
 
-                        // takagen99: Capture Live URL into Config
-                        LOG.i("Live URL :" + extUrlFix);
-                        putLiveHistory(extUrlFix);
-                        // Overwrite with Live URL from Settings
-                        if (StringUtils.isBlank(liveURL)) {
-                            Hawk.put(HawkConfig.LIVE_URL, extUrlFix);
-                        } else {
-                            extUrlFix = liveURL;
-                        }
-
-                        // Final Live URL
-                        liveURL_final = extUrlFix;
-
-//                    // Encoding the Live URL
-//                    extUrlFix = Base64.encodeToString(extUrlFix.getBytes("UTF-8"), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP);
-//                    url = url.replace(extUrl, extUrlFix);
-                    }
-
-                    // takagen99 : Getting EPG URL from File Config & put into Settings
-                    if (livesOBJ.has("epg")) {
-                        String epg = livesOBJ.get("epg").getAsString();
-                        LOG.i("EPG URL :" + epg);
-                        putEPGHistory(epg);
-                        // Overwrite with EPG URL from Settings
-                        if (StringUtils.isBlank(epgURL)) {
-                            Hawk.put(HawkConfig.EPG_URL, epg);
-                        } else {
-                            Hawk.put(HawkConfig.EPG_URL, epgURL);
-                        }
-                    }
-
-//                // Populate Live Channel Listing
-//                LiveChannelGroup liveChannelGroup = new LiveChannelGroup();
-//                liveChannelGroup.setGroupName(url);
-//                liveChannelGroupList.add(liveChannelGroup);
-
-                } else {
-
-                    // if FongMi Live URL Formatting exists
-                    if (!lives.contains("type")) {
-                        loadLives(infoJson.get("lives").getAsJsonArray());
-                    } else {
-                        JsonObject fengMiLives = infoJson.get("lives").getAsJsonArray().get(0).getAsJsonObject();
-                        Hawk.put(HawkConfig.LIVE_PLAYER_TYPE, DefaultConfig.safeJsonInt(fengMiLives, "playerType", -1));
-                        String type = fengMiLives.get("type").getAsString();
-                        if (type.equals("0")) {
-                            String url = fengMiLives.get("url").getAsString();
-
-                            // takagen99 : Getting EPG URL from File Config & put into Settings
-                            if (fengMiLives.has("epg")) {
-                                String epg = fengMiLives.get("epg").getAsString();
-                                LOG.i("EPG URL :" + epg);
-                                putEPGHistory(epg);
-                                // Overwrite with EPG URL from Settings
-                                if (StringUtils.isBlank(epgURL)) {
-                                    Hawk.put(HawkConfig.EPG_URL, epg);
-                                } else {
-                                    Hawk.put(HawkConfig.EPG_URL, epgURL);
-                                }
+                        //clan
+                        String extUrl = Uri.parse(url).getQueryParameter("ext");
+                        if (extUrl != null && !extUrl.isEmpty()) {
+                            String extUrlFix;
+                            if (extUrl.startsWith("http") || extUrl.startsWith("clan://")) {
+                                extUrlFix = extUrl;
+                            } else {
+                                extUrlFix = new String(Base64.decode(extUrl, Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP), "UTF-8");
                             }
+                            if (extUrlFix.startsWith("clan://")) {
+                                extUrlFix = clanContentFix(clanToAddress(apiUrl), extUrlFix);
+                            }
+
+                            // takagen99: Capture Live URL into Config
+                            String name = livesOBJ.get("name").getAsString();
+                            putLiveHistory(name, extUrlFix);
+                        }
+
+//                        // takagen99 : Getting EPG URL from File Config & put into Settings
+//                        if (livesOBJ.has("epg")) {
+//                            String epg = livesOBJ.get("epg").getAsString();
+//                            LOG.i("EPG URL :" + epg);
+//                            putEPGHistory(epg);
+//                        }
+                    } else {
+                        Hawk.put(HawkConfig.LIVE_PLAYER_TYPE, DefaultConfig.safeJsonInt(livesOBJ, "playerType", -1));
+                        String type = livesOBJ.get("type").getAsString();
+                        if (type.equals("0")) {
+                            String url = livesOBJ.get("url").getAsString();
+                            String name = livesOBJ.get("name").getAsString();
+
+//                            // takagen99 : Getting EPG URL from File Config & put into Settings
+//                            if (livesOBJ.has("epg")) {
+//                                String epg = livesOBJ.get("epg").getAsString();
+//                                LOG.i("EPG URL :" + epg);
+//                                putEPGHistory(epg);
+//                                // Overwrite with EPG URL from Settings
+//                                if (StringUtils.isBlank(epgURL)) {
+//                                    Hawk.put(HawkConfig.EPG_URL, epg);
+//                                } else {
+//                                    Hawk.put(HawkConfig.EPG_URL, epgURL);
+//                                }
+//                            }
 
                             if (url.startsWith("http")) {
                                 // takagen99: Capture Live URL into Settings
-                                LOG.i("Live URL :" + url);
-                                putLiveHistory(url);
-                                // Overwrite with Live URL from Settings
-                                if (StringUtils.isBlank(liveURL)) {
-                                    Hawk.put(HawkConfig.LIVE_URL, url);
-                                } else {
-                                    url = liveURL;
-                                }
-
-                                // Final Live URL
-                                liveURL_final = url;
-
-//                            url = Base64.encodeToString(url.getBytes("UTF-8"), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP);
+                                putLiveHistory(name, url);
                             }
                         }
                     }
                 }
-
-                // takagen99: Load Live Channel from settings URL (WIP)
-                if (StringUtils.isBlank(liveURL_final)) {
-                    liveURL_final = liveURL;
-                }
-                liveURL_final = Base64.encodeToString(liveURL_final.getBytes("UTF-8"), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP);
-                liveURL_final = "http://127.0.0.1:9978/proxy?do=live&type=txt&ext=" + liveURL_final;
-                LiveChannelGroup liveChannelGroup = new LiveChannelGroup();
-                liveChannelGroup.setGroupName(liveURL_final);
-                liveChannelGroupList.add(liveChannelGroup);
             }
 
+            // takagen99: Load Live Channel from settings URL (WIP)
+            String url = Hawk.get(HawkConfig.LIVE_URL);
+            LOG.i("Live URL :" + url);
+            url = Base64.encodeToString(url.getBytes("UTF-8"), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP);
+            url = "http://127.0.0.1:9978/proxy?do=live&type=txt&ext=" + url;
+            LiveChannelGroup liveChannelGroup = new LiveChannelGroup();
+            liveChannelGroup.setGroupName(url);
+            liveChannelGroupList.add(liveChannelGroup);
 
         } catch (Throwable th) {
             th.printStackTrace();
@@ -587,21 +533,17 @@ public class ApiConfig {
         }
     }
 
-    private void putLiveHistory(String url) {
+    private void putLiveHistory(String name, String url) {
         if (!url.isEmpty()) {
-            ArrayList<String> liveHistory = Hawk.get(HawkConfig.LIVE_HISTORY, new ArrayList<String>());
-            if (!liveHistory.contains(url)) liveHistory.add(0, url);
-            if (liveHistory.size() > 20) liveHistory.remove(20);
-            Hawk.put(HawkConfig.LIVE_HISTORY, liveHistory);
-        }
-    }
+            List<DataSourceBean> liveList = Hawk.get(HawkConfig.LIVE_LIST);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                boolean isMatch = liveList.stream().anyMatch(dataSourceBean -> Objects.equals(dataSourceBean.getUrl(), url));
 
-    public static void putEPGHistory(String url) {
-        if (!url.isEmpty()) {
-            ArrayList<String> epgHistory = Hawk.get(HawkConfig.EPG_HISTORY, new ArrayList<String>());
-            if (!epgHistory.contains(url)) epgHistory.add(0, url);
-            if (epgHistory.size() > 20) epgHistory.remove(20);
-            Hawk.put(HawkConfig.EPG_HISTORY, epgHistory);
+                if (!isMatch) {
+                    liveList.add(new DataSourceBean(name, url));
+                    Hawk.put(HawkConfig.LIVE_LIST, liveList);
+                }
+            }
         }
     }
 
