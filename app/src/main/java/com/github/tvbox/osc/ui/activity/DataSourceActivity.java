@@ -120,9 +120,11 @@ public class DataSourceActivity extends BaseActivity {
 
                     List<DataSourceBean> beanList = adapter.getData();
                     // 如果删除的当前正好是选中的，则重新选择第一个
+                    String url = null;
                     if (bean.isCurrent()) {
-                        beanList.get(0).setCurrent(true);
-                        Hawk.put(HawkConfig.API_URL, beanList.get(0).getUrl());
+                        DataSourceBean item = beanList.get(0);
+                        item.setCurrent(true);
+                        url = item.getUrl();
                         recyclerView.setSelection(0);
                     } else {
                         // 焦点选中之前
@@ -134,7 +136,7 @@ public class DataSourceActivity extends BaseActivity {
                     }
 
                     adapter.notifyDataSetChanged();
-                    Hawk.put(HawkConfig.API_LIST, beanList);
+                    saveDataSource(url, beanList);
                 }
             });
         }
@@ -183,13 +185,13 @@ public class DataSourceActivity extends BaseActivity {
 
     private void saveDataSource(String url, List<DataSourceBean> list) {
         if (type == 1) { // 直播
-            Hawk.put(HawkConfig.LIVE_URL, url);
+            if (url != null) Hawk.put(HawkConfig.LIVE_URL, url);
             Hawk.put(HawkConfig.LIVE_LIST, list);
         } else if (type == 2) { // 节目单
-            Hawk.put(HawkConfig.EPG_URL, url);
+            if (url != null) Hawk.put(HawkConfig.EPG_URL, url);
             Hawk.put(HawkConfig.EPG_LIST, list);
         } else {
-            Hawk.put(HawkConfig.API_URL, url);
+            if (url != null) Hawk.put(HawkConfig.API_URL, url);
             Hawk.put(HawkConfig.API_LIST, list);
         }
 
