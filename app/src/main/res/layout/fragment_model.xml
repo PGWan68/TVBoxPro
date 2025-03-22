@@ -396,11 +396,13 @@
                         android:layout_weight="1" />
 
                     <TextView
+                        android:id="@+id/tvVodName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="默认"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/ts_24" />
+                        android:textSize="@dimen/ts_24"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
@@ -434,7 +436,8 @@
                         android:layout_height="wrap_content"
                         android:text="默认"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/ts_24" />
+                        android:textSize="@dimen/ts_24"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
@@ -469,7 +472,8 @@
                         android:layout_height="wrap_content"
                         android:text="默认"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/ts_24" />
+                        android:textSize="@dimen/ts_24"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 

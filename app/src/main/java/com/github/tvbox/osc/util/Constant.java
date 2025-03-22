@@ -4,7 +4,15 @@ public interface Constant {
 
     String GH_PROXY = "https://github.moeyy.xyz/";
 
+    // 饭太硬加强版
     String DEFAULT_VOD_URL = GH_PROXY + "https://raw.githubusercontent.com/qist/tvbox/master/0821.json";
+
+    // 菜妮丝
+    String DEFAULT_VOD_URL2 = "https://tv.菜妮丝.top";
+    // 老刘备
+    String DEFAULT_VOD_URL3 = "https://raw.liucn.cc/box/m.json";
+
+
     String DEFAULT_LIVE_URL = GH_PROXY + "https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u";
 
     String DEFAULT_EPG_URL = GH_PROXY + "https://raw.githubusercontent.com/fanmingming/live/refs/heads/main/e.xml";

@@ -30,6 +30,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.viewpager.widget.ViewPager;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.App;
@@ -402,8 +403,6 @@ public class HomeActivity extends BaseActivity {
             return;
         }
         ApiConfig.get().loadConfig(new ApiConfig.LoadConfigCallback() {
-            TipDialog dialog = null;
-
             @Override
             public void retry() {
                 mHandler.post(new Runnable() {
@@ -444,31 +443,12 @@ public class HomeActivity extends BaseActivity {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (dialog == null)
-                            dialog = new TipDialog(HomeActivity.this, msg, getString(R.string.hm_retry), getString(R.string.hm_cancel), new TipDialog.OnListener() {
-                                @Override
-                                public void left() {
-                                    dialog.hide();
-                                    initData();
-                                }
-
-                                @Override
-                                public void right() {
-                                    dialog.hide();
-                                    dataInitOk = true;
-                                    jarInitOk = true;
-                                    initData();
-                                }
-
-                                @Override
-                                public void cancel() {
-                                    dialog.hide();
-                                    dataInitOk = true;
-                                    jarInitOk = true;
-                                    initData();
-                                }
-                            });
-                        if (!dialog.isShowing()) dialog.show();
+                        dataInitOk = true;
+                        jarInitOk = true;
+                        initData();
+                        if (!msg.isEmpty()) {
+                            ToastUtils.showShort(msg);
+                        }
                     }
                 });
             }

@@ -29,7 +29,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class DataSourceActivity extends BaseActivity {
 
@@ -63,21 +65,25 @@ public class DataSourceActivity extends BaseActivity {
 
         List<DataSourceBean> list = getDataFromLocal();
 
-        list.add(new DataSourceBean("添加更多数据源", ""));
-
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new V7LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         adapter = new DataSourceAdapter(list);
         recyclerView.setAdapter(adapter);
 
-        adapter.setOnItemClickListener((adapter, view, position) -> {
-            // 最后一个条目
-            if (position == list.size() - 1) {
-                // 展示一个弹窗，显示二维码
-                showQrCodeDialog();
-            } else {
-                showSelectDialog(position, view);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).isCurrent()) {
+                recyclerView.setSelection(i);
+                break;
             }
+        }
+
+        // 展示一个弹窗，显示二维码
+        findViewById(R.id.tvAdd).setOnClickListener(v -> {
+            showQrCodeDialog();
+        });
+
+        adapter.setOnItemClickListener((adapter, view, position) -> {
+            showSelectDialog(position, view);
         });
     }
 
@@ -95,36 +101,42 @@ public class DataSourceActivity extends BaseActivity {
                     }
 
                     for (DataSourceBean sourceBean : adapter.getData()) {
-                        sourceBean.setCurrent(sourceBean.equals(bean));
+                        sourceBean.setCurrent(Objects.equals(sourceBean.getUrl(), bean.getUrl()));
                     }
 
-                    Hawk.put(HawkConfig.API_URL, bean.getUrl());
-                    final List<DataSourceBean> lastData = adapter.getData();
-                    lastData.remove(lastData.size() - 1);
-                    Hawk.put(HawkConfig.API_LIST, lastData);
-
-                    // TODO 会失去焦点
-                    view.requestFocus();
                     adapter.notifyDataSetChanged();
+
+                    Hawk.put(HawkConfig.API_URL, bean.getUrl());
+                    Hawk.put(HawkConfig.API_LIST, adapter.getData());
+
+                    recyclerView.setSelection(position);
                 }
 
                 @Override
                 public void onClickBtnSetDelete() {
-                    if (position == 0) {
+                    if (bean.isDefault()) {
                         ToastUtils.showShort("默认数据源不可删除");
                         return;
                     }
-
-                    // 重新选择第一个
-                    List<DataSourceBean> bean = adapter.getData();
-                    bean.get(0).setCurrent(true);
                     adapter.remove(position);
 
-                    Hawk.put(HawkConfig.API_URL, bean.get(0).getUrl());
-                    // TODO 会崩溃
-//                    final List<DataSourceBean> lastData = bean;
-//                    lastData.remove(lastData.size() - 1);
-//                    Hawk.put(HawkConfig.API_LIST, lastData);
+                    List<DataSourceBean> beanList = adapter.getData();
+                    // 如果删除的当前正好是选中的，则重新选择第一个
+                    if (bean.isCurrent()) {
+                        beanList.get(0).setCurrent(true);
+                        Hawk.put(HawkConfig.API_URL, beanList.get(0).getUrl());
+                        recyclerView.setSelection(0);
+                    } else {
+                        // 焦点选中之前
+                        for (int i = 0; i < beanList.size(); i++) {
+                            if (beanList.get(i).isCurrent()) {
+                                recyclerView.setSelection(i);
+                            }
+                        }
+                    }
+
+                    adapter.notifyDataSetChanged();
+                    Hawk.put(HawkConfig.API_LIST, beanList);
                 }
             });
         }
@@ -147,8 +159,7 @@ public class DataSourceActivity extends BaseActivity {
     }
 
     private void showQrCodeDialog() {
-        QRCodeDialog dialog = new QRCodeDialog(this);
-        dialog.show();
+        new QRCodeDialog(this).show();
     }
 
     private List<DataSourceBean> getDataFromLocal() {
@@ -166,17 +177,7 @@ public class DataSourceActivity extends BaseActivity {
             return data;
         } else { // 点播
             tvTitle.setText("点播源");
-
-            List<DataSourceBean> list = Hawk.get(HawkConfig.API_LIST);
-
-            list.add(new DataSourceBean("饭太硬二号", Constant.DEFAULT_VOD_URL));
-            list.add(new DataSourceBean("饭太硬3号", Constant.DEFAULT_VOD_URL));
-            list.add(new DataSourceBean("饭太硬4号", Constant.DEFAULT_VOD_URL));
-
-
-            return list;
-
-//            return Hawk.get(HawkConfig.API_LIST);
+            return Hawk.get(HawkConfig.API_LIST);
         }
     }
 

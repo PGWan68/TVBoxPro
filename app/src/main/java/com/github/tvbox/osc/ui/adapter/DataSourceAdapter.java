@@ -18,10 +18,8 @@ public class DataSourceAdapter extends BaseQuickAdapter<DataSourceBean, BaseView
 
     @Override
     protected void convert(@NonNull BaseViewHolder helper, DataSourceBean item) {
-        int position = helper.getLayoutPosition();
-        helper.setGone(R.id.tvUrl, !(position == 0 || position == getData().size() - 1));
+        helper.setGone(R.id.tvUrl, !item.isDefault());
         helper.setGone(R.id.ivChecked, item.isCurrent());
-
 
         helper.setText(R.id.tvName, item.getName());
         helper.setText(R.id.tvUrl, item.getUrl());

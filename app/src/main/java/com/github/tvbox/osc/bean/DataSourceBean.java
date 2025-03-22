@@ -1,13 +1,11 @@
 package com.github.tvbox.osc.bean;
-
-import java.util.Objects;
-
 public class DataSourceBean {
 
     private String name;
     private String url;
 
     private boolean isCurrent = false;
+    private boolean isDefault = false;
 
 
     public DataSourceBean(String name, String url) {
@@ -15,10 +13,11 @@ public class DataSourceBean {
         this.url = url;
     }
 
-    public DataSourceBean(String name, String url, boolean isCurrent) {
+    public DataSourceBean(String name, String url, boolean isCurrent, boolean isDefault) {
         this.name = name;
         this.url = url;
         this.isCurrent = isCurrent;
+        this.isDefault = isDefault;
     }
 
     public String getName() {
@@ -45,15 +44,11 @@ public class DataSourceBean {
         isCurrent = current;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        DataSourceBean that = (DataSourceBean) o;
-        return isCurrent == that.isCurrent && Objects.equals(name, that.name) && Objects.equals(url, that.url);
+    public boolean isDefault() {
+        return isDefault;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, url, isCurrent);
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
     }
 }

@@ -89,7 +89,9 @@ public class ApiConfig {
         List<DataSourceBean> apiList = Hawk.get(HawkConfig.API_LIST);
         if (apiList == null || apiList.isEmpty()) {
             List<DataSourceBean> data = new ArrayList<>();
-            data.add(new DataSourceBean("饭太硬加强版", Constant.DEFAULT_VOD_URL, true));
+            data.add(new DataSourceBean("饭太硬加强版", Constant.DEFAULT_VOD_URL, true, true));
+            data.add(new DataSourceBean("菜妮丝", Constant.DEFAULT_VOD_URL2, false, true));
+            data.add(new DataSourceBean("老刘备", Constant.DEFAULT_VOD_URL3, false, true));
             Hawk.put(HawkConfig.API_LIST, data);
             Hawk.put(HawkConfig.API_URL, data.get(0).getUrl());
         }
