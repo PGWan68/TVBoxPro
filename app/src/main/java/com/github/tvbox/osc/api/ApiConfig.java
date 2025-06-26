@@ -536,6 +536,8 @@ public class ApiConfig {
     private void putLiveHistory(String name, String url) {
         if (!url.isEmpty()) {
             List<DataSourceBean> liveList = Hawk.get(HawkConfig.LIVE_LIST);
+            if (liveList == null) return;
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 boolean isMatch = liveList.stream().anyMatch(dataSourceBean -> Objects.equals(dataSourceBean.getUrl(), url));
 

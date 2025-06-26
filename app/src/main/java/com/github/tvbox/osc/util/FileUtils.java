@@ -14,7 +14,9 @@ import com.google.gson.JsonObject;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.model.HttpHeaders;
 import com.orhanobut.hawk.Hawk;
+
 import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -31,6 +33,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import okhttp3.Response;
 
 public class FileUtils {
@@ -41,8 +44,7 @@ public class FileUtils {
 
     public static boolean writeSimple(byte[] data, File dst) {
         try {
-            if (dst.exists())
-                dst.delete();
+            if (dst.exists()) dst.delete();
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dst));
             bos.write(data);
             bos.close();
@@ -111,8 +113,7 @@ public class FileUtils {
 
     public static void recursiveDelete(File file) {
         try {
-            if (!file.exists())
-                return;
+            if (!file.exists()) return;
             if (file.isDirectory()) {
                 for (File f : file.listFiles()) {
                     recursiveDelete(f);
@@ -153,12 +154,9 @@ public class FileUtils {
             } else if (isAsFile(name, "js/lib")) {
                 return getAsOpen("js/lib/" + name);
             } else if (name.startsWith("file://")) {
-                return get(ControlManager.get()
-                    .getAddress(true) + "file/" + name.replace("file:///", "")
-                    .replace("file://", ""));
+                return get(ControlManager.get().getAddress(true) + "file/" + name.replace("file:///", "").replace("file://", ""));
             } else if (name.startsWith("clan://localhost/")) {
-                return get(ControlManager.get()
-                    .getAddress(true) + "file/" + name.replace("clan://localhost/", ""));
+                return get(ControlManager.get().getAddress(true) + "file/" + name.replace("clan://localhost/", ""));
             } else if (name.startsWith("clan://")) {
                 String substring = name.substring(7);
                 int indexOf = substring.indexOf(47);
@@ -242,14 +240,14 @@ public class FileUtils {
 
     public static void setCacheByte(String name, byte[] data) {
         try {
-            writeSimple(byteMerger("//DRPY".getBytes(),Base64.encode(data, Base64.URL_SAFE)), open("B_" + name));
+            writeSimple(byteMerger("//DRPY".getBytes(), Base64.encode(data, Base64.URL_SAFE)), open("B_" + name));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static byte[] byteMerger(byte[] bt1, byte[] bt2){
-        byte[] bt3 = new byte[bt1.length+bt2.length];
+    public static byte[] byteMerger(byte[] bt1, byte[] bt2) {
+        byte[] bt3 = new byte[bt1.length + bt2.length];
         System.arraycopy(bt1, 0, bt3, 0, bt1.length);
         System.arraycopy(bt2, 0, bt3, bt1.length, bt2.length);
         return bt3;
@@ -269,9 +267,9 @@ public class FileUtils {
                 }
                 response = OkGo.<String>get(str).headers(h).execute();
             } else {
-                response =OkGo.<String>get(str).headers("User-Agent", str.startsWith("https://gitcode.net/") ? UA.random() : "okhttp/3.15").execute();
+                response = OkGo.<String>get(str).headers("User-Agent", str.startsWith("https://gitcode.net/") ? UA.random() : "okhttp/3.15").execute();
             }
-            if (response.isSuccessful() && response.body() != null){
+            if (response.isSuccessful() && response.body() != null) {
                 return new String(response.body().bytes(), "UTF-8");
             } else {
                 return "";
@@ -286,13 +284,15 @@ public class FileUtils {
     public static File getCacheDir() {
         return App.getInstance().getCacheDir();
     }
+
     public static File getExternalCacheDir() {
         return App.getInstance().getExternalCacheDir();
     }
+
     public static String getExternalCachePath() {
         //部分机器getExternalCacheDir()会返回空
         File externalCacheDir = getExternalCacheDir();
-        if (externalCacheDir == null){
+        if (externalCacheDir == null) {
             return getCachePath();
         }
         return externalCacheDir.getAbsolutePath();
@@ -336,8 +336,7 @@ public class FileUtils {
         if (TextUtils.isEmpty(fileName)) return "";
         int p = fileName.lastIndexOf('.');
         if (p != -1) {
-            return fileName.substring(p)
-                .toLowerCase();
+            return fileName.substring(p).toLowerCase();
         }
         return "";
     }
@@ -368,9 +367,16 @@ public class FileUtils {
             return "";
         }
     }
+
     public static File getLocal(String path) {
         File file1 = new File(path.replace("file:/", ""));
         File file2 = new File(path.replace("file:/", Environment.getExternalStorageDirectory().getAbsolutePath()));
         return file2.exists() ? file2 : file1.exists() ? file1 : new File(path);
+    }
+
+    public static void clearFileCache() {
+        recursiveDelete(getCacheDir());
+        recursiveDelete(getExternalCacheDir());
+        cleanPlayerCache();
     }
 }
