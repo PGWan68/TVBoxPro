@@ -2,7 +2,7 @@ package com.github.tvbox.osc.util;
 
 public interface Constant {
 
-    String GH_PROXY = "https://gh-proxy.com/";
+    String GH_PROXY = "https://github.moeyy.xyz/";
 
     // 饭太硬加强版
     String DEFAULT_VOD_URL = "http://www.饭太硬.net/tv";

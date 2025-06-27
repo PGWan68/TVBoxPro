@@ -460,18 +460,23 @@ public class LivePlayActivity extends BaseActivity {
                     case KeyEvent.KEYCODE_DPAD_LEFT:
                         // takagen99 : To cater for newer Android w no Menu button
                         // playPreSource();
-                        if (!isVOD) {
-                            showSettingGroup();
-                        } else {
-                            showChannelInfo();
-                        }
+//                        if (!isVOD) {
+//                            showSettingGroup();
+//                        } else {
+//                            showChannelInfo();
+//                        }
+                        showChannelList();
                         break;
                     case KeyEvent.KEYCODE_DPAD_RIGHT:
-                        if (!isVOD) {
-                            playNextSource();
-                        } else {
-                            showChannelInfo();
-                        }
+//                        if (!isVOD) {
+//                            playNextSource();
+//                        } else {
+//                            showChannelInfo();
+//                        }
+
+                        showChannelInfo();
+                        // TODO 频道信息和设置合并
+                        // showSettingGroup();
                         break;
                     case KeyEvent.KEYCODE_DPAD_CENTER:
                     case KeyEvent.KEYCODE_ENTER:
@@ -721,9 +726,9 @@ public class LivePlayActivity extends BaseActivity {
                 return;
             }
         }
-        Epginfo epginfo = new Epginfo(date, "暂无节目信息", date, "00:00", "23:59", 0);
-        epginfos = new ArrayList<>();
-        epginfos.add(epginfo);
+//        Epginfo epginfo = new Epginfo(date, "暂无节目信息", date, "00:00", "23:59", 0);
+//        epginfos = new ArrayList<>();
+//        epginfos.add(epginfo);
         epgListAdapter.CanBack(false);
         epgListAdapter.setNewData(epginfos);
     }
@@ -926,13 +931,13 @@ public class LivePlayActivity extends BaseActivity {
         return true;
     }
 
-    //节目播放
-    private boolean playChannel(int channelGroupIndex, int liveChannelIndex, boolean changeSource) {
+    /// 直播视频播放
+    private void playChannel(int channelGroupIndex, int liveChannelIndex, boolean changeSource) {
         if ((channelGroupIndex == currentChannelGroupIndex && liveChannelIndex == currentLiveChannelIndex && !changeSource) || (changeSource && currentLiveChannelItem.getSourceNum() == 1)) {
             showChannelInfo();
-            return true;
+            return;
         }
-        if (mVideoView == null) return true;
+        if (mVideoView == null) return;
         mVideoView.release();
         if (!changeSource) {
             currentChannelGroupIndex = channelGroupIndex;
@@ -961,7 +966,6 @@ public class LivePlayActivity extends BaseActivity {
         mVideoView.setUrl(currentLiveChannelItem.getUrl(), setPlayHeaders(currentLiveChannelItem.getUrl()));
         showChannelInfo();
         mVideoView.start();
-        return true;
     }
 
     private void playNext() {
@@ -1085,23 +1089,26 @@ public class LivePlayActivity extends BaseActivity {
                         break;
                     case VideoView.STATE_PREPARED:
                         // takagen99 : Retrieve Video Resolution & Retrieve Video Duration
-                        if (mVideoView.getVideoSize().length >= 2) {
+                        if (mVideoView.getVideoSize()[0] > 0 && mVideoView.getVideoSize()[1] > 0) {
                             tv_size.setVisibility(View.VISIBLE);
                             tv_size.setText(mVideoView.getVideoSize()[0] + " x " + mVideoView.getVideoSize()[1]);
+                        } else {
+                            tv_size.setVisibility(View.GONE);
                         }
                         // Show SeekBar if it's a VOD (with duration)
-                        int duration = (int) mVideoView.getDuration();
-                        if (duration > 0) {
-                            isVOD = true;
-                            llSeekBar.setVisibility(View.VISIBLE);
-                            mSeekBar.setProgress(10);
-                            mSeekBar.setMax(duration);
-                            mSeekBar.setProgress(0);
-                            mTotalTime.setText(stringForTimeVod(duration));
-                        } else {
-                            isVOD = false;
-                            llSeekBar.setVisibility(View.GONE);
-                        }
+                        // 暂时隐藏
+//                        int duration = (int) mVideoView.getDuration();
+//                        if (duration > 0) {
+//                            isVOD = true;
+//                            llSeekBar.setVisibility(View.VISIBLE);
+//                            mSeekBar.setProgress(10);
+//                            mSeekBar.setMax(duration);
+//                            mSeekBar.setProgress(0);
+//                            mTotalTime.setText(stringForTimeVod(duration));
+//                        } else {
+//                            isVOD = false;
+//                            llSeekBar.setVisibility(View.GONE);
+//                        }
                         break;
                     case VideoView.STATE_BUFFERED:
                     case VideoView.STATE_PLAYING:
@@ -1148,6 +1155,7 @@ public class LivePlayActivity extends BaseActivity {
         mVideoView.setProgressManager(null);
     }
 
+    ///  直播源播放失败自动切换
     private final Runnable mConnectTimeoutChangeSourceRun = new Runnable() {
         @Override
         public void run() {

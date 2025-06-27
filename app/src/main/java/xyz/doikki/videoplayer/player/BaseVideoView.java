@@ -199,14 +199,13 @@ public class BaseVideoView<P extends AbstractPlayer> extends FrameLayout
 
     /**
      * 第一次播放
-     * @return 是否成功开始播放
      */
-    protected boolean startPlay() {
+    protected void startPlay() {
         //如果要显示移动网络提示则不继续播放
         if (showNetWarning()) {
             //中止播放
             setPlayState(STATE_START_ABORT);
-            return false;
+            return;
         }
         //监听音频焦点改变
         if (mEnableAudioFocus) {
@@ -224,7 +223,6 @@ public class BaseVideoView<P extends AbstractPlayer> extends FrameLayout
         initPlayer();
         addDisplay();
         startPrepare(false);
-        return true;
     }
 
     /**

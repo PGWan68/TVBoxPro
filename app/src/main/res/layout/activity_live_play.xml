@@ -242,6 +242,7 @@
 
     </LinearLayout>
 
+<!--    右侧设置位置-->
     <LinearLayout
         android:id="@+id/tvRightSettingLayout"
         android:layout_width="wrap_content"
