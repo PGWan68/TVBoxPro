@@ -1,4 +1,4 @@
-package com.github.tvbox.osc.ui.activity;
+package com.github.tvbox.osc.ui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,10 +10,12 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
-import com.github.tvbox.osc.base.BaseActivity;
+import com.github.tvbox.osc.base.BaseLazyFragment;
 import com.github.tvbox.osc.cache.RoomDataManger;
 import com.github.tvbox.osc.cache.VodCollect;
 import com.github.tvbox.osc.event.RefreshEvent;
+import com.github.tvbox.osc.ui.activity.DetailActivity;
+import com.github.tvbox.osc.ui.activity.SearchActivity;
 import com.github.tvbox.osc.ui.adapter.CollectAdapter;
 import com.github.tvbox.osc.ui.dialog.ConfirmClearDialog;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
@@ -28,7 +30,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CollectActivity extends BaseActivity {
+public class CollectFragment extends BaseLazyFragment {
+
     private TextView tvDelTip;
     private ImageView tvDelete;
     private ImageView tvClear;
@@ -36,9 +39,10 @@ public class CollectActivity extends BaseActivity {
     public static CollectAdapter collectAdapter;
     private boolean delMode = false;
 
+
     @Override
     protected int getLayoutResID() {
-        return R.layout.activity_collect;
+        return R.layout.fragment_collect;
     }
 
     @Override
@@ -46,6 +50,7 @@ public class CollectActivity extends BaseActivity {
         initView();
         initData();
     }
+
 
     private void toggleDelMode() {
         // takagen99: Toggle Delete Mode
@@ -79,7 +84,11 @@ public class CollectActivity extends BaseActivity {
         tvClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ConfirmClearDialog dialog = new ConfirmClearDialog(mContext, "Collect");
+                ConfirmClearDialog dialog = new ConfirmClearDialog(mContext, () -> {
+                    collectAdapter.setNewData(new ArrayList<>());
+                    collectAdapter.notifyDataSetChanged();
+                    RoomDataManger.deleteVodCollectAll();
+                });
                 dialog.show();
             }
         });
@@ -167,17 +176,17 @@ public class CollectActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onDetach() {
+        super.onDetach();
         EventBus.getDefault().unregister(this);
     }
 
-    @Override
-    public void onBackPressed() {
-        if (delMode) {
-            toggleDelMode();
-            return;
-        }
-        super.onBackPressed();
-    }
+//    @Override
+//    public void onBackPressed() {
+//        if (delMode) {
+//            toggleDelMode();
+//            return;
+//        }
+//        super.onBackPressed();
+//    }
 }

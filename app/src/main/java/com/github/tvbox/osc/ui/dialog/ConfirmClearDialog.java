@@ -5,24 +5,18 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-
 import com.github.tvbox.osc.R;
-import com.github.tvbox.osc.bean.VodInfo;
-import com.github.tvbox.osc.cache.RoomDataManger;
-import com.github.tvbox.osc.cache.VodCollect;
-import com.github.tvbox.osc.ui.activity.CollectActivity;
-import com.github.tvbox.osc.ui.activity.HistoryActivity;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ConfirmClearDialog extends BaseDialog {
     private final TextView tvYes;
     private final TextView tvNo;
 
-    public ConfirmClearDialog(@NonNull @NotNull Context context, String type) {
+
+//    public
+
+    public ConfirmClearDialog(@NonNull @NotNull Context context,ClearConfirmCallback callback) {
         super(context);
         setContentView(R.layout.dialog_confirm);
         setCanceledOnTouchOutside(true);
@@ -32,21 +26,8 @@ public class ConfirmClearDialog extends BaseDialog {
         tvYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // if removing all Favorites
-                if (type == "Collect") {
-                    List<VodCollect> vodInfoList = new ArrayList<>();
-                    CollectActivity.collectAdapter.setNewData(vodInfoList);
-                    CollectActivity.collectAdapter.notifyDataSetChanged();
-                    RoomDataManger.deleteVodCollectAll();
-                    // if removing all History
-                } else if (type == "History") {
-                    List<VodInfo> vodInfoList = new ArrayList<>();
-                    HistoryActivity.historyAdapter.setNewData(vodInfoList);
-                    HistoryActivity.historyAdapter.notifyDataSetChanged();
-                    RoomDataManger.deleteVodRecordAll();
-                }
-
                 ConfirmClearDialog.this.dismiss();
+                callback.clearConfirm();
             }
         });
         tvNo.setOnClickListener(new View.OnClickListener() {
@@ -55,6 +36,11 @@ public class ConfirmClearDialog extends BaseDialog {
                 ConfirmClearDialog.this.dismiss();
             }
         });
+    }
+
+
+    public interface ClearConfirmCallback{
+         void clearConfirm();
     }
 
 }
