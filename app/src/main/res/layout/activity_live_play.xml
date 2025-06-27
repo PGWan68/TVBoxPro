@@ -476,7 +476,8 @@
                     android:text="1920 x 1080"
                     android:textColor="@color/color_white"
                     android:textSize="@dimen/ts_15"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tv_source"
