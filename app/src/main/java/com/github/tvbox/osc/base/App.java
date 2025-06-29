@@ -1,18 +1,14 @@
 package com.github.tvbox.osc.base;
 
-import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.webkit.MimeTypeMap;
 
 import androidx.core.os.HandlerCompat;
 import androidx.multidex.MultiDexApplication;
 
-import com.github.catvod.crawler.JarLoader;
 import com.github.catvod.crawler.JsLoader;
 import com.github.tvbox.osc.R;
-import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.bean.DataSourceBean;
 import com.github.tvbox.osc.callback.EmptyCallback;
 import com.github.tvbox.osc.callback.LoadingCallback;
@@ -22,8 +18,8 @@ import com.github.tvbox.osc.util.Constant;
 import com.github.tvbox.osc.util.EpgUtil;
 import com.github.tvbox.osc.util.FileUtils;
 import com.github.tvbox.osc.util.HawkConfig;
-import com.github.tvbox.osc.util.LocaleHelper;
 import com.github.tvbox.osc.util.LOG;
+import com.github.tvbox.osc.util.LocaleHelper;
 import com.github.tvbox.osc.util.OkGoHelper;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.github.tvbox.osc.util.SubtitleHelper;
@@ -37,7 +33,6 @@ import com.yanzhenjie.andserver.AndServer;
 import com.yanzhenjie.andserver.Server;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -190,6 +185,7 @@ public class App extends MultiDexApplication {
         if (liveList == null || liveList.isEmpty()) {
             liveList = new ArrayList<>();
             liveList.add(new DataSourceBean("IPTV加强版直播源", Constant.DEFAULT_LIVE_URL, true, true));
+            liveList.add(new DataSourceBean("局域网直播源", Constant.DEFAULT_LIVE_URL2, false, true));
             Hawk.put(HawkConfig.LIVE_LIST, liveList);
             Hawk.put(HawkConfig.LIVE_URL, liveList.get(0).getUrl());
         }
