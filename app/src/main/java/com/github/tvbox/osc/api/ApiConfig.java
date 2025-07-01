@@ -208,29 +208,27 @@ public class ApiConfig {
      */
     public void loadJar(String spider, LoadConfigCallback callback) {
         String[] urls = spider.split(";md5;");
-        String jarUrl = urls[0];
         String md5 = urls.length > 1 ? urls[1].trim() : "";
-        File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/csp.jar");
-
-        if (!md5.isEmpty() && cache.exists() && MD5.getFileMd5(cache).equalsIgnoreCase(md5)) {
-
+        File jarFile = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/csp.jar");
+        if (!md5.isEmpty() && jarFile.exists() && MD5.getFileMd5(jarFile).equalsIgnoreCase(md5)) {
             // 缓冲中加载Jar成功直接返回，如果没有成功，继续从网络加载
-            if (jarLoader.load(cache.getAbsolutePath())) {
+            if (jarLoader.load(jarFile)) {
                 callback.success();
                 return;
             }
         }
 
+        String jarUrl = urls[0];
         boolean isJarInImg = jarUrl.startsWith("img+");
         jarUrl = jarUrl.replace("img+", "");
         OkGo.<File>get(jarUrl).headers("User-Agent", userAgent).headers("Accept", requestAccept).execute(new AbsCallback<File>() {
 
             @Override
             public File convertResponse(okhttp3.Response response) throws Throwable {
-                File cacheDir = cache.getParentFile();
+                File cacheDir = jarFile.getParentFile();
                 if (cacheDir != null && !cacheDir.exists()) cacheDir.mkdirs();
-                if (cache.exists()) cache.delete();
-                FileOutputStream fos = new FileOutputStream(cache);
+                if (jarFile.exists()) jarFile.delete();
+                FileOutputStream fos = new FileOutputStream(jarFile);
                 ResponseBody body = response.body();
                 if (body != null) {
                     if (isJarInImg) {
@@ -243,15 +241,15 @@ public class ApiConfig {
                 }
                 fos.flush();
                 fos.close();
-                return cache;
+                return jarFile;
             }
 
             @Override
             public void onSuccess(Response<File> response) {
 
-                File file = response.body();
-                if (file.exists()) {
-                    if (jarLoader.load(file.getAbsolutePath())) {
+                File jarFile = response.body();
+                if (jarFile.exists()) {
+                    if (jarLoader.load(jarFile)) {
                         callback.success();
                     } else {
                         callback.error("从网络上加载jar写入缓存后加载失败");
@@ -269,19 +267,10 @@ public class ApiConfig {
         });
     }
 
-    private void parseJson(String apiUrl, File f) throws Throwable {
-        LOG.i("从本地缓存加载" + f.getAbsolutePath());
-        BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
-        StringBuilder sb = new StringBuilder();
-        String s = "";
-        while ((s = bReader.readLine()) != null) {
-            sb.append(s + "\n");
-        }
-        bReader.close();
-        parseJson(apiUrl, sb.toString());
-    }
 
     private void parseJson(String apiUrl, String jsonStr) {
+
+//        LOG.i(jsonStr);
 
         JsonObject infoJson = new Gson().fromJson(jsonStr, JsonObject.class);
         // spider

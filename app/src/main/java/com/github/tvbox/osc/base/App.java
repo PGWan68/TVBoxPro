@@ -98,7 +98,7 @@ public class App extends MultiDexApplication {
     }
 
     private void initBugly() {
-        CrashReport.initCrashReport(getApplicationContext(), "1efbca1553", false);
+        CrashReport.initCrashReport(getApplicationContext(), "1efbca1553", true);
     }
 
     private void updateCacheFile() {
