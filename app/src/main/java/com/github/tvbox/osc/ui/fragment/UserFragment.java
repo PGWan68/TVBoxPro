@@ -50,7 +50,6 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
     private LinearLayout tvSearch;
     private LinearLayout tvSetting;
     private LinearLayout tvHistory;
-    private LinearLayout tvCollect;
     private LinearLayout tvPush;
     public static HomeHotVodAdapter homeHotVodAdapter;
     public static TvRecyclerView tvHotListForGrid;
@@ -72,7 +71,6 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         tvLive = findViewById(R.id.tvLive);
         tvSearch = findViewById(R.id.tvSearch);
         tvSetting = findViewById(R.id.tvSetting);
-        tvCollect = findViewById(R.id.tvFavorite);
         tvHistory = findViewById(R.id.tvHistory);
         tvPush = findViewById(R.id.tvPush);
         tvDrive.setOnClickListener(this);
@@ -81,14 +79,12 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         tvSetting.setOnClickListener(this);
         tvHistory.setOnClickListener(this);
         tvPush.setOnClickListener(this);
-        tvCollect.setOnClickListener(this);
         tvDrive.setOnFocusChangeListener(focusChangeListener);
         tvLive.setOnFocusChangeListener(focusChangeListener);
         tvSearch.setOnFocusChangeListener(focusChangeListener);
         tvSetting.setOnFocusChangeListener(focusChangeListener);
         tvHistory.setOnFocusChangeListener(focusChangeListener);
         tvPush.setOnFocusChangeListener(focusChangeListener);
-        tvCollect.setOnFocusChangeListener(focusChangeListener);
         tvHotListForLine = findViewById(R.id.tvHotListForLine);
         tvHotListForGrid = findViewById(R.id.tvHotListForGrid);
         tvHotListForGrid.setHasFixedSize(true);
@@ -295,8 +291,6 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
             jumpActivity(HistoryActivity.class);
         } else if (v.getId() == R.id.tvPush) {
             jumpActivity(PushActivity.class);
-        } else if (v.getId() == R.id.tvFavorite) {
-            jumpActivity(CollectActivity.class);
         } else if (v.getId() == R.id.tvDrive) {
             jumpActivity(DriveActivity.class);
         }

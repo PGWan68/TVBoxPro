@@ -78,9 +78,6 @@
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true" />
         <activity
-            android:name=".ui.activity.CollectActivity"
-            android:screenOrientation="sensorLandscape" />
-        <activity
             android:name=".ui.activity.PushActivity"
             android:screenOrientation="sensorLandscape" />
         <activity
