@@ -12,8 +12,7 @@ public interface Constant {
     // 老刘备
     String DEFAULT_VOD_URL3 = "https://raw.liucn.cc/box/m.json";
 
-    String DEFAULT_LIVE_URL = GH_PROXY + "https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u";
-    String DEFAULT_LIVE_URL2 = "http://192.168.1.18:35456/m3u/2";
+    String DEFAULT_LIVE_URL = "http://192.168.1.18:35456/m3u/2";
 
     String DEFAULT_EPG_URL = GH_PROXY + "https://raw.githubusercontent.com/fanmingming/live/refs/heads/main/e.xml";
 
